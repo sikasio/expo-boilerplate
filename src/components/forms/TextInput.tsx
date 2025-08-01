@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   TextInput as RNTextInput,
@@ -6,8 +6,8 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Text } from './Text';
-import { Icon, IconName } from './Icon';
+import { Text } from '../ui/Text';
+import { Icon, IconName } from '../ui/Icon';
 
 interface TextInputProps extends RNTextInputProps {
   label?: string;
@@ -29,7 +29,6 @@ export function TextInput({
   ...props
 }: TextInputProps) {
   const { theme } = useTheme();
-  const [isFocused, setIsFocused] = useState(false);
 
   const getInputStyle = () => {
     return {
@@ -37,7 +36,10 @@ export function TextInput({
       fontSize: theme.fontSizes.md,
       color: theme.colors.text,
       paddingHorizontal: leftIcon || rightIcon ? theme.sizes.sm : theme.sizes.md,
-      includeFontPadding: false,
+      paddingVertical: theme.sizes.sm,
+      minHeight: 40,
+      textAlign: 'left' as const,
+      writingDirection: 'ltr' as const,
     };
   };
 
@@ -48,25 +50,13 @@ export function TextInput({
       backgroundColor: theme.colors.surface,
       flexDirection: 'row' as const,
       alignItems: 'center' as const,
-      height: 48,
+      minHeight: theme.sizes.xxl, // Use theme size instead of hardcoded 48
     };
 
     if (error) {
       return {
         ...baseStyle,
         borderColor: theme.colors.error,
-      };
-    }
-
-    if (isFocused) {
-      return {
-        ...baseStyle,
-        borderColor: theme.colors.primary,
-        shadowColor: theme.colors.primary,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 2,
       };
     }
 
@@ -96,16 +86,17 @@ export function TextInput({
             <Icon
               name={leftIcon}
               color={theme.colors.textSecondary}
-              size={20}
+              size={theme.fontSizes.lg} // Use theme font size instead of hardcoded 20
             />
           </View>
         )}
 
         <RNTextInput
-          style={[getInputStyle()]}
+          style={getInputStyle()}
           placeholderTextColor={theme.colors.placeholder}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          editable={props.editable !== false}
+          selectTextOnFocus={true}
+          textAlign="left"
           {...props}
         />
 
@@ -114,7 +105,7 @@ export function TextInput({
             <Icon
               name={rightIcon}
               color={theme.colors.textSecondary}
-              size={20}
+              size={theme.fontSizes.lg} // Use theme font size instead of hardcoded 20
             />
           </View>
         )}
