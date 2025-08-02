@@ -1,5 +1,6 @@
 export { Text } from './Text';
 export { Button } from './Button';
+export { ButtonGroup } from './ButtonGroup';
 export { Card } from './Card';
 export { LoadingSpinner } from './LoadingSpinner';
 export { TabBarIcon } from './TabBarIcon';
@@ -9,3 +10,4 @@ export { ThemeToast } from './ThemeToast';
 export { Icon } from './Icon';
 export type { IconName } from './Icon';
 export type { CardVariant, CardSize, CardColorScheme } from './Card';
+export type { ButtonGroupOrientation, ButtonGroupVariant, ButtonGroupSize, ButtonGroupItem } from './ButtonGroup';

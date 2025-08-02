@@ -17,7 +17,7 @@ interface ContainerProps extends ViewProps {
 export function Container({
   children,
   safeArea = true,
-  padding = 'medium',
+  padding = 'large',
   backgroundColor,
   style,
   ...props
@@ -27,9 +27,18 @@ export function Container({
   const getContainerStyle = () => {
     const paddingStyles = {
       none: {},
-      small: { padding: theme.sizes.sm },
-      medium: { padding: theme.sizes.md },
-      large: { padding: theme.sizes.lg },
+      small: { 
+        paddingHorizontal: theme.sizes.sm,
+        paddingTop: theme.sizes.md,
+      },
+      medium: { 
+        paddingHorizontal: theme.sizes.md,
+        paddingTop: theme.sizes.md,
+      },
+      large: { 
+        paddingHorizontal: theme.sizes.lg,
+        paddingTop: theme.sizes.lg,
+      },
     };
 
     const baseStyle = {
@@ -41,11 +50,26 @@ export function Container({
     return baseStyle;
   };
 
-  const Wrapper = safeArea ? SafeAreaView : View;
+  const getSafeAreaStyle = () => {
+    return {
+      flex: 1,
+      backgroundColor: backgroundColor || theme.colors.background,
+    };
+  };
+
+  if (safeArea) {
+    return (
+      <SafeAreaView style={[getSafeAreaStyle(), { paddingTop: 0 }]} {...props}>
+        <View style={[getContainerStyle(), style]}>
+          {children}
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <Wrapper style={[getContainerStyle(), style]} {...props}>
+    <View style={[getContainerStyle(), style]} {...props}>
       {children}
-    </Wrapper>
+    </View>
   );
 }
