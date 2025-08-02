@@ -80,7 +80,7 @@ export function Card({
     switch (size) {
       case 'small':
         return {
-          borderRadius: theme.sizes.sm,
+          borderRadius: theme.borderRadius.sm,
           minHeight: 80,
           titleSize: theme.fontSizes.md,
           subtitleSize: theme.fontSizes.sm,
@@ -88,7 +88,7 @@ export function Card({
         };
       case 'large':
         return {
-          borderRadius: theme.sizes.lg,
+          borderRadius: theme.borderRadius.lg,
           minHeight: 160,
           titleSize: theme.fontSizes.xl,
           subtitleSize: theme.fontSizes.md,
@@ -96,7 +96,7 @@ export function Card({
         };
       default: // medium
         return {
-          borderRadius: theme.sizes.md,
+          borderRadius: theme.borderRadius.md,
           minHeight: 120,
           titleSize: theme.fontSizes.lg,
           subtitleSize: theme.fontSizes.md,
@@ -218,6 +218,14 @@ export function Card({
     }
   };
 
+  const getBadgeStyle = () => ({
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: theme.borderRadius.md,
+    marginLeft: 8,
+    backgroundColor: getBadgeColor(),
+  });
+
   const renderHeader = () => {
     if (!title && !subtitle && !headerIcon && !headerActions && !badge) return null;
 
@@ -262,7 +270,7 @@ export function Card({
         
         <View style={styles.headerRight}>
           {badge && (
-            <View style={[styles.badge, { backgroundColor: getBadgeColor() }]}>
+            <View style={getBadgeStyle()}>
               <Text variant="caption" style={styles.badgeText}>
                 {badge}
               </Text>
@@ -377,12 +385,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     lineHeight: 20,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 8,
   },
   badgeText: {
     color: 'white',

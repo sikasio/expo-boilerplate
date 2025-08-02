@@ -106,7 +106,7 @@ export function ButtonGroup({
 
     // Attached style
     const baseStyle: ViewStyle = {
-      borderRadius: 0,
+      borderRadius: theme.borderRadius.none,
     };
 
     if (fullWidth && orientation === 'horizontal') {

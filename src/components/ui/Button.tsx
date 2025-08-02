@@ -43,7 +43,7 @@ export function Button({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: theme.sizes.sm,
+      borderRadius: theme.borderRadius.sm,
       borderWidth: 1,
     };
 

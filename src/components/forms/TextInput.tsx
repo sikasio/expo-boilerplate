@@ -46,7 +46,7 @@ export function TextInput({
   const getContainerStyle = () => {
     const baseStyle = {
       borderWidth: 1,
-      borderRadius: theme.sizes.sm,
+      borderRadius: theme.borderRadius.sm,
       backgroundColor: theme.colors.surface,
       flexDirection: 'row' as const,
       alignItems: 'center' as const,

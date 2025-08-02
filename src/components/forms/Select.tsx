@@ -257,7 +257,7 @@ export function Select({
   const getSelectButtonStyle = () => {
     const baseStyle = {
       borderWidth: 1,
-      borderRadius: theme.sizes.sm,
+      borderRadius: theme.borderRadius.sm,
       backgroundColor: theme.colors.surface,
       flexDirection: 'row' as const,
       alignItems: 'center' as const,
@@ -410,7 +410,7 @@ export function Select({
               maxWidth: 500, // Maximum width for tablets
               height: optimalHeight,
               backgroundColor: theme.colors.surface,
-              borderRadius: theme.sizes.md,
+              borderRadius: theme.borderRadius.md,
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.25,

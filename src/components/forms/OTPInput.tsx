@@ -98,7 +98,7 @@ export function OTPInput({
       width: 48,
       height: 48,
       borderWidth: 1,
-      borderRadius: theme.sizes.sm,
+      borderRadius: theme.borderRadius.sm,
       backgroundColor: theme.colors.surface,
       textAlign: 'center' as const,
       fontSize: theme.fontSizes.lg,
@@ -193,7 +193,7 @@ export function OTPInput({
             paddingHorizontal: theme.sizes.md,
             paddingVertical: theme.sizes.xs,
             backgroundColor: theme.colors.textSecondary + '20',
-            borderRadius: theme.sizes.xs,
+            borderRadius: theme.borderRadius.xs,
           }}
         >
           <Text variant="caption" style={{ color: theme.colors.textSecondary }}>

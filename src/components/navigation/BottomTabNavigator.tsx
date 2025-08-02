@@ -37,7 +37,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
           bottom: Platform.OS === 'ios' ? 15 : 15,
           marginHorizontal: 16,
           backgroundColor: theme.colors.surface,
-          borderRadius: 30,
+          borderRadius: theme.borderRadius.xxl,
           paddingTop: 15,
           paddingBottom: Platform.OS === 'ios' ? 25 : 15,
           height: Platform.OS === 'ios' ? 75 : 65,
@@ -47,16 +47,6 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
           shadowOpacity: 0.15,
           shadowRadius: 12,
           elevation: 15,
-        };
-
-      case 'bubble':
-        return {
-          ...baseStyle,
-          backgroundColor: 'transparent',
-          borderTopWidth: 0,
-          paddingTop: Platform.OS === 'ios' ? 12 : 10,
-          paddingBottom: Platform.OS === 'ios' ? 30 : 15,
-          height: Platform.OS === 'ios' ? 90 : 75,
         };
 
       default:
@@ -86,15 +76,15 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-          <View 
+          <View
             key={`bubble-container-${state.index}`}
             style={{
               flex: 1,
               flexDirection: 'row',
               backgroundColor: theme.colors.surface,
-              borderRadius: 30,
-              paddingHorizontal: 12,
-              paddingVertical: 12,
+              borderRadius: theme.borderRadius.xxl,
+              paddingHorizontal: 10,
+              paddingVertical: 10,
               shadowColor: theme.colors.text,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.2,
@@ -103,7 +93,6 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
               justifyContent: 'center',
             }}>
             {state.routes.map((route: any, index: number) => {
-              const { options } = descriptors[route.key];
               const isFocused = state.index === index;
               const tab = tabs.find(t => t.name === route.name);
 
@@ -131,7 +120,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
                     paddingHorizontal: isFocused ? 16 : 8,
                     paddingVertical: 8,
                     marginHorizontal: 4,
-                    borderRadius: 20,
+                    borderRadius: theme.borderRadius.lg,
                     backgroundColor: isFocused
                       ? theme.colors.primary + '20'
                       : 'transparent',

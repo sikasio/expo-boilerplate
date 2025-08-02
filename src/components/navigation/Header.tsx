@@ -38,16 +38,6 @@ export function Header({
 }: HeaderProps) {
   const { theme } = useTheme();
 
-  const getPaddingHorizontal = () => {
-    switch (paddingHorizontal) {
-      case 'none': return 0;
-      case 'small': return theme.sizes.sm;
-      case 'medium': return theme.sizes.md;
-      case 'large': return theme.sizes.lg;
-      default: return theme.sizes.lg;
-    }
-  };
-
   const getMarginBottom = () => {
     switch (marginBottom) {
       case 'none': return 0;
@@ -67,7 +57,7 @@ export function Header({
       paddingVertical: theme.sizes.sm,
       marginBottom: getMarginBottom(),
       backgroundColor: backgroundColor || theme.colors.surface,
-      borderRadius: theme.sizes.md,
+      borderRadius: theme.borderRadius.md,
       borderBottomWidth: borderBottom ? 1 : 0,
       borderBottomColor: theme.colors.border,
       shadowColor: theme.colors.text,

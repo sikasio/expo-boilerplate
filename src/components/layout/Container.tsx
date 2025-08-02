@@ -17,7 +17,7 @@ interface ContainerProps extends ViewProps {
 export function Container({
   children,
   safeArea = true,
-  padding = 'large',
+  padding = 'medium',
   backgroundColor,
   style,
   ...props
@@ -27,15 +27,15 @@ export function Container({
   const getContainerStyle = () => {
     const paddingStyles = {
       none: {},
-      small: { 
+      small: {
         paddingHorizontal: theme.sizes.sm,
         paddingTop: theme.sizes.md,
       },
-      medium: { 
+      medium: {
         paddingHorizontal: theme.sizes.md,
         paddingTop: theme.sizes.md,
       },
-      large: { 
+      large: {
         paddingHorizontal: theme.sizes.lg,
         paddingTop: theme.sizes.lg,
       },

@@ -57,7 +57,7 @@ export function BackButton({
           fontSize: theme.fontSizes.sm,
           padding: theme.sizes.xs,
           minHeight: 32,
-          borderRadius: theme.sizes.xs,
+          borderRadius: theme.borderRadius.xs,
         };
       case 'large':
         return {
@@ -65,7 +65,7 @@ export function BackButton({
           fontSize: theme.fontSizes.lg,
           padding: theme.sizes.md,
           minHeight: 48,
-          borderRadius: theme.sizes.sm,
+          borderRadius: theme.borderRadius.sm,
         };
       default: // medium
         return {
@@ -73,7 +73,7 @@ export function BackButton({
           fontSize: theme.fontSizes.md,
           padding: theme.sizes.sm,
           minHeight: 40,
-          borderRadius: theme.sizes.xs,
+          borderRadius: theme.borderRadius.xs,
         };
     }
   };
