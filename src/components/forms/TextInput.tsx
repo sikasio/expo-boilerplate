@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
   ViewStyle,
+  TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Text } from '../ui/Text';
@@ -16,6 +17,7 @@ interface TextInputProps extends RNTextInputProps {
   leftIcon?: IconName;
   rightIcon?: IconName;
   containerStyle?: ViewStyle;
+  showPasswordToggle?: boolean;
 }
 
 export function TextInput({
@@ -26,16 +28,43 @@ export function TextInput({
   rightIcon,
   containerStyle,
   style,
+  secureTextEntry,
+  showPasswordToggle = true,
   ...props
 }: TextInputProps) {
   const { theme } = useTheme();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  // Detect if this is a password field with toggle enabled
+  const isPasswordField = Boolean(secureTextEntry);
+  const shouldShowPasswordToggle = isPasswordField && showPasswordToggle;
+  
+  // Determine the actual secureTextEntry value
+  const actualSecureTextEntry = shouldShowPasswordToggle ? !isPasswordVisible : Boolean(secureTextEntry);
+  
+  // Determine the right icon to show
+  const getEffectiveRightIcon = (): IconName | undefined => {
+    if (shouldShowPasswordToggle) {
+      return isPasswordVisible ? 'eye-off-outline' : 'eye-outline';
+    }
+    return rightIcon;
+  };
+
+  const togglePasswordVisibility = () => {
+    if (shouldShowPasswordToggle) {
+      setIsPasswordVisible(!isPasswordVisible);
+    }
+  };
+
+  // Determine if right icon should be interactive
+  const isRightIconInteractive = shouldShowPasswordToggle;
 
   const getInputStyle = () => {
     return {
       flex: 1,
       fontSize: theme.fontSizes.md,
       color: theme.colors.text,
-      paddingHorizontal: leftIcon || rightIcon ? theme.sizes.sm : theme.sizes.md,
+      paddingHorizontal: leftIcon || getEffectiveRightIcon() ? theme.sizes.sm : theme.sizes.md,
       paddingVertical: theme.sizes.sm,
       minHeight: 40,
       textAlign: 'left' as const,
@@ -97,17 +126,27 @@ export function TextInput({
           editable={props.editable !== false}
           selectTextOnFocus={true}
           textAlign="left"
+          secureTextEntry={actualSecureTextEntry}
           {...props}
         />
 
-        {rightIcon && (
-          <View style={{ paddingRight: theme.sizes.md }}>
+        {getEffectiveRightIcon() && (
+          <TouchableOpacity
+            onPress={isRightIconInteractive ? togglePasswordVisibility : undefined}
+            style={{ 
+              paddingRight: theme.sizes.md,
+              paddingLeft: theme.sizes.xs,
+              justifyContent: 'center',
+            }}
+            activeOpacity={isRightIconInteractive ? 0.7 : 1}
+            disabled={!isRightIconInteractive}
+          >
             <Icon
-              name={rightIcon}
+              name={getEffectiveRightIcon()!}
               color={theme.colors.textSecondary}
-              size={theme.fontSizes.lg} // Use theme font size instead of hardcoded 20
+              size={theme.fontSizes.lg}
             />
-          </View>
+          </TouchableOpacity>
         )}
       </View>
 

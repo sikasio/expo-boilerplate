@@ -10,6 +10,7 @@ export type HeaderMarginBottom = 'none' | 'small' | 'medium' | 'large';
 interface HeaderProps extends ViewProps {
   title?: string;
   subtitle?: string;
+  titleSize?: keyof typeof import('../../constants').FONT_SIZES;
   showBackButton?: boolean;
   backButtonProps?: Partial<BackButtonProps>;
   leftComponent?: React.ReactNode;
@@ -24,6 +25,7 @@ interface HeaderProps extends ViewProps {
 export function Header({
   title,
   subtitle,
+  titleSize = 'lg',
   showBackButton = true,
   backButtonProps,
   leftComponent,
@@ -126,7 +128,7 @@ export function Header({
             <Text
               variant="subtitle"
               style={{
-                fontSize: theme.fontSizes.lg,
+                fontSize: theme.fontSizes[titleSize],
                 fontWeight: '600',
                 textAlign: 'center',
                 width: '100%',
