@@ -15,7 +15,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 type ButtonSize = 'small' | 'medium' | 'large';
 
 interface ButtonProps extends TouchableOpacityProps {
-  title: string;
+  title?: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
@@ -143,7 +143,7 @@ export function Button({
       ) : (
         <>
           {leftIcon && (
-            <View style={{ marginRight: theme.sizes.sm }}>
+            <View style={{ marginRight: title ? theme.sizes.sm : 0 }}>
               <Icon 
                 name={leftIcon} 
                 color={getTextColor()} 
@@ -152,18 +152,20 @@ export function Button({
             </View>
           )}
           
-          <Text
-            style={{
-              color: getTextColor(),
-              fontSize: getFontSize(),
-              fontWeight: '600',
-            }}
-          >
-            {title}
-          </Text>
+          {title && (
+            <Text
+              style={{
+                color: getTextColor(),
+                fontSize: getFontSize(),
+                fontWeight: '600',
+              }}
+            >
+              {title}
+            </Text>
+          )}
           
           {rightIcon && (
-            <View style={{ marginLeft: theme.sizes.sm }}>
+            <View style={{ marginLeft: title ? theme.sizes.sm : 0 }}>
               <Icon 
                 name={rightIcon} 
                 color={getTextColor()} 
