@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { AppState } from '../types';
-import { NotificationService } from '../services';
 
 interface AppContextType {
   state: AppState;
@@ -49,10 +48,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  useEffect(() => {
-    // Initialize notifications
-    NotificationService.initialize();
-  }, []);
+  // Removed notification service initialization
 
   const setLoading = (loading: boolean) => {
     dispatch({ type: 'SET_LOADING', payload: loading });
