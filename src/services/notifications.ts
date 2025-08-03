@@ -1,5 +1,4 @@
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
 
 export class NotificationService {
   static async initialize(): Promise<void> {

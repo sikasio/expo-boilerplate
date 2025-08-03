@@ -14,7 +14,7 @@ import { Button } from './Button';
 
 export type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled';
 export type CardSize = 'small' | 'medium' | 'large';
-export type CardColorScheme = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error';
+export type CardColorScheme = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost';
 
 interface CardAction {
   label: string;
@@ -31,22 +31,24 @@ interface CardProps extends ViewProps {
   size?: CardSize;
   colorScheme?: CardColorScheme;
   padding?: 'none' | 'small' | 'medium' | 'large';
-  
+
   // Header section
   title?: string;
   subtitle?: string;
   headerIcon?: IconName;
   headerActions?: React.ReactNode;
-  
+  headerSpacing?: 'none' | 'small' | 'medium' | 'large' | 'xl';
+  headerBorder?: boolean;
+
   // Footer section
   footer?: React.ReactNode;
   actions?: CardAction[];
-  
+
   // Visual enhancements
   image?: React.ReactNode;
   badge?: string;
   badgeColor?: CardColorScheme;
-  
+
   // Layout options
   horizontal?: boolean;
   disabled?: boolean;
@@ -63,6 +65,8 @@ export function Card({
   subtitle,
   headerIcon,
   headerActions,
+  headerSpacing = 'medium',
+  headerBorder = false,
   footer,
   actions,
   image,
@@ -143,6 +147,13 @@ export function Card({
           titleColor: theme.colors.error,
           badgeColor: theme.colors.error,
         };
+      case 'ghost':
+        return {
+          backgroundColor: 'transparent',
+          borderColor: 'transparent',
+          titleColor: theme.colors.text,
+          badgeColor: theme.colors.primary,
+        };
       default:
         return {
           backgroundColor: theme.colors.surface,
@@ -160,9 +171,9 @@ export function Card({
     const baseStyle: ViewStyle = {
       backgroundColor: schemeColors.backgroundColor,
       borderRadius: sizeDimensions.borderRadius,
-      minHeight: sizeDimensions.minHeight,
       flexDirection: horizontal ? 'row' : 'column',
       overflow: 'hidden',
+      marginBottom: theme.sizes.md,
     };
 
     const paddingStyles = {
@@ -226,11 +237,43 @@ export function Card({
     backgroundColor: getBadgeColor(),
   });
 
+  const getHeaderBottomMargin = () => {
+    if (!title && !subtitle && !headerIcon && !headerActions && !badge) return 0;
+    if (children) {
+      switch (headerSpacing) {
+        case 'none': return 0;
+        case 'small': return theme.sizes.sm;
+        case 'medium': return theme.sizes.md;
+        case 'large': return theme.sizes.lg;
+        case 'xl': return theme.sizes.xl;
+        default: return theme.sizes.md;
+      }
+    }
+    return 0;
+  };
+
+  const getHeaderStyle = () => {
+    const baseStyle = {
+      marginBottom: getHeaderBottomMargin(),
+    };
+
+    if (headerBorder && children) {
+      return {
+        ...baseStyle,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.border,
+        paddingBottom: theme.sizes.sm,
+      };
+    }
+
+    return baseStyle;
+  };
+
   const renderHeader = () => {
     if (!title && !subtitle && !headerIcon && !headerActions && !badge) return null;
 
     return (
-      <View style={styles.header}>
+      <View style={[styles.header, getHeaderStyle()]}>
         <View style={styles.headerLeft}>
           {headerIcon && (
             <Icon
@@ -267,7 +310,7 @@ export function Card({
             )}
           </View>
         </View>
-        
+
         <View style={styles.headerRight}>
           {badge && (
             <View style={getBadgeStyle()}>
@@ -360,7 +403,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 12,
   },
   headerLeft: {
     flexDirection: 'row',

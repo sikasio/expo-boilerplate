@@ -6,6 +6,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { TabBarIcon } from '../ui/TabBarIcon';
 import { IconName } from '../ui/Icon';
 import { Text } from '../ui/Text';
+import { getTabBarDimensions, NAVIGATION_CONSTANTS, TabNavigatorDesign } from '../../config/navigation';
 
 export interface TabConfig {
   name: string;
@@ -13,8 +14,6 @@ export interface TabConfig {
   icon: IconName;
   iconFocused: IconName;
 }
-
-export type TabNavigatorDesign = 'default' | 'floating' | 'bubble';
 
 interface BottomTabNavigatorProps {
   tabs: TabConfig[];
@@ -25,6 +24,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
   const { theme } = useTheme();
 
   const getTabBarStyle = () => {
+    const dimensions = getTabBarDimensions(design);
     const baseStyle = {
       backgroundColor: theme.colors.surface,
       borderTopColor: theme.colors.border,
@@ -34,13 +34,13 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
       case 'floating':
         return {
           position: 'absolute' as const,
-          bottom: Platform.OS === 'ios' ? 15 : 15,
+          bottom: dimensions.bottomOffset,
           marginHorizontal: 16,
           backgroundColor: theme.colors.surface,
           borderRadius: theme.borderRadius.xxl,
-          paddingTop: 15,
-          paddingBottom: Platform.OS === 'ios' ? 25 : 15,
-          height: Platform.OS === 'ios' ? 75 : 65,
+          paddingTop: dimensions.paddingTop,
+          paddingBottom: dimensions.paddingBottom,
+          height: dimensions.height,
           borderTopWidth: 0,
           shadowColor: theme.colors.text,
           shadowOffset: { width: 0, height: 4 },
@@ -52,9 +52,9 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
       default:
         return {
           ...baseStyle,
-          paddingTop: Platform.OS === 'ios' ? 8 : 0,
-          paddingBottom: Platform.OS === 'ios' ? 22 : 0,
-          height: Platform.OS === 'ios' ? 75 : 60,
+          paddingTop: dimensions.paddingTop,
+          paddingBottom: dimensions.paddingBottom,
+          height: dimensions.height,
           shadowColor: theme.colors.text,
           shadowOffset: { width: 0, height: -1 },
           shadowOpacity: 0.05,
@@ -66,10 +66,11 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
 
   const CustomTabBar = ({ state, descriptors, navigation }: any) => {
     if (design === 'bubble') {
+      const dimensions = getTabBarDimensions(design);
       return (
         <View style={{
           position: 'absolute',
-          bottom: Platform.OS === 'ios' ? 15 : 15,
+          bottom: dimensions.bottomOffset,
           left: 16,
           right: 16,
           flexDirection: 'row',
@@ -84,7 +85,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
               backgroundColor: theme.colors.surface,
               borderRadius: theme.borderRadius.xxl,
               paddingHorizontal: 10,
-              paddingVertical: 10,
+              paddingVertical: dimensions.paddingTop,
               shadowColor: theme.colors.text,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.2,

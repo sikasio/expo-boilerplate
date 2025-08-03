@@ -11,8 +11,8 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
-type ButtonSize = 'small' | 'medium' | 'large';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'success' | 'warning' | 'error';
+export type ButtonSize = 'xs' | 'small' | 'medium' | 'large' | 'xl';
 
 interface ButtonProps extends TouchableOpacityProps {
   title?: string;
@@ -48,6 +48,11 @@ export function Button({
     };
 
     const sizeStyles = {
+      xs: {
+        paddingHorizontal: theme.sizes.sm,
+        paddingVertical: theme.sizes.xs,
+        minHeight: 28,
+      },
       small: {
         paddingHorizontal: theme.sizes.md,
         paddingVertical: theme.sizes.sm,
@@ -63,6 +68,11 @@ export function Button({
         paddingVertical: theme.sizes.lg,
         minHeight: 52,
       },
+      xl: {
+        paddingHorizontal: theme.sizes.xxl,
+        paddingVertical: theme.sizes.xl,
+        minHeight: 60,
+      },
     };
 
     const variantStyles = {
@@ -73,6 +83,18 @@ export function Button({
       secondary: {
         backgroundColor: theme.colors.secondary,
         borderColor: theme.colors.secondary,
+      },
+      success: {
+        backgroundColor: theme.colors.success,
+        borderColor: theme.colors.success,
+      },
+      warning: {
+        backgroundColor: theme.colors.warning,
+        borderColor: theme.colors.warning,
+      },
+      error: {
+        backgroundColor: theme.colors.error,
+        borderColor: theme.colors.error,
       },
       outline: {
         backgroundColor: 'transparent',
@@ -100,7 +122,10 @@ export function Button({
     switch (variant) {
       case 'primary':
       case 'secondary':
-        return theme.isDark ? '#FFFFFF' : '#FFFFFF';
+      case 'success':
+      case 'warning':
+      case 'error':
+        return '#FFFFFF';
       case 'outline':
         return theme.colors.primary;
       case 'ghost':
@@ -112,10 +137,16 @@ export function Button({
 
   const getFontSize = () => {
     switch (size) {
+      case 'xs':
+        return theme.fontSizes.xs;
       case 'small':
         return theme.fontSizes.sm;
+      case 'medium':
+        return theme.fontSizes.md;
       case 'large':
         return theme.fontSizes.lg;
+      case 'xl':
+        return theme.fontSizes.xl;
       default:
         return theme.fontSizes.md;
     }

@@ -8,7 +8,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { Text } from './Text';
 
 interface LoadingSpinnerProps {
-  size?: 'small' | 'large';
+  size?: 'small' | 'medium' | 'large';
   color?: string;
   message?: string;
   overlay?: boolean;
@@ -50,12 +50,32 @@ export function LoadingSpinner({
     };
   };
 
+  const getSpinnerSize = () => {
+    switch (size) {
+      case 'small': return 'small' as const;
+      case 'medium': return 'large' as const;
+      case 'large': return 'large' as const;
+      default: return 'large' as const;
+    }
+  };
+
+  const getSpinnerStyle = () => {
+    switch (size) {
+      case 'small': return { transform: [{ scale: 0.8 }] };
+      case 'medium': return { transform: [{ scale: 1 }] };
+      case 'large': return { transform: [{ scale: 1.3 }] };
+      default: return {};
+    }
+  };
+
   return (
     <View style={[getContainerStyle(), style]}>
-      <ActivityIndicator
-        size={size}
-        color={color || theme.colors.primary}
-      />
+      <View style={getSpinnerStyle()}>
+        <ActivityIndicator
+          size={getSpinnerSize()}
+          color={color || theme.colors.primary}
+        />
+      </View>
       {message && (
         <Text
           variant="body"
