@@ -11,7 +11,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'success' | 'warning' | 'error';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'outline-white' | 'ghost' | 'success' | 'warning' | 'error';
 export type ButtonSize = 'xs' | 'small' | 'medium' | 'large' | 'xl';
 
 interface ButtonProps extends TouchableOpacityProps {
@@ -100,6 +100,10 @@ export function Button({
         backgroundColor: 'transparent',
         borderColor: theme.colors.primary,
       },
+      'outline-white': {
+        backgroundColor: 'transparent',
+        borderColor: '#FFFFFF',
+      },
       ghost: {
         backgroundColor: 'transparent',
         borderColor: 'transparent',
@@ -128,6 +132,8 @@ export function Button({
         return '#FFFFFF';
       case 'outline':
         return theme.colors.primary;
+      case 'outline-white':
+        return '#FFFFFF';
       case 'ghost':
         return theme.colors.text;
       default:
