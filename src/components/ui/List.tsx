@@ -15,7 +15,7 @@ import {
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
 import { Avatar, AvatarSize } from './Avatar';

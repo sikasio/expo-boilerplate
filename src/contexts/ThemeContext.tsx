@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
-import { Theme, getTheme } from '../config/theme';
-import { ThemeMode } from '../types';
-import { StorageService } from '../services/storage';
-import { STORAGE_KEYS } from '../constants';
+import { Theme, getTheme } from '@/config/theme';
+import { ThemeMode } from '@/types';
+import { StorageService } from '@/services/storage';
+import { STORAGE_KEYS } from '@/constants';
 
 interface ThemeContextType {
   theme: Theme;

@@ -9,11 +9,11 @@ import {
   ImageBackground,
   ImageSourcePropType,
 } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
-import { Text } from '../components/ui/Text';
-import { Button } from '../components/ui/Button';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { Icon, IconName } from '../components/ui/Icon';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Text } from '@/components/ui/Text';
+import { Button } from '@/components/ui/Button';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { Icon, IconName } from '@/components/ui/Icon';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 

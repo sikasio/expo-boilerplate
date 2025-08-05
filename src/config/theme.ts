@@ -1,4 +1,4 @@
-import { COLORS, DARK_COLORS, SIZES, FONT_SIZES, BORDER_RADIUS } from '../constants';
+import { COLORS, DARK_COLORS, SIZES, FONT_SIZES, BORDER_RADIUS } from '@/constants';
 
 export interface Theme {
   colors: typeof COLORS;

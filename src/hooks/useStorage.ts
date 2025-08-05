@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { StorageService } from '../services/storage';
+import { StorageService } from '@/services/storage';
 
 export function useStorage<T>(
   key: string,

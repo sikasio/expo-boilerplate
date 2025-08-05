@@ -25,7 +25,7 @@ try {
 } catch (error) {
   console.warn('Some icon families are not available:', error);
 }
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export type IconFamily = 
   | 'Ionicons'

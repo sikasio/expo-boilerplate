@@ -11,7 +11,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from 'react-native';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Card, CardProps } from './Card';
 import { Text } from './Text';
 import { Button } from './Button';

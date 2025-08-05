@@ -1,6 +1,6 @@
 import React from 'react';
 import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export function ThemeToast() {
   const { theme } = useTheme();

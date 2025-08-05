@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, ViewStyle, ViewProps } from 'react-native';
-import { useTheme } from '../../contexts/ThemeContext';
-import { Text } from '../ui/Text';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Text } from '@/components/ui/Text';
 import { BackButton, BackButtonProps } from './BackButton';
-import { IconName } from '../ui/Icon';
+import { IconName } from '@/components/ui/Icon';
 
 export type HeaderMarginBottom = 'none' | 'small' | 'medium' | 'large';
 

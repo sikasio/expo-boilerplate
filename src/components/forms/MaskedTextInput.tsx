@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextInputProps as RNTextInputProps, ViewStyle } from 'react-native';
 import { TextInput } from './TextInput';
-import { IconName } from '../ui/Icon';
+import { IconName } from '@/components/ui/Icon';
 
 export type MaskType = 'phone' | 'credit-card' | 'date' | 'time' | 'currency' | 'ssn' | 'custom';
 

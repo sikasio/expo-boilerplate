@@ -6,9 +6,9 @@ import {
   ViewStyle,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '../../contexts/ThemeContext';
-import { Text } from '../ui/Text';
-import { Icon, IconName } from '../ui/Icon';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Text } from '@/components/ui/Text';
+import { Icon, IconName } from '@/components/ui/Icon';
 
 interface TextInputProps extends RNTextInputProps {
   label?: string;

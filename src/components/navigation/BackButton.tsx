@@ -1,9 +1,9 @@
 import React from 'react';
 import { TouchableOpacity, TouchableOpacityProps, ViewStyle } from 'react-native';
 import { router } from 'expo-router';
-import { useTheme } from '../../contexts/ThemeContext';
-import { Icon, IconName } from '../ui/Icon';
-import { Text } from '../ui/Text';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Icon, IconName } from '@/components/ui/Icon';
+import { Text } from '@/components/ui/Text';
 
 export type BackButtonVariant = 'icon-only' | 'with-text' | 'text-only';
 export type BackButtonSize = 'small' | 'medium' | 'large';

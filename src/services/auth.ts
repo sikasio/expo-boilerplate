@@ -1,7 +1,7 @@
-import { apiClient } from '../config/api';
+import { apiClient } from '@/config/api';
 import { StorageService } from './storage';
-import { STORAGE_KEYS, API_ENDPOINTS } from '../constants';
-import { User, ApiResponse } from '../types';
+import { STORAGE_KEYS, API_ENDPOINTS } from '@/constants';
+import { User, ApiResponse } from '@/types';
 
 export interface LoginCredentials {
   email: string;

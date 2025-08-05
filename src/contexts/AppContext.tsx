@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { AppState } from '../types';
+import { AppState } from '@/types';
 
 interface AppContextType {
   state: AppState;

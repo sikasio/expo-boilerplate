@@ -5,7 +5,7 @@ import {
   SafeAreaView,
   StyleSheet,
 } from 'react-native';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ContainerProps extends ViewProps {
   children: React.ReactNode;

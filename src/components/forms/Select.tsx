@@ -9,9 +9,9 @@ import {
   TextStyle,
   Dimensions,
 } from 'react-native';
-import { useTheme } from '../../contexts/ThemeContext';
-import { Text } from '../ui/Text';
-import { Icon, IconName } from '../ui/Icon';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Text } from '@/components/ui/Text';
+import { Icon, IconName } from '@/components/ui/Icon';
 import { TextInput } from './TextInput';
 
 export interface SelectOption {

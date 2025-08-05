@@ -4,7 +4,7 @@ import {
   ViewProps,
   ViewStyle,
 } from 'react-native';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from './Button';
 import { IconName } from './Icon';
 
