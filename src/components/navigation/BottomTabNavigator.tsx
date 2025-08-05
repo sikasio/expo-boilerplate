@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { Platform, View, Animated, TouchableOpacity } from 'react-native';
 
 import { useTheme } from '../../contexts/ThemeContext';
+import { useSplash } from '../../contexts/SplashContext';
 import { TabBarIcon } from '../ui/TabBarIcon';
 import { IconName } from '../ui/Icon';
 import { Text } from '../ui/Text';
@@ -22,6 +23,7 @@ interface BottomTabNavigatorProps {
 
 export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNavigatorProps) {
   const { theme } = useTheme();
+  const { isSplashActive } = useSplash();
 
   const getTabBarStyle = () => {
     const dimensions = getTabBarDimensions(design);
@@ -66,6 +68,11 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
 
   const CustomTabBar = ({ state, descriptors, navigation }: any) => {
     if (design === 'bubble') {
+      // Hide tab bar when splash is active
+      if (isSplashActive) {
+        return null;
+      }
+      
       const dimensions = getTabBarDimensions(design);
       return (
         <View style={{
@@ -84,7 +91,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
               flexDirection: 'row',
               backgroundColor: theme.colors.surface,
               borderRadius: theme.borderRadius.xxl,
-              paddingHorizontal: 10,
+              paddingHorizontal: 6,
               paddingVertical: dimensions.paddingTop,
               shadowColor: theme.colors.text,
               shadowOffset: { width: 0, height: 4 },
@@ -118,9 +125,10 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
                     minWidth: isFocused ? 'auto' : 0,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    paddingHorizontal: isFocused ? 16 : 8,
+                    paddingHorizontal: isFocused ? 14 : 8,
                     paddingVertical: 8,
-                    marginHorizontal: 4,
+                    paddingBottom: 6,
+                    marginHorizontal: 2,
                     borderRadius: theme.borderRadius.lg,
                     backgroundColor: isFocused
                       ? theme.colors.primary + '20'
