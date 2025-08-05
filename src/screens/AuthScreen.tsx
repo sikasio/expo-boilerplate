@@ -1,0 +1,1283 @@
+import React, { useState, useRef } from 'react';
+import {
+  View,
+  ViewStyle,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Dimensions,
+  StatusBar,
+  ImageBackground,
+  ImageSourcePropType,
+  Animated,
+  Easing,
+  TouchableOpacity,
+} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useForm, Controller } from 'react-hook-form';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Text } from '@/components/ui/Text';
+import { Button } from '@/components/ui/Button';
+import { TextInput } from '@/components/forms/TextInput';
+import { OTPInput } from '@/components/forms/OTPInput';
+import { Card } from '@/components/ui/Card';
+import { Icon, IconName } from '@/components/ui/Icon';
+import { Avatar } from '@/components/ui/Avatar';
+import { Checkbox } from '@/components/ui/Checkbox';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+// Function to mask contact information (show last 3 digits)
+const maskContact = (contact: string): string => {
+  if (!contact || contact.length < 4) return contact;
+  
+  // For email addresses
+  if (contact.includes('@')) {
+    const [localPart, domain] = contact.split('@');
+    if (localPart.length <= 3) {
+      return `***@${domain}`;
+    }
+    const maskedLocal = '***' + localPart.slice(-3);
+    return `${maskedLocal}@${domain}`;
+  }
+  
+  // For phone numbers
+  const cleanContact = contact.replace(/[^\d]/g, ''); // Remove non-digits
+  if (cleanContact.length <= 3) {
+    return '***' + cleanContact;
+  }
+  return '***' + cleanContact.slice(-3);
+};
+
+// Function to get last 3 characters for "ends with" format
+const getLastThreeChars = (contact: string): string => {
+  if (!contact) return '';
+  
+  // For email addresses, get last 3 characters before @
+  if (contact.includes('@')) {
+    const [localPart] = contact.split('@');
+    return localPart.slice(-3);
+  }
+  
+  // For phone numbers, get last 3 digits
+  const cleanContact = contact.replace(/[^\d]/g, '');
+  return cleanContact.slice(-3);
+};
+
+export type AuthScreenVariant = 'login' | 'register' | 'forgot-password' | 'forgot-password-email' | 'forgot-password-whatsapp' | 'reset-password' | 'social-login' | 'verification' | 'verification-email' | 'verification-whatsapp' | 'account-review' | 'account-suspended' | 'account-created-successfully';
+export type AuthScreenLayout = 'default' | 'split' | 'centered' | 'minimal' | 'card' | 'fullscreen';
+export type AuthScreenTheme = 'light' | 'dark' | 'gradient' | 'branded' | 'glassmorphism' | 'custom';
+
+interface SocialProvider {
+  name: string;
+  icon: IconName;
+  color: string;
+  onPress: () => void;
+}
+
+interface AuthFormData {
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  name?: string;
+  phone?: string;
+  code?: string;
+  rememberMe?: boolean;
+  agreeToTerms?: boolean;
+}
+
+interface AuthScreenContent {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  primaryButtonText?: string;
+  secondaryButtonText?: string;
+  footerText?: string;
+  footerLinkText?: string;
+}
+
+export interface AuthScreenProps {
+  variant?: AuthScreenVariant;
+  layout?: AuthScreenLayout;
+  theme?: AuthScreenTheme;
+  
+  // Content
+  content?: AuthScreenContent;
+  logo?: React.ReactNode;
+  logoSource?: ImageSourcePropType;
+  logoSize?: number;
+  backgroundImage?: ImageSourcePropType;
+  
+  // Social Authentication
+  socialProviders?: SocialProvider[];
+  showSocialLogin?: boolean;
+  socialLoginTitle?: string;
+  
+  // Form Configuration
+  showRememberMe?: boolean;
+  showForgotPassword?: boolean;
+  showTermsCheckbox?: boolean;
+  enableBiometric?: boolean;
+  
+  // Verification Configuration
+  verificationContact?: string; // Phone number or email for verification
+  
+  // Validation
+  enableValidation?: boolean;
+  customValidation?: (data: AuthFormData) => { [key: string]: string } | null;
+  
+  // Loading States
+  isLoading?: boolean;
+  loadingText?: string;
+  
+  // Callbacks
+  onSubmit?: (data: AuthFormData) => Promise<void> | void;
+  onSocialLogin?: (provider: string) => Promise<void> | void;
+  onForgotPassword?: () => void;
+  onSecondaryAction?: () => void;
+  onFooterLinkPress?: () => void;
+  onBiometricLogin?: () => Promise<void> | void;
+  
+  // Customization
+  backgroundColor?: string;
+  gradientColors?: [string, string];
+  overlayOpacity?: number;
+  borderRadius?: number;
+  
+  // Animation
+  enableAnimations?: boolean;
+  animationDuration?: number;
+  
+  // Accessibility
+  testID?: string;
+  accessible?: boolean;
+  
+  // Style overrides
+  style?: ViewStyle;
+  contentStyle?: ViewStyle;
+  formStyle?: ViewStyle;
+}
+
+export function AuthScreen({
+  variant = 'login',
+  layout = 'default',
+  theme: authTheme = 'light',
+  content = {},
+  logo,
+  logoSource,
+  logoSize = 80,
+  backgroundImage,
+  socialProviders = [],
+  showSocialLogin = false,
+  socialLoginTitle = 'Or continue with',
+  showRememberMe = true,
+  showForgotPassword = true,
+  showTermsCheckbox = false,
+  enableBiometric = false,
+  verificationContact,
+  enableValidation = true,
+  customValidation,
+  isLoading = false,
+  loadingText = 'Please wait...',
+  onSubmit,
+  onSocialLogin,
+  onForgotPassword,
+  onSecondaryAction,
+  onFooterLinkPress,
+  onBiometricLogin,
+  backgroundColor,
+  gradientColors,
+  overlayOpacity = 0.3,
+  borderRadius,
+  enableAnimations = true,
+  animationDuration = 600,
+  testID,
+  accessible = true,
+  style,
+  contentStyle,
+  formStyle,
+}: AuthScreenProps) {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+  
+  // Form state
+  const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AuthFormData>();
+  const [rememberMe, setRememberMe] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // Start animations on mount
+  React.useEffect(() => {
+    if (enableAnimations) {
+      // Simple, consistent animation for all screen types
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          delay: 50,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 450,
+          delay: 100,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      // Set final values immediately if animations disabled
+      fadeAnim.setValue(1);
+      slideAnim.setValue(0);
+      scaleAnim.setValue(1);
+    }
+  }, []);
+  
+  // Get default content based on variant
+  const getDefaultContent = (): AuthScreenContent => {
+    switch (variant) {
+      case 'login':
+        return {
+          title: 'Welcome Back',
+          subtitle: 'Sign in to your account',
+          primaryButtonText: 'Sign In',
+          secondaryButtonText: 'Create Account',
+          footerText: "Don't have an account?",
+          footerLinkText: 'Sign Up',
+        };
+      case 'register':
+        return {
+          title: 'Create Account',
+          subtitle: 'Join us today',
+          primaryButtonText: 'Create Account',
+          footerText: 'Already have an account?',
+          footerLinkText: 'Sign In',
+        };
+      case 'forgot-password':
+        return {
+          title: 'Forgot Password',
+          subtitle: 'Enter your email to reset password',
+          primaryButtonText: 'Send Reset Link',
+          secondaryButtonText: 'Back to Login',
+          footerText: 'Remember your password?',
+          footerLinkText: 'Sign In',
+        };
+      case 'reset-password':
+        return {
+          title: 'Reset Password',
+          subtitle: 'Enter your new password',
+          primaryButtonText: 'Reset Password',
+          secondaryButtonText: 'Back to Login',
+        };
+      case 'forgot-password-email':
+        return {
+          title: 'Forgot Password',
+          subtitle: 'Reset via Email',
+          description: 'Enter your email address to receive a password reset link',
+          primaryButtonText: 'Send Reset Link',
+          secondaryButtonText: 'Back to Login',
+          footerText: 'Remember your password?',
+          footerLinkText: 'Sign In',
+        };
+      case 'forgot-password-whatsapp':
+        return {
+          title: 'Forgot Password',
+          subtitle: 'Reset via WhatsApp',
+          description: 'Enter your WhatsApp number to receive a password reset code',
+          primaryButtonText: 'Send Reset Code',
+          secondaryButtonText: 'Back to Login',
+          footerText: 'Remember your password?',
+          footerLinkText: 'Sign In',
+        };
+      case 'verification':
+        return {
+          title: 'Verify Account',
+          subtitle: 'Enter the verification code',
+          description: 'We sent a 6-digit code to you',
+          primaryButtonText: 'Verify',
+          secondaryButtonText: 'Resend Code',
+        };
+      case 'verification-email':
+        return {
+          title: 'Email Verification',
+          subtitle: 'Check your email',
+          description: verificationContact 
+            ? `We sent a 6-digit verification code to ${verificationContact}`
+            : 'We sent a 6-digit verification code to your email address',
+          primaryButtonText: 'Verify Email',
+          secondaryButtonText: 'Resend Code',
+        };
+      case 'verification-whatsapp':
+        return {
+          title: 'WhatsApp Verification',
+          subtitle: 'Check your WhatsApp',
+          description: verificationContact 
+            ? `We sent a 6-digit verification code to your WhatsApp number ends with ***${getLastThreeChars(verificationContact)}`
+            : 'We sent a 6-digit verification code to your WhatsApp number',
+          primaryButtonText: 'Verify Number',
+          secondaryButtonText: 'Resend Code',
+        };
+      case 'social-login':
+        return {
+          title: 'Welcome',
+          subtitle: 'Choose your preferred sign-in method',
+          primaryButtonText: 'Continue',
+        };
+      case 'account-review':
+        return {
+          title: 'Account Under Review',
+          subtitle: 'Your account is being reviewed',
+          description: 'We are currently reviewing your account information. This process usually takes 1-3 business days. You will receive an email notification once the review is complete.',
+          primaryButtonText: 'Check Status',
+          secondaryButtonText: 'Contact Support',
+          footerText: 'Questions about the review?',
+          footerLinkText: 'Help Center',
+        };
+      case 'account-suspended':
+        return {
+          title: 'Account Suspended',
+          subtitle: 'Your account has been temporarily suspended',
+          description: 'Your account has been suspended due to a violation of our terms of service. Please contact our support team to resolve this issue and restore your account access.',
+          primaryButtonText: 'Appeal Suspension',
+          secondaryButtonText: 'Contact Support',
+          footerText: 'Need help understanding why?',
+          footerLinkText: 'Community Guidelines',
+        };
+      case 'account-created-successfully':
+        return {
+          title: '🎉 Welcome Aboard!',
+          subtitle: 'Your account is ready to go',
+          description: 'Congratulations! You\'ve successfully joined our community. Everything is set up and ready for you to start your amazing journey with us.',
+          primaryButtonText: 'Start Exploring',
+          secondaryButtonText: 'View Profile',
+          footerText: 'Need help getting started?',
+          footerLinkText: 'User Guide',
+        };
+      default:
+        return content;
+    }
+  };
+  
+  const finalContent = { ...getDefaultContent(), ...content };
+  
+  // Get theme colors
+  const getThemeColors = () => {
+    switch (authTheme) {
+      case 'light':
+        return {
+          background: '#FFFFFF',
+          surface: '#F8F9FA',
+          text: '#1A1A1A',
+          textSecondary: '#6C757D',
+          border: '#E9ECEF',
+          primary: theme.colors.primary,
+        };
+      case 'dark':
+        return {
+          background: '#1A1A1A',
+          surface: '#2D2D2D',
+          text: '#FFFFFF',
+          textSecondary: '#AAAAAA',
+          border: '#404040',
+          primary: theme.colors.primary,
+        };
+      case 'gradient':
+        return {
+          background: 'transparent',
+          surface: 'rgba(255, 255, 255, 0.1)',
+          text: '#FFFFFF',
+          textSecondary: '#E0E0E0',
+          border: 'rgba(255, 255, 255, 0.2)',
+          primary: '#FFFFFF',
+        };
+      case 'branded':
+        return {
+          background: theme.colors.primary,
+          surface: 'rgba(255, 255, 255, 0.95)',
+          text: '#1A1A1A',
+          textSecondary: '#6C757D',
+          border: 'rgba(255, 255, 255, 0.3)',
+          primary: theme.colors.primary,
+        };
+      case 'glassmorphism':
+        return {
+          background: 'transparent',
+          surface: 'rgba(255, 255, 255, 0.15)',
+          text: '#FFFFFF',
+          textSecondary: 'rgba(255, 255, 255, 0.8)',
+          border: 'rgba(255, 255, 255, 0.2)',
+          primary: '#FFFFFF',
+        };
+      case 'custom':
+        return {
+          background: backgroundColor || theme.colors.background,
+          surface: theme.colors.surface,
+          text: theme.colors.text,
+          textSecondary: theme.colors.textSecondary,
+          border: theme.colors.border,
+          primary: theme.colors.primary,
+        };
+      default:
+        return {
+          background: theme.colors.background,
+          surface: theme.colors.surface,
+          text: theme.colors.text,
+          textSecondary: theme.colors.textSecondary,
+          border: theme.colors.border,
+          primary: theme.colors.primary,
+        };
+    }
+  };
+  
+  const colors = getThemeColors();
+  
+  // Validation rules
+  const getValidationRules = (field: keyof AuthFormData) => {
+    if (!enableValidation) return {};
+    
+    const rules: any = {};
+    
+    switch (field) {
+      case 'email':
+        rules.required = 'Email is required';
+        rules.pattern = {
+          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+          message: 'Invalid email address',
+        };
+        break;
+      case 'password':
+        rules.required = 'Password is required';
+        rules.minLength = {
+          value: 6,
+          message: 'Password must be at least 6 characters',
+        };
+        break;
+      case 'confirmPassword':
+        rules.required = 'Please confirm your password';
+        rules.validate = (value: string) => {
+          const password = watch('password');
+          return value === password || 'Passwords do not match';
+        };
+        break;
+      case 'name':
+        rules.required = 'Name is required';
+        rules.minLength = {
+          value: 2,
+          message: 'Name must be at least 2 characters',
+        };
+        break;
+      case 'phone':
+        if (variant === 'forgot-password-whatsapp') {
+          rules.required = 'WhatsApp number is required';
+        }
+        rules.pattern = {
+          value: /^[+]?[1-9][\d\s\-\(\)]{7,15}$/,
+          message: 'Invalid phone number',
+        };
+        break;
+      case 'code':
+        rules.required = 'Verification code is required';
+        rules.pattern = {
+          value: /^\d{4,6}$/,
+          message: 'Invalid verification code',
+        };
+        break;
+    }
+    
+    return rules;
+  };
+  
+  // Container styles
+  const getContainerStyle = (): ViewStyle => {
+    const baseStyle: ViewStyle = {
+      flex: 1,
+      backgroundColor: colors.background,
+    };
+    
+    if (authTheme === 'gradient' && gradientColors) {
+      return {
+        ...baseStyle,
+        backgroundColor: 'transparent',
+      };
+    }
+    
+    return baseStyle;
+  };
+  
+  // Content layout styles
+  const getContentLayoutStyle = (): ViewStyle => {
+    const baseStyle: ViewStyle = {
+      flex: 1,
+      paddingHorizontal: theme.sizes.lg,
+      paddingVertical: theme.sizes.xl,
+    };
+    
+    switch (layout) {
+      case 'centered':
+        return {
+          ...baseStyle,
+          justifyContent: 'center',
+          paddingHorizontal: theme.sizes.xl,
+        };
+      case 'split':
+        return {
+          ...baseStyle,
+          justifyContent: 'space-between',
+        };
+      case 'minimal':
+        return {
+          ...baseStyle,
+          paddingHorizontal: theme.sizes.md,
+          paddingVertical: theme.sizes.lg,
+        };
+      case 'card':
+        return {
+          ...baseStyle,
+          justifyContent: 'center',
+          paddingHorizontal: theme.sizes.sm,
+        };
+      case 'fullscreen':
+        return {
+          ...baseStyle,
+          paddingHorizontal: 0,
+          paddingVertical: 0,
+        };
+      default:
+        return baseStyle;
+    }
+  };
+  
+  // Render logo
+  const renderLogo = () => {
+    if (!logo && !logoSource) return null;
+    
+    const logoContent = logo || (
+      <Animated.Image
+        source={logoSource!}
+        style={[
+          {
+            width: logoSize,
+            height: logoSize,
+            resizeMode: 'contain',
+          },
+          enableAnimations && {
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      />
+    );
+    
+    return (
+      <Animated.View
+        style={[
+          {
+            alignItems: 'center',
+            marginBottom: theme.sizes.xl,
+          },
+          enableAnimations && {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        {logoContent}
+      </Animated.View>
+    );
+  };
+  
+  // Render header
+  const renderHeader = () => {
+    if (!finalContent.title && !finalContent.subtitle) return null;
+    
+    return (
+      <Animated.View
+        style={[
+          {
+            alignItems: layout === 'centered' ? 'center' : 'flex-start',
+            marginBottom: theme.sizes.xl,
+          },
+          enableAnimations && {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        {finalContent.title && (
+          <Text
+            variant="title"
+            style={{
+              fontSize: theme.fontSizes.xxl,
+              fontWeight: '700',
+              color: variant === 'account-created-successfully' ? '#22C55E' : colors.text,
+              textAlign: layout === 'centered' ? 'center' : 'left',
+              marginBottom: theme.sizes.sm,
+              ...(variant === 'account-created-successfully' && {
+                fontSize: theme.fontSizes.xxl + 4,
+                letterSpacing: 0.5,
+              }),
+            }}
+          >
+            {finalContent.title}
+          </Text>
+        )}
+        
+        {finalContent.subtitle && (
+          <Text
+            variant="subtitle"
+            style={{
+              fontSize: theme.fontSizes.lg,
+              color: variant === 'account-created-successfully' ? '#16A34A' : colors.textSecondary,
+              textAlign: layout === 'centered' ? 'center' : 'left',
+              ...(variant === 'account-created-successfully' && {
+                fontSize: theme.fontSizes.lg + 2,
+                fontWeight: '600',
+              }),
+            }}
+          >
+            {finalContent.subtitle}
+          </Text>
+        )}
+        
+        {finalContent.description && (
+          <Text
+            variant="body"
+            style={{
+              fontSize: theme.fontSizes.md,
+              color: variant === 'account-created-successfully' ? '#374151' : colors.textSecondary,
+              textAlign: layout === 'centered' ? 'center' : 'left',
+              marginTop: theme.sizes.sm,
+              lineHeight: theme.fontSizes.md * 1.5,
+              ...(variant === 'account-created-successfully' && {
+                fontSize: theme.fontSizes.md + 1,
+                lineHeight: (theme.fontSizes.md + 1) * 1.6,
+                fontWeight: '500',
+              }),
+            }}
+          >
+            {finalContent.description}
+          </Text>
+        )}
+      </Animated.View>
+    );
+  };
+  
+  // Render form fields based on variant
+  const renderFormFields = () => {
+    // Account status screens don't need form fields
+    if (variant === 'account-review' || variant === 'account-suspended' || variant === 'account-created-successfully') {
+      return null;
+    }
+    
+    const fields = [];
+    
+    // Name field for registration
+    if (variant === 'register') {
+      fields.push(
+        <Controller
+          key="name"
+          control={control}
+          name="name"
+          rules={getValidationRules('name')}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              label="Full Name"
+              placeholder="Enter your full name"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.name?.message}
+              leftIcon="person-outline"
+              style={{ marginBottom: theme.sizes.md }}
+            />
+          )}
+        />
+      );
+    }
+    
+    // Email field (for most variants)
+    if (['login', 'register', 'forgot-password', 'forgot-password-email'].includes(variant)) {
+      fields.push(
+        <Controller
+          key="email"
+          control={control}
+          name="email"
+          rules={getValidationRules('email')}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              label="Email"
+              placeholder="Enter your email"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.email?.message}
+              leftIcon="mail-outline"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={{ marginBottom: theme.sizes.md }}
+            />
+          )}
+        />
+      );
+    }
+    
+    // Phone field (for registration and WhatsApp reset)
+    if (variant === 'register' || variant === 'forgot-password-whatsapp') {
+      fields.push(
+        <Controller
+          key="phone"
+          control={control}
+          name="phone"
+          rules={getValidationRules('phone')}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              label={variant === 'forgot-password-whatsapp' ? 'WhatsApp Number' : 'Phone Number (Optional)'}
+              placeholder={variant === 'forgot-password-whatsapp' ? 'Enter your WhatsApp number' : 'Enter your phone number'}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.phone?.message}
+              leftIcon={variant === 'forgot-password-whatsapp' ? 'logo-whatsapp' : 'call-outline'}
+              keyboardType="phone-pad"
+              style={{ marginBottom: theme.sizes.md }}
+            />
+          )}
+        />
+      );
+    }
+    
+    // Password field
+    if (['login', 'register', 'reset-password'].includes(variant)) {
+      fields.push(
+        <Controller
+          key="password"
+          control={control}
+          name="password"
+          rules={getValidationRules('password')}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              label="Password"
+              placeholder="Enter your password"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.password?.message}
+              leftIcon="lock-closed-outline"
+              rightIcon={showPassword ? "eye-off-outline" : "eye-outline"}
+              onRightIconPress={() => setShowPassword(!showPassword)}
+              secureTextEntry={!showPassword}
+              style={{ marginBottom: theme.sizes.md }}
+            />
+          )}
+        />
+      );
+    }
+    
+    // Confirm password field
+    if (['register', 'reset-password'].includes(variant)) {
+      fields.push(
+        <Controller
+          key="confirmPassword"
+          control={control}
+          name="confirmPassword"
+          rules={getValidationRules('confirmPassword')}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              label="Confirm Password"
+              placeholder="Confirm your password"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.confirmPassword?.message}
+              leftIcon="lock-closed-outline"
+              rightIcon={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+              onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              secureTextEntry={!showConfirmPassword}
+              style={{ marginBottom: theme.sizes.md }}
+            />
+          )}
+        />
+      );
+    }
+    
+    // Verification code fields using OTP component
+    if (['verification', 'verification-email', 'verification-whatsapp'].includes(variant)) {
+      fields.push(
+        <Controller
+          key="code"
+          control={control}
+          name="code"
+          rules={getValidationRules('code')}
+          render={({ field: { onChange } }) => (
+            <OTPInput
+              length={6}
+              onChangeText={onChange}
+              onComplete={onChange}
+              error={errors.code?.message}
+              label="Verification Code"
+              autoFocus={true}
+            />
+          )}
+        />
+      );
+    }
+    
+    return fields;
+  };
+  
+  // Render form options (remember me, terms)
+  const renderFormOptions = () => {
+    if (variant === 'forgot-password' || variant === 'verification' || variant === 'account-review' || variant === 'account-suspended' || variant === 'account-created-successfully') return null;
+    
+    return (
+      <View style={{ marginBottom: theme.sizes.lg }}>
+        {showRememberMe && variant === 'login' && (
+          <Checkbox
+            label="Remember me"
+            checked={rememberMe}
+            onPress={() => setRememberMe(!rememberMe)}
+            style={{ marginBottom: theme.sizes.sm }}
+          />
+        )}
+        
+        {showTermsCheckbox && variant === 'register' && (
+          <Checkbox
+            label="I agree to the Terms of Service and Privacy Policy"
+            checked={agreeToTerms}
+            onPress={() => setAgreeToTerms(!agreeToTerms)}
+            style={{ marginBottom: theme.sizes.sm }}
+            labelStyle={{
+              fontSize: theme.fontSizes.sm,
+              lineHeight: theme.fontSizes.sm * 1.4,
+            }}
+          />
+        )}
+        
+        {showForgotPassword && variant === 'login' && (
+          <Button
+            title="Forgot Password?"
+            variant="ghost"
+            size="small"
+            onPress={onForgotPassword}
+            style={{ alignSelf: 'flex-end' }}
+            textStyle={{ color: colors.primary }}
+          />
+        )}
+      </View>
+    );
+  };
+  
+  // Render social login
+  const renderSocialLogin = () => {
+    if (!showSocialLogin || socialProviders.length === 0) return null;
+    
+    return (
+      <View style={{ marginBottom: theme.sizes.lg }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: theme.sizes.md,
+          }}
+        >
+          <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+          <Text
+            variant="caption"
+            style={{
+              color: colors.textSecondary,
+              marginHorizontal: theme.sizes.md,
+            }}
+          >
+            {socialLoginTitle}
+          </Text>
+          <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+        </View>
+        
+        <View
+          style={{
+            flexDirection: 'column',
+            gap: theme.sizes.sm,
+          }}
+        >
+          {socialProviders.map((provider, index) => {
+            // Define proper text colors for each platform
+            const getTextColor = (providerName: string) => {
+              switch (providerName.toLowerCase()) {
+                case 'google':
+                  return '#1F1F1F'; // Official Google text color (dark gray)
+                case 'apple':
+                  return '#FFFFFF'; // White text on black background
+                case 'facebook':
+                  return '#FFFFFF'; // White text on blue background
+                default:
+                  return '#FFFFFF';
+              }
+            };
+
+            const getBackgroundColor = (providerName: string) => {
+              switch (providerName.toLowerCase()) {
+                case 'google':
+                  return '#FFFFFF'; // Official Google white background
+                case 'apple':
+                  return '#000000'; // Black background for Apple
+                case 'facebook':
+                  return '#1877F2'; // Official Facebook blue
+                default:
+                  return provider.color;
+              }
+            };
+
+            const getBorderColor = (providerName: string) => {
+              switch (providerName.toLowerCase()) {
+                case 'google':
+                  return '#DADCE0'; // Light gray border for Google
+                case 'apple':
+                  return '#000000'; // Black border for Apple
+                case 'facebook':
+                  return '#1877F2'; // Same as background for seamless look
+                default:
+                  return provider.color;
+              }
+            };
+
+            const getButtonStyle = (providerName: string) => {
+              const backgroundColor = getBackgroundColor(providerName);
+              const borderColor = getBorderColor(providerName);
+              
+              const baseStyle = {
+                width: '100%',
+                backgroundColor: backgroundColor,
+                borderColor: borderColor,
+                borderWidth: 1,
+                paddingVertical: theme.sizes.md,
+                minHeight: 52,
+                // Force background color override
+                ...(backgroundColor && { backgroundColor: backgroundColor }),
+              };
+
+              // Add platform-specific styling
+              switch (providerName.toLowerCase()) {
+                case 'facebook':
+                  return {
+                    ...baseStyle,
+                    backgroundColor: '#1877F2', // Force Facebook blue
+                    borderColor: '#1877F2',
+                    shadowColor: '#1877F2',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    elevation: 2,
+                  };
+                case 'google':
+                  return {
+                    ...baseStyle,
+                    backgroundColor: '#FFFFFF', // Pure white - Official Google
+                    borderColor: '#DADCE0', // Light gray border - Official Google
+                    shadowColor: '#000000',
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 2,
+                    elevation: 1,
+                  };
+                case 'apple':
+                  return {
+                    ...baseStyle,
+                    backgroundColor: '#000000', // Force black
+                    borderColor: '#000000',
+                  };
+                default:
+                  return baseStyle;
+              }
+            };
+
+            return (
+              <Button
+                key={index}
+                title={`Continue with ${provider.name}`}
+                variant={provider.name.toLowerCase() === 'google' ? 'outline' : 'primary'}
+                leftIcon={provider.icon}
+                onPress={provider.onPress}
+                style={getButtonStyle(provider.name)}
+                textStyle={{ 
+                  color: getTextColor(provider.name),
+                  fontWeight: '600',
+                  fontSize: theme.fontSizes.md,
+                  // Force text color override - Official platform colors
+                  ...(provider.name.toLowerCase() === 'facebook' && { color: '#FFFFFF' }),
+                  ...(provider.name.toLowerCase() === 'google' && { color: '#1F1F1F' }),
+                  ...(provider.name.toLowerCase() === 'apple' && { color: '#FFFFFF' }),
+                }}
+              />
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+  
+  // Render biometric login
+  const renderBiometricLogin = () => {
+    if (!enableBiometric || variant !== 'login') return null;
+    
+    return (
+      <Button
+        title="Use Biometric"
+        variant="ghost"
+        leftIcon="finger-print-outline"
+        onPress={onBiometricLogin}
+        style={{
+          alignSelf: 'center',
+          marginBottom: theme.sizes.md,
+        }}
+        textStyle={{ color: colors.primary }}
+      />
+    );
+  };
+  
+  // Render footer
+  const renderFooter = () => {
+    if (!finalContent.footerText && !finalContent.footerLinkText) return null;
+    
+    // Special handling for account-suspended to prevent text overflow
+    const isAccountSuspended = variant === 'account-suspended';
+    
+    return (
+      <View
+        style={{
+          alignItems: 'center',
+          marginTop: theme.sizes.lg,
+          paddingHorizontal: theme.sizes.sm,
+        }}
+      >
+        {finalContent.footerText && (
+          <Text
+            variant="body"
+            style={{
+              color: colors.textSecondary,
+              textAlign: 'center',
+              marginBottom: isAccountSuspended ? theme.sizes.sm : theme.sizes.xs,
+              lineHeight: theme.fontSizes.md * 1.4,
+              maxWidth: '100%',
+            }}
+          >
+            {finalContent.footerText}
+          </Text>
+        )}
+        
+        {finalContent.footerLinkText && (
+          <Button
+            title={finalContent.footerLinkText}
+            variant="ghost"
+            size="small"
+            onPress={onFooterLinkPress}
+            textStyle={{ color: colors.primary }}
+            style={{
+              alignSelf: 'center',
+              paddingHorizontal: theme.sizes.sm,
+            }}
+          />
+        )}
+      </View>
+    );
+  };
+  
+  // Handle form submission
+  const handleFormSubmit = async (data: AuthFormData) => {
+    if (customValidation) {
+      const validationErrors = customValidation(data);
+      if (validationErrors) {
+        // Handle custom validation errors
+        return;
+      }
+    }
+    
+    try {
+      await onSubmit?.(data);
+    } catch (error) {
+      console.error('Auth form submission error:', error);
+    }
+  };
+  
+  // Render gradient background
+  const renderGradientBackground = () => {
+    if (authTheme !== 'gradient' || !gradientColors) return null;
+    
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: gradientColors[0],
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: gradientColors[1],
+            opacity: 0.8,
+          }}
+        />
+      </View>
+    );
+  };
+  
+  // Render background image
+  const renderBackgroundImage = () => {
+    if (!backgroundImage) return null;
+    
+    return (
+      <ImageBackground
+        source={backgroundImage}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        }}
+        resizeMode="cover"
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})`,
+          }}
+        />
+      </ImageBackground>
+    );
+  };
+  
+  // Main form content
+  const renderFormContent = () => {
+    const cardStyle: ViewStyle = {
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius || theme.borderRadius.xl,
+      padding: theme.sizes.xl,
+      marginHorizontal: layout === 'card' ? theme.sizes.md : 0,
+      ...(authTheme === 'glassmorphism' && {
+        backdropFilter: 'blur(10px)',
+        borderWidth: 1,
+        borderColor: colors.border,
+      }),
+    };
+    
+    const content = (
+      <Animated.View
+        style={[
+          layout === 'card' ? cardStyle : {},
+          formStyle,
+          enableAnimations && {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
+      >
+        {renderHeader()}
+        
+        <View style={{ marginBottom: theme.sizes.lg }}>
+          {renderFormFields()}
+          {renderFormOptions()}
+          
+          <Button
+            title={finalContent.primaryButtonText || 'Submit'}
+            variant="primary"
+            size="medium"
+            onPress={handleSubmit(handleFormSubmit)}
+            loading={isLoading}
+            loadingText={loadingText}
+            style={{ marginBottom: theme.sizes.md }}
+            disabled={
+              showTermsCheckbox && variant === 'register' ? !agreeToTerms : false
+            }
+          />
+          
+          {finalContent.secondaryButtonText && (
+            <Button
+              title={finalContent.secondaryButtonText}
+              variant="outline"
+              size="medium"
+              onPress={onSecondaryAction}
+              style={{ marginBottom: theme.sizes.md }}
+            />
+          )}
+        </View>
+        
+        {renderBiometricLogin()}
+        {renderSocialLogin()}
+        {renderFooter()}
+      </Animated.View>
+    );
+    
+    if (layout === 'fullscreen') {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', padding: theme.sizes.xl }}>
+          {content}
+        </View>
+      );
+    }
+    
+    return content;
+  };
+  
+  return (
+    <SafeAreaView
+      style={[getContainerStyle(), style, { flex: 1 }]}
+      testID={testID}
+      accessible={accessible}
+    >
+      <StatusBar
+        barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+        translucent={authTheme === 'gradient' || backgroundImage ? true : false}
+      />
+      
+      {renderGradientBackground()}
+      {renderBackgroundImage()}
+      
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={[
+            {
+              flexGrow: 1,
+              paddingHorizontal: layout === 'minimal' ? theme.sizes.md : layout === 'card' ? theme.sizes.sm : theme.sizes.lg,
+              paddingTop: authTheme === 'gradient' || backgroundImage ? insets.top + theme.sizes.lg : theme.sizes.xl,
+              paddingBottom: Math.max(insets.bottom, theme.sizes.sm) + theme.sizes.md,
+              ...(layout === 'centered' && { justifyContent: 'center', minHeight: '100%' }),
+              ...(layout === 'split' && { justifyContent: 'space-between', minHeight: '100%' }),
+              ...(layout === 'fullscreen' && { paddingHorizontal: 0 }),
+            },
+            contentStyle,
+          ]}
+          showsVerticalScrollIndicator={true}
+          keyboardShouldPersistTaps="handled"
+          bounces={true}
+        >
+          {renderLogo()}
+          {renderFormContent()}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
