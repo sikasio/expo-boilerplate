@@ -30,7 +30,7 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 // Function to mask contact information (show last 3 digits)
 const maskContact = (contact: string): string => {
   if (!contact || contact.length < 4) return contact;
-  
+
   // For email addresses
   if (contact.includes('@')) {
     const [localPart, domain] = contact.split('@');
@@ -40,7 +40,7 @@ const maskContact = (contact: string): string => {
     const maskedLocal = '***' + localPart.slice(-3);
     return `${maskedLocal}@${domain}`;
   }
-  
+
   // For phone numbers
   const cleanContact = contact.replace(/[^\d]/g, ''); // Remove non-digits
   if (cleanContact.length <= 3) {
@@ -52,19 +52,19 @@ const maskContact = (contact: string): string => {
 // Function to get last 3 characters for "ends with" format
 const getLastThreeChars = (contact: string): string => {
   if (!contact) return '';
-  
+
   // For email addresses, get last 3 characters before @
   if (contact.includes('@')) {
     const [localPart] = contact.split('@');
     return localPart.slice(-3);
   }
-  
+
   // For phone numbers, get last 3 digits
   const cleanContact = contact.replace(/[^\d]/g, '');
   return cleanContact.slice(-3);
 };
 
-export type AuthScreenVariant = 'login' | 'register' | 'forgot-password' | 'forgot-password-email' | 'forgot-password-whatsapp' | 'reset-password' | 'social-login' | 'verification' | 'verification-email' | 'verification-whatsapp' | 'account-review' | 'account-suspended' | 'account-created-successfully';
+export type AuthScreenVariant = 'login-email' | 'login-phone' | 'register' | 'forgot-password' | 'forgot-password-email' | 'forgot-password-whatsapp' | 'reset-password' | 'social-login' | 'verification' | 'verification-email' | 'verification-whatsapp' | 'account-review' | 'account-suspended' | 'account-created-successfully';
 export type AuthScreenLayout = 'default' | 'split' | 'centered' | 'minimal' | 'card' | 'fullscreen';
 export type AuthScreenTheme = 'light' | 'dark' | 'gradient' | 'branded' | 'glassmorphism' | 'custom';
 
@@ -100,36 +100,39 @@ export interface AuthScreenProps {
   variant?: AuthScreenVariant;
   layout?: AuthScreenLayout;
   theme?: AuthScreenTheme;
-  
+
   // Content
   content?: AuthScreenContent;
   logo?: React.ReactNode;
   logoSource?: ImageSourcePropType;
   logoSize?: number;
+  showTopLeftLogo?: boolean;
+  topLeftLogoSource?: ImageSourcePropType;
+  topLeftLogoSize?: number;
   backgroundImage?: ImageSourcePropType;
-  
+
   // Social Authentication
   socialProviders?: SocialProvider[];
   showSocialLogin?: boolean;
   socialLoginTitle?: string;
-  
+
   // Form Configuration
   showRememberMe?: boolean;
   showForgotPassword?: boolean;
   showTermsCheckbox?: boolean;
   enableBiometric?: boolean;
-  
+
   // Verification Configuration
   verificationContact?: string; // Phone number or email for verification
-  
+
   // Validation
   enableValidation?: boolean;
   customValidation?: (data: AuthFormData) => { [key: string]: string } | null;
-  
+
   // Loading States
   isLoading?: boolean;
   loadingText?: string;
-  
+
   // Callbacks
   onSubmit?: (data: AuthFormData) => Promise<void> | void;
   onSocialLogin?: (provider: string) => Promise<void> | void;
@@ -137,21 +140,21 @@ export interface AuthScreenProps {
   onSecondaryAction?: () => void;
   onFooterLinkPress?: () => void;
   onBiometricLogin?: () => Promise<void> | void;
-  
+
   // Customization
   backgroundColor?: string;
   gradientColors?: [string, string];
   overlayOpacity?: number;
   borderRadius?: number;
-  
+
   // Animation
   enableAnimations?: boolean;
   animationDuration?: number;
-  
+
   // Accessibility
   testID?: string;
   accessible?: boolean;
-  
+
   // Style overrides
   style?: ViewStyle;
   contentStyle?: ViewStyle;
@@ -161,11 +164,14 @@ export interface AuthScreenProps {
 export function AuthScreen({
   variant = 'login',
   layout = 'default',
-  theme: authTheme = 'light',
+  theme: authTheme,
   content = {},
   logo,
   logoSource,
   logoSize = 80,
+  showTopLeftLogo = true,
+  topLeftLogoSource,
+  topLeftLogoSize = 48,
   backgroundImage,
   socialProviders = [],
   showSocialLogin = false,
@@ -199,19 +205,19 @@ export function AuthScreen({
 }: AuthScreenProps) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  
+
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
-  
+
   // Form state
   const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AuthFormData>();
   const [rememberMe, setRememberMe] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   // Start animations on mount
   React.useEffect(() => {
     if (enableAnimations) {
@@ -245,16 +251,23 @@ export function AuthScreen({
       scaleAnim.setValue(1);
     }
   }, []);
-  
+
   // Get default content based on variant
   const getDefaultContent = (): AuthScreenContent => {
     switch (variant) {
-      case 'login':
+      case 'login-email':
         return {
           title: 'Welcome Back',
-          subtitle: 'Sign in to your account',
-          primaryButtonText: 'Sign In',
-          secondaryButtonText: 'Create Account',
+          subtitle: 'Sign in with your email',
+          primaryButtonText: 'Sign In with Email',
+          footerText: "Don't have an account?",
+          footerLinkText: 'Sign Up',
+        };
+      case 'login-phone':
+        return {
+          title: 'Welcome Back',
+          subtitle: 'Sign in with your phone number',
+          primaryButtonText: 'Sign In with Phone',
           footerText: "Don't have an account?",
           footerLinkText: 'Sign Up',
         };
@@ -314,7 +327,7 @@ export function AuthScreen({
         return {
           title: 'Email Verification',
           subtitle: 'Check your email',
-          description: verificationContact 
+          description: verificationContact
             ? `We sent a 6-digit verification code to ${verificationContact}`
             : 'We sent a 6-digit verification code to your email address',
           primaryButtonText: 'Verify Email',
@@ -324,7 +337,7 @@ export function AuthScreen({
         return {
           title: 'WhatsApp Verification',
           subtitle: 'Check your WhatsApp',
-          description: verificationContact 
+          description: verificationContact
             ? `We sent a 6-digit verification code to your WhatsApp number ends with ***${getLastThreeChars(verificationContact)}`
             : 'We sent a 6-digit verification code to your WhatsApp number',
           primaryButtonText: 'Verify Number',
@@ -370,11 +383,22 @@ export function AuthScreen({
         return content;
     }
   };
-  
+
   const finalContent = { ...getDefaultContent(), ...content };
-  
-  // Get theme colors
+
+  // Get theme colors - prioritize global theme for better consistency
   const getThemeColors = () => {
+    // Always use global theme colors as the base, unless specifically overridden
+    const baseColors = {
+      background: theme.colors.background,
+      surface: theme.colors.surface,
+      text: theme.colors.text,
+      textSecondary: theme.colors.textSecondary,
+      border: theme.colors.border,
+      primary: theme.colors.primary,
+    };
+
+    // Only override when authTheme is explicitly set to something specific
     switch (authTheme) {
       case 'light':
         return {
@@ -397,7 +421,7 @@ export function AuthScreen({
       case 'gradient':
         return {
           background: 'transparent',
-          surface: 'rgba(255, 255, 255, 0.1)',
+          surface: theme.isDark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.1)',
           text: '#FFFFFF',
           textSecondary: '#E0E0E0',
           border: 'rgba(255, 255, 255, 0.2)',
@@ -406,16 +430,16 @@ export function AuthScreen({
       case 'branded':
         return {
           background: theme.colors.primary,
-          surface: 'rgba(255, 255, 255, 0.95)',
-          text: '#1A1A1A',
-          textSecondary: '#6C757D',
+          surface: theme.isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.95)',
+          text: '#FFFFFF',
+          textSecondary: 'rgba(255, 255, 255, 0.8)',
           border: 'rgba(255, 255, 255, 0.3)',
-          primary: theme.colors.primary,
+          primary: '#FFFFFF',
         };
       case 'glassmorphism':
         return {
           background: 'transparent',
-          surface: 'rgba(255, 255, 255, 0.15)',
+          surface: theme.isDark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.15)',
           text: '#FFFFFF',
           textSecondary: 'rgba(255, 255, 255, 0.8)',
           border: 'rgba(255, 255, 255, 0.2)',
@@ -423,33 +447,23 @@ export function AuthScreen({
         };
       case 'custom':
         return {
-          background: backgroundColor || theme.colors.background,
-          surface: theme.colors.surface,
-          text: theme.colors.text,
-          textSecondary: theme.colors.textSecondary,
-          border: theme.colors.border,
-          primary: theme.colors.primary,
+          ...baseColors,
+          background: backgroundColor || baseColors.background,
         };
       default:
-        return {
-          background: theme.colors.background,
-          surface: theme.colors.surface,
-          text: theme.colors.text,
-          textSecondary: theme.colors.textSecondary,
-          border: theme.colors.border,
-          primary: theme.colors.primary,
-        };
+        // Use global theme colors for default/unspecified theme
+        return baseColors;
     }
   };
-  
+
   const colors = getThemeColors();
-  
+
   // Validation rules
   const getValidationRules = (field: keyof AuthFormData) => {
     if (!enableValidation) return {};
-    
+
     const rules: any = {};
-    
+
     switch (field) {
       case 'email':
         rules.required = 'Email is required';
@@ -482,6 +496,8 @@ export function AuthScreen({
       case 'phone':
         if (variant === 'forgot-password-whatsapp') {
           rules.required = 'WhatsApp number is required';
+        } else if (variant === 'login-phone') {
+          rules.required = 'Phone number is required';
         }
         rules.pattern = {
           value: /^[+]?[1-9][\d\s\-\(\)]{7,15}$/,
@@ -496,27 +512,27 @@ export function AuthScreen({
         };
         break;
     }
-    
+
     return rules;
   };
-  
+
   // Container styles
   const getContainerStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
       flex: 1,
       backgroundColor: colors.background,
     };
-    
+
     if (authTheme === 'gradient' && gradientColors) {
       return {
         ...baseStyle,
         backgroundColor: 'transparent',
       };
     }
-    
+
     return baseStyle;
   };
-  
+
   // Content layout styles
   const getContentLayoutStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
@@ -524,7 +540,7 @@ export function AuthScreen({
       paddingHorizontal: theme.sizes.lg,
       paddingVertical: theme.sizes.xl,
     };
-    
+
     switch (layout) {
       case 'centered':
         return {
@@ -559,11 +575,63 @@ export function AuthScreen({
         return baseStyle;
     }
   };
-  
+
   // Render logo
   const renderLogo = () => {
-    if (!logo && !logoSource) return null;
-    
+    // Don't show center logo for register screen
+    if (variant === 'register') return null;
+
+    // Smart logo selection for center logo
+    const getSmartCenterLogoSource = () => {
+      // If a specific logoSource is provided, use it
+      if (logoSource) return logoSource;
+
+      // Smart selection based on theme for center logo
+      if (theme.isDark) {
+        return require('@/assets/logo-white.png');
+      } else {
+        return require('@/assets/logo.png');
+      }
+    };
+
+    if (!logo && !logoSource) {
+      // Use smart logo selection when no specific logo is provided
+      const smartLogoSource = getSmartCenterLogoSource();
+
+      const logoContent = (
+        <Animated.Image
+          source={smartLogoSource}
+          style={[
+            {
+              width: logoSize,
+              height: logoSize,
+              resizeMode: 'contain',
+            },
+            enableAnimations && {
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        />
+      );
+
+      return (
+        <Animated.View
+          style={[
+            {
+              alignItems: 'center',
+              marginBottom: theme.sizes.sm,
+            },
+            enableAnimations && {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          {logoContent}
+        </Animated.View>
+      );
+    }
+
     const logoContent = logo || (
       <Animated.Image
         source={logoSource!}
@@ -579,13 +647,14 @@ export function AuthScreen({
         ]}
       />
     );
-    
+
     return (
       <Animated.View
         style={[
           {
             alignItems: 'center',
-            marginBottom: theme.sizes.xl,
+            marginTop: theme.sizes.md,
+            marginBottom: theme.sizes.md,
           },
           enableAnimations && {
             opacity: fadeAnim,
@@ -597,11 +666,64 @@ export function AuthScreen({
       </Animated.View>
     );
   };
-  
+
+  // Render top left logo
+  const renderTopLeftLogo = () => {
+    if (!showTopLeftLogo) return null;
+
+    // Smart logo selection based on theme
+    const getSmartLogoSource = () => {
+      // If a specific topLeftLogoSource is provided, use it
+      if (topLeftLogoSource) return topLeftLogoSource;
+
+      // If logoSource is provided, use it
+      if (logoSource) return logoSource;
+
+      // Smart selection based on theme
+      if (theme.isDark) {
+        return require('@/assets/logo-white.png');
+      } else {
+        return require('@/assets/logo.png');
+      }
+    };
+
+    const logoSrc = getSmartLogoSource();
+    if (!logoSrc) return null;
+
+    return (
+      <Animated.View
+        style={[
+          {
+            alignSelf: 'flex-start',
+            marginBottom: theme.sizes.md,
+          },
+          enableAnimations && {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        <Animated.Image
+          source={logoSrc}
+          style={[
+            {
+              width: topLeftLogoSize,
+              height: topLeftLogoSize,
+              resizeMode: 'contain',
+            },
+            enableAnimations && {
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        />
+      </Animated.View>
+    );
+  };
+
   // Render header
   const renderHeader = () => {
     if (!finalContent.title && !finalContent.subtitle) return null;
-    
+
     return (
       <Animated.View
         style={[
@@ -633,7 +755,7 @@ export function AuthScreen({
             {finalContent.title}
           </Text>
         )}
-        
+
         {finalContent.subtitle && (
           <Text
             variant="subtitle"
@@ -650,7 +772,7 @@ export function AuthScreen({
             {finalContent.subtitle}
           </Text>
         )}
-        
+
         {finalContent.description && (
           <Text
             variant="body"
@@ -673,16 +795,16 @@ export function AuthScreen({
       </Animated.View>
     );
   };
-  
+
   // Render form fields based on variant
   const renderFormFields = () => {
     // Account status screens don't need form fields
     if (variant === 'account-review' || variant === 'account-suspended' || variant === 'account-created-successfully') {
       return null;
     }
-    
+
     const fields = [];
-    
+
     // Name field for registration
     if (variant === 'register') {
       fields.push(
@@ -706,9 +828,9 @@ export function AuthScreen({
         />
       );
     }
-    
-    // Email field (for most variants)
-    if (['login', 'register', 'forgot-password', 'forgot-password-email'].includes(variant)) {
+
+    // Email field (for most variants, excluding phone login)
+    if (['login-email', 'register', 'forgot-password', 'forgot-password-email'].includes(variant)) {
       fields.push(
         <Controller
           key="email"
@@ -732,9 +854,9 @@ export function AuthScreen({
         />
       );
     }
-    
-    // Phone field (for registration and WhatsApp reset)
-    if (variant === 'register' || variant === 'forgot-password-whatsapp') {
+
+    // Phone field (for registration, WhatsApp reset, and phone login only)
+    if (variant === 'register' || variant === 'forgot-password-whatsapp' || variant === 'login-phone') {
       fields.push(
         <Controller
           key="phone"
@@ -743,8 +865,16 @@ export function AuthScreen({
           rules={getValidationRules('phone')}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              label={variant === 'forgot-password-whatsapp' ? 'WhatsApp Number' : 'Phone Number (Optional)'}
-              placeholder={variant === 'forgot-password-whatsapp' ? 'Enter your WhatsApp number' : 'Enter your phone number'}
+              label={
+                variant === 'forgot-password-whatsapp' ? 'WhatsApp Number' :
+                variant === 'login-phone' ? 'Phone Number' :
+                'Phone Number (Optional)'
+              }
+              placeholder={
+                variant === 'forgot-password-whatsapp' ? 'Enter your WhatsApp number' :
+                variant === 'login-phone' ? 'Enter your phone number' :
+                'Enter your phone number'
+              }
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -757,9 +887,9 @@ export function AuthScreen({
         />
       );
     }
-    
+
     // Password field
-    if (['login', 'register', 'reset-password'].includes(variant)) {
+    if (['login-email', 'login-phone', 'register', 'reset-password'].includes(variant)) {
       fields.push(
         <Controller
           key="password"
@@ -784,7 +914,7 @@ export function AuthScreen({
         />
       );
     }
-    
+
     // Confirm password field
     if (['register', 'reset-password'].includes(variant)) {
       fields.push(
@@ -811,7 +941,7 @@ export function AuthScreen({
         />
       );
     }
-    
+
     // Verification code fields using OTP component
     if (['verification', 'verification-email', 'verification-whatsapp'].includes(variant)) {
       fields.push(
@@ -833,17 +963,17 @@ export function AuthScreen({
         />
       );
     }
-    
+
     return fields;
   };
-  
+
   // Render form options (remember me, terms)
   const renderFormOptions = () => {
     if (variant === 'forgot-password' || variant === 'verification' || variant === 'account-review' || variant === 'account-suspended' || variant === 'account-created-successfully') return null;
-    
+
     return (
       <View style={{ marginBottom: theme.sizes.lg }}>
-        {showRememberMe && variant === 'login' && (
+        {showRememberMe && ['login-email', 'login-phone'].includes(variant) && (
           <Checkbox
             label="Remember me"
             checked={rememberMe}
@@ -851,7 +981,7 @@ export function AuthScreen({
             style={{ marginBottom: theme.sizes.sm }}
           />
         )}
-        
+
         {showTermsCheckbox && variant === 'register' && (
           <Checkbox
             label="I agree to the Terms of Service and Privacy Policy"
@@ -864,8 +994,8 @@ export function AuthScreen({
             }}
           />
         )}
-        
-        {showForgotPassword && variant === 'login' && (
+
+        {showForgotPassword && ['login-email', 'login-phone'].includes(variant) && (
           <Button
             title="Forgot Password?"
             variant="ghost"
@@ -878,11 +1008,11 @@ export function AuthScreen({
       </View>
     );
   };
-  
+
   // Render social login
   const renderSocialLogin = () => {
     if (!showSocialLogin || socialProviders.length === 0) return null;
-    
+
     return (
       <View style={{ marginBottom: theme.sizes.lg }}>
         <View
@@ -904,7 +1034,7 @@ export function AuthScreen({
           </Text>
           <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
         </View>
-        
+
         <View
           style={{
             flexDirection: 'column',
@@ -912,15 +1042,15 @@ export function AuthScreen({
           }}
         >
           {socialProviders.map((provider, index) => {
-            // Define proper text colors for each platform
+            // Define theme-aware colors for each platform
             const getTextColor = (providerName: string) => {
               switch (providerName.toLowerCase()) {
                 case 'google':
-                  return '#1F1F1F'; // Official Google text color (dark gray)
+                  return theme.isDark ? '#FFFFFF' : '#1F1F1F'; // White on dark theme, dark gray on light
                 case 'apple':
-                  return '#FFFFFF'; // White text on black background
+                  return theme.isDark ? '#000000' : '#FFFFFF'; // Black text on white bg (dark theme), white text on black bg (light)
                 case 'facebook':
-                  return '#FFFFFF'; // White text on blue background
+                  return '#FFFFFF'; // Always white on Facebook blue
                 default:
                   return '#FFFFFF';
               }
@@ -929,11 +1059,11 @@ export function AuthScreen({
             const getBackgroundColor = (providerName: string) => {
               switch (providerName.toLowerCase()) {
                 case 'google':
-                  return '#FFFFFF'; // Official Google white background
+                  return theme.isDark ? colors.surface : '#FFFFFF'; // Use theme surface on dark, white on light
                 case 'apple':
-                  return '#000000'; // Black background for Apple
+                  return theme.isDark ? '#FFFFFF' : '#000000'; // White on dark theme, black on light
                 case 'facebook':
-                  return '#1877F2'; // Official Facebook blue
+                  return '#1877F2'; // Always Facebook blue
                 default:
                   return provider.color;
               }
@@ -942,9 +1072,9 @@ export function AuthScreen({
             const getBorderColor = (providerName: string) => {
               switch (providerName.toLowerCase()) {
                 case 'google':
-                  return '#DADCE0'; // Light gray border for Google
+                  return theme.isDark ? colors.border : '#DADCE0'; // Use theme border on dark
                 case 'apple':
-                  return '#000000'; // Black border for Apple
+                  return theme.isDark ? '#FFFFFF' : '#000000'; // White border on dark, black on light
                 case 'facebook':
                   return '#1877F2'; // Same as background for seamless look
                 default:
@@ -955,7 +1085,7 @@ export function AuthScreen({
             const getButtonStyle = (providerName: string) => {
               const backgroundColor = getBackgroundColor(providerName);
               const borderColor = getBorderColor(providerName);
-              
+
               const baseStyle = {
                 width: '100%',
                 backgroundColor: backgroundColor,
@@ -967,35 +1097,42 @@ export function AuthScreen({
                 ...(backgroundColor && { backgroundColor: backgroundColor }),
               };
 
-              // Add platform-specific styling
+              // Add platform-specific styling with theme awareness
               switch (providerName.toLowerCase()) {
                 case 'facebook':
                   return {
                     ...baseStyle,
-                    backgroundColor: '#1877F2', // Force Facebook blue
+                    backgroundColor: '#1877F2', // Facebook blue (consistent across themes)
                     borderColor: '#1877F2',
-                    shadowColor: '#1877F2',
+                    shadowColor: theme.isDark ? '#000000' : '#1877F2',
                     shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
+                    shadowOpacity: theme.isDark ? 0.3 : 0.1,
                     shadowRadius: 4,
                     elevation: 2,
                   };
                 case 'google':
                   return {
                     ...baseStyle,
-                    backgroundColor: '#FFFFFF', // Pure white - Official Google
-                    borderColor: '#DADCE0', // Light gray border - Official Google
-                    shadowColor: '#000000',
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    shadowColor: theme.isDark ? '#FFFFFF' : '#000000',
                     shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.1,
+                    shadowOpacity: theme.isDark ? 0.2 : 0.1,
                     shadowRadius: 2,
                     elevation: 1,
                   };
                 case 'apple':
                   return {
                     ...baseStyle,
-                    backgroundColor: '#000000', // Force black
-                    borderColor: '#000000',
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    ...(theme.isDark && {
+                      shadowColor: '#FFFFFF',
+                      shadowOffset: { width: 0, height: 1 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 2,
+                      elevation: 1,
+                    }),
                   };
                 default:
                   return baseStyle;
@@ -1010,14 +1147,10 @@ export function AuthScreen({
                 leftIcon={provider.icon}
                 onPress={provider.onPress}
                 style={getButtonStyle(provider.name)}
-                textStyle={{ 
+                textStyle={{
                   color: getTextColor(provider.name),
                   fontWeight: '600',
                   fontSize: theme.fontSizes.md,
-                  // Force text color override - Official platform colors
-                  ...(provider.name.toLowerCase() === 'facebook' && { color: '#FFFFFF' }),
-                  ...(provider.name.toLowerCase() === 'google' && { color: '#1F1F1F' }),
-                  ...(provider.name.toLowerCase() === 'apple' && { color: '#FFFFFF' }),
                 }}
               />
             );
@@ -1026,33 +1159,29 @@ export function AuthScreen({
       </View>
     );
   };
-  
+
   // Render biometric login
   const renderBiometricLogin = () => {
-    if (!enableBiometric || variant !== 'login') return null;
-    
+    if (!enableBiometric || !['login-email', 'login-phone'].includes(variant)) return null;
+
     return (
       <Button
         title="Use Biometric"
-        variant="ghost"
+        variant="outline"
+        size="medium"
         leftIcon="finger-print-outline"
         onPress={onBiometricLogin}
-        style={{
-          alignSelf: 'center',
-          marginBottom: theme.sizes.md,
-        }}
-        textStyle={{ color: colors.primary }}
       />
     );
   };
-  
+
   // Render footer
   const renderFooter = () => {
     if (!finalContent.footerText && !finalContent.footerLinkText) return null;
-    
+
     // Special handling for account-suspended to prevent text overflow
     const isAccountSuspended = variant === 'account-suspended';
-    
+
     return (
       <View
         style={{
@@ -1075,7 +1204,7 @@ export function AuthScreen({
             {finalContent.footerText}
           </Text>
         )}
-        
+
         {finalContent.footerLinkText && (
           <Button
             title={finalContent.footerLinkText}
@@ -1092,7 +1221,7 @@ export function AuthScreen({
       </View>
     );
   };
-  
+
   // Handle form submission
   const handleFormSubmit = async (data: AuthFormData) => {
     if (customValidation) {
@@ -1102,18 +1231,18 @@ export function AuthScreen({
         return;
       }
     }
-    
+
     try {
       await onSubmit?.(data);
     } catch (error) {
-      console.error('Auth form submission error:', error);
+      // Handle error silently or with proper error handling
     }
   };
-  
+
   // Render gradient background
   const renderGradientBackground = () => {
     if (authTheme !== 'gradient' || !gradientColors) return null;
-    
+
     return (
       <View
         style={{
@@ -1135,11 +1264,11 @@ export function AuthScreen({
       </View>
     );
   };
-  
+
   // Render background image
   const renderBackgroundImage = () => {
     if (!backgroundImage) return null;
-    
+
     return (
       <ImageBackground
         source={backgroundImage}
@@ -1161,7 +1290,7 @@ export function AuthScreen({
       </ImageBackground>
     );
   };
-  
+
   // Main form content
   const renderFormContent = () => {
     const cardStyle: ViewStyle = {
@@ -1175,7 +1304,7 @@ export function AuthScreen({
         borderColor: colors.border,
       }),
     };
-    
+
     const content = (
       <Animated.View
         style={[
@@ -1191,11 +1320,11 @@ export function AuthScreen({
         ]}
       >
         {renderHeader()}
-        
-        <View style={{ marginBottom: theme.sizes.lg }}>
+
+        <View>
           {renderFormFields()}
           {renderFormOptions()}
-          
+
           <Button
             title={finalContent.primaryButtonText || 'Submit'}
             variant="primary"
@@ -1208,7 +1337,7 @@ export function AuthScreen({
               showTermsCheckbox && variant === 'register' ? !agreeToTerms : false
             }
           />
-          
+
           {finalContent.secondaryButtonText && (
             <Button
               title={finalContent.secondaryButtonText}
@@ -1219,13 +1348,13 @@ export function AuthScreen({
             />
           )}
         </View>
-        
+
         {renderBiometricLogin()}
         {renderSocialLogin()}
         {renderFooter()}
       </Animated.View>
     );
-    
+
     if (layout === 'fullscreen') {
       return (
         <View style={{ flex: 1, justifyContent: 'center', padding: theme.sizes.xl }}>
@@ -1233,10 +1362,10 @@ export function AuthScreen({
         </View>
       );
     }
-    
+
     return content;
   };
-  
+
   return (
     <SafeAreaView
       style={[getContainerStyle(), style, { flex: 1 }]}
@@ -1244,14 +1373,19 @@ export function AuthScreen({
       accessible={accessible}
     >
       <StatusBar
-        barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'}
-        backgroundColor={colors.background}
-        translucent={authTheme === 'gradient' || backgroundImage ? true : false}
+        barStyle={
+          authTheme === 'gradient' || authTheme === 'glassmorphism' || authTheme === 'branded' || authTheme === 'dark' ||
+          (colors.text === '#FFFFFF' || colors.background === 'transparent')
+            ? 'light-content'
+            : 'dark-content'
+        }
+        backgroundColor={colors.background === 'transparent' ? 'transparent' : colors.background}
+        translucent={authTheme === 'gradient' || authTheme === 'glassmorphism' || backgroundImage ? true : false}
       />
-      
+
       {renderGradientBackground()}
       {renderBackgroundImage()}
-      
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
@@ -1262,8 +1396,8 @@ export function AuthScreen({
             {
               flexGrow: 1,
               paddingHorizontal: layout === 'minimal' ? theme.sizes.md : layout === 'card' ? theme.sizes.sm : theme.sizes.lg,
-              paddingTop: authTheme === 'gradient' || backgroundImage ? insets.top + theme.sizes.lg : theme.sizes.xl,
-              paddingBottom: Math.max(insets.bottom, theme.sizes.sm) + theme.sizes.md,
+              paddingTop: theme.sizes.sm,
+              paddingBottom: Math.max(insets.bottom, theme.sizes.sm) + (layout === 'centered' ? theme.sizes.md : theme.sizes.xs),
               ...(layout === 'centered' && { justifyContent: 'center', minHeight: '100%' }),
               ...(layout === 'split' && { justifyContent: 'space-between', minHeight: '100%' }),
               ...(layout === 'fullscreen' && { paddingHorizontal: 0 }),
@@ -1274,6 +1408,7 @@ export function AuthScreen({
           keyboardShouldPersistTaps="handled"
           bounces={true}
         >
+          {renderTopLeftLogo()}
           {renderLogo()}
           {renderFormContent()}
         </ScrollView>

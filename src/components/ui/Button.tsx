@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   ViewStyle,
+  TextStyle,
   View,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -22,6 +23,8 @@ interface ButtonProps extends TouchableOpacityProps {
   disabled?: boolean;
   leftIcon?: IconName;
   rightIcon?: IconName;
+  textStyle?: TextStyle;
+  iconColor?: string;
 }
 
 export function Button({
@@ -32,6 +35,8 @@ export function Button({
   disabled = false,
   leftIcon,
   rightIcon,
+  textStyle,
+  iconColor,
   style,
   onPress,
   ...props
@@ -175,7 +180,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator 
           size="small" 
-          color={getTextColor()} 
+          color={iconColor || textStyle?.color || getTextColor()} 
         />
       ) : (
         <>
@@ -183,7 +188,7 @@ export function Button({
             <View style={{ marginRight: title ? theme.sizes.sm : 0 }}>
               <Icon 
                 name={leftIcon} 
-                color={getTextColor()} 
+                color={iconColor || textStyle?.color || getTextColor()} 
                 size={getFontSize()} 
               />
             </View>
@@ -191,11 +196,14 @@ export function Button({
           
           {title && (
             <Text
-              style={{
-                color: getTextColor(),
-                fontSize: getFontSize(),
-                fontWeight: '600',
-              }}
+              style={[
+                {
+                  color: getTextColor(),
+                  fontSize: getFontSize(),
+                  fontWeight: '600',
+                },
+                textStyle
+              ]}
             >
               {title}
             </Text>
@@ -205,7 +213,7 @@ export function Button({
             <View style={{ marginLeft: title ? theme.sizes.sm : 0 }}>
               <Icon 
                 name={rightIcon} 
-                color={getTextColor()} 
+                color={iconColor || textStyle?.color || getTextColor()} 
                 size={getFontSize()} 
               />
             </View>
