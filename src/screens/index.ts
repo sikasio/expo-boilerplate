@@ -3,3 +3,6 @@ export type { SplashScreenVariant, SplashScreenLayout, SplashScreenTheme } from 
 
 export { AuthScreen } from './AuthScreen';
 export type { AuthScreenVariant, AuthScreenLayout, AuthScreenTheme, AuthScreenProps } from './AuthScreen';
+
+export { OnboardingScreen } from './OnboardingScreen';
+export type { OnboardingSlide, OnboardingScreenProps } from './OnboardingScreen';
