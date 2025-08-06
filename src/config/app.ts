@@ -61,6 +61,7 @@ export const AppConfig = {
   storage: {
     theme: 'ignite_theme',
     language: 'ignite_language',
+    fontSize: 'ignite_font_size',
     onboardingCompleted: 'ignite_onboarding_completed',
     notificationSettings: 'ignite_notifications',
   },
@@ -69,6 +70,7 @@ export const AppConfig = {
   defaults: {
     theme: 'light' as const,
     language: 'en',
+    fontSize: 16,
     notifications: {
       push: true,
       email: true,
@@ -91,6 +93,15 @@ export const AppConfig = {
 export type AppConfigType = typeof AppConfig;
 export type ThemeType = typeof AppConfig.defaults.theme;
 export type LanguageType = typeof AppConfig.defaults.language;
+export type FontSizeType = typeof AppConfig.defaults.fontSize;
+
+// Available language options
+export const LanguageOptions = [
+  { label: 'English', value: 'en' },
+  { label: 'Spanish', value: 'es' },
+  { label: 'French', value: 'fr' },
+  { label: 'German', value: 'de' },
+] as const;
 
 // Utility functions
 export const getAppName = () => AppConfig.name;

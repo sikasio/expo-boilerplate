@@ -1,4 +1,4 @@
-import { COLORS, DARK_COLORS, SIZES, FONT_SIZES, BORDER_RADIUS } from '@/constants';
+import { COLORS, DARK_COLORS, COLOR_SCHEMES, SIZES, FONT_SIZES, BORDER_RADIUS } from '@/constants';
 
 export interface Theme {
   colors: typeof COLORS;
@@ -24,6 +24,21 @@ export const darkTheme: Theme = {
   isDark: true,
 };
 
-export const getTheme = (isDark: boolean): Theme => {
-  return isDark ? darkTheme : lightTheme;
+export const getTheme = (isDark: boolean, colorScheme: string = 'blue'): Theme => {
+  const baseTheme = isDark ? darkTheme : lightTheme;
+  const schemeColors = COLOR_SCHEMES[colorScheme as keyof typeof COLOR_SCHEMES];
+  
+  if (schemeColors) {
+    const colors = isDark ? schemeColors.dark : schemeColors.light;
+    return {
+      ...baseTheme,
+      colors: {
+        ...baseTheme.colors,
+        primary: colors.primary,
+        secondary: colors.secondary,
+      },
+    };
+  }
+  
+  return baseTheme;
 };

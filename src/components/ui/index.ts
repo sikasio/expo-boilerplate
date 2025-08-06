@@ -15,6 +15,7 @@ export { HeroSection } from './HeroSection';
 export { Checkbox } from './Checkbox';
 export { List, ListItem, ListSection, ListDivider } from './List';
 export { HorizontalCardScroll } from './HorizontalCardScroll';
+export { GlobalConfigPanel } from '../overlays/GlobalConfigPanel';
 export type { IconName } from './Icon';
 export type { IconFamily, IconName as EnhancedIconName } from './EnhancedIcon';
 export { getAvailableIconFamilies } from './EnhancedIcon';

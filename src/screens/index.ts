@@ -6,3 +6,6 @@ export type { AuthScreenVariant, AuthScreenLayout, AuthScreenTheme, AuthScreenPr
 
 export { OnboardingScreen } from './OnboardingScreen';
 export type { OnboardingSlide, OnboardingScreenProps } from './OnboardingScreen';
+
+export { SettingsScreen } from './SettingsScreen';
+export type { SettingsScreenLayout, SettingsScreenTheme, SettingsScreenProps } from './SettingsScreen';

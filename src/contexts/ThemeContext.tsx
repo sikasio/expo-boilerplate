@@ -8,7 +8,9 @@ import { STORAGE_KEYS } from '@/constants';
 interface ThemeContextType {
   theme: Theme;
   themeMode: ThemeMode;
+  colorScheme: string;
   setThemeMode: (mode: ThemeMode) => void;
+  setColorScheme: (scheme: string) => void;
   toggleTheme: () => void;
 }
 
@@ -17,9 +19,11 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
+  const [colorScheme, setColorSchemeState] = useState<string>('blue');
 
   useEffect(() => {
     loadThemeMode();
+    loadColorScheme();
   }, []);
 
   const loadThemeMode = async () => {
@@ -33,12 +37,32 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loadColorScheme = async () => {
+    try {
+      const savedScheme = await StorageService.getItem(STORAGE_KEYS.COLOR_SCHEME);
+      if (savedScheme) {
+        setColorSchemeState(savedScheme);
+      }
+    } catch (error) {
+      console.error('Failed to load color scheme:', error);
+    }
+  };
+
   const setThemeMode = async (mode: ThemeMode) => {
     try {
       setThemeModeState(mode);
       await StorageService.setItem(STORAGE_KEYS.THEME, mode);
     } catch (error) {
       console.error('Failed to save theme mode:', error);
+    }
+  };
+
+  const setColorScheme = async (scheme: string) => {
+    try {
+      setColorSchemeState(scheme);
+      await StorageService.setItem(STORAGE_KEYS.COLOR_SCHEME, scheme);
+    } catch (error) {
+      console.error('Failed to save color scheme:', error);
     }
   };
 
@@ -56,7 +80,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       isDark = themeMode === 'dark';
     }
     
-    return getTheme(isDark);
+    return getTheme(isDark, colorScheme);
   };
 
   const theme = getEffectiveTheme();
@@ -64,7 +88,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const value: ThemeContextType = {
     theme,
     themeMode,
+    colorScheme,
     setThemeMode,
+    setColorScheme,
     toggleTheme,
   };
 
