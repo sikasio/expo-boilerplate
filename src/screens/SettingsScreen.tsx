@@ -188,7 +188,7 @@ export function SettingsScreen({
   };
 
   const handleUserPress = () => {
-    onUserPress?.() || Alert.alert('User Profile', 'Navigate to user profile');
+    onUserPress?.() || Alert.alert('User Settings', 'Navigate to user settings');
   };
 
   const handleSearchPress = () => {
@@ -279,15 +279,6 @@ export function SettingsScreen({
       subtitle: 'Manage your account settings',
       icon: 'person-outline',
       items: [
-        {
-          id: 'profile',
-          title: 'Edit Profile',
-          subtitle: 'Update your personal information',
-          icon: 'create-outline',
-          type: 'navigation',
-          rightIcon: 'chevron-forward-outline',
-          onPress: () => Alert.alert('Edit Profile', 'Navigate to edit profile'),
-        },
         {
           id: 'privacy',
           title: 'Privacy & Security',
