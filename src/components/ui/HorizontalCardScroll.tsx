@@ -10,6 +10,7 @@ import {
   Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Image,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Card, CardProps } from './Card';
@@ -54,7 +55,7 @@ export interface HorizontalCardScrollProps extends Omit<ScrollViewProps, 'horizo
     onPress: () => void;
     icon?: IconName;
   };
-  contentPadding?: number;
+  contentPadding?: number | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   snapToCards?: boolean;
   loading?: boolean;
   error?: string;
@@ -70,6 +71,7 @@ export interface HorizontalCardScrollProps extends Omit<ScrollViewProps, 'horizo
   renderEmpty?: () => React.ReactNode;
   renderError?: (error: string) => React.ReactNode;
   renderLoading?: () => React.ReactNode;
+  imageNoPadding?: boolean;
 }
 
 export function HorizontalCardScroll({
@@ -100,6 +102,7 @@ export function HorizontalCardScroll({
   renderEmpty,
   renderError,
   renderLoading,
+  imageNoPadding = false,
   style,
   ...scrollViewProps
 }: HorizontalCardScrollProps) {
@@ -150,7 +153,22 @@ export function HorizontalCardScroll({
   };
 
   const getDefaultContentPadding = () => {
-    if (contentPadding !== undefined) return contentPadding;
+    if (contentPadding !== undefined) {
+      // Handle theme size values
+      if (typeof contentPadding === 'string') {
+        switch (contentPadding) {
+          case 'none': return 0;
+          case 'xs': return theme.sizes.xs;
+          case 'sm': return theme.sizes.sm;
+          case 'md': return theme.sizes.md;
+          case 'lg': return theme.sizes.lg;
+          case 'xl': return theme.sizes.xl;
+          default: return theme.sizes.md;
+        }
+      }
+      // Handle numeric values
+      return contentPadding;
+    }
     return variant === 'hero' ? 20 : 16;
   };
 
@@ -215,7 +233,7 @@ export function HorizontalCardScroll({
   const renderDefaultCard = (item: CardData, index: number) => {
     const cardStyle: ViewStyle = {
       width: finalCardWidth,
-      height: finalCardHeight,
+      ...(cardHeight ? { height: finalCardHeight } : {}),
       marginRight: index === data.length - 1 ? 0 : finalSpacing,
     };
 
@@ -231,22 +249,67 @@ export function HorizontalCardScroll({
     return (
       <Card
         key={item.id}
-        title={item.title}
-        subtitle={item.subtitle}
-        description={item.description}
-        headerIcon={item.icon}
         onPress={item.onPress}
         variant={variant === 'hero' ? 'elevated' : 'outlined'}
         style={cardStyle}
+        padding={imageNoPadding ? "none" : "medium"}
         {...item.cardProps}
       >
-        {/* Badge */}
-        {item.badge && (
+        {/* Image */}
+        {item.image && (
+          <View style={{
+            height: variant === 'compact' ? 100 : 120,
+            backgroundColor: theme.colors.background,
+            borderTopLeftRadius: imageNoPadding ? 0 : theme.borderRadius.md,
+            borderTopRightRadius: imageNoPadding ? 0 : theme.borderRadius.md,
+            borderBottomLeftRadius: imageNoPadding ? 0 : theme.borderRadius.md,
+            borderBottomRightRadius: imageNoPadding ? 0 : theme.borderRadius.md,
+            marginBottom: imageNoPadding ? 0 : theme.sizes.sm,
+            marginHorizontal: imageNoPadding ? 0 : 0,
+            marginTop: imageNoPadding ? 0 : 0,
+            overflow: 'hidden',
+            position: 'relative'
+          }}>
+            <Image
+              source={{ uri: item.image }}
+              style={{
+                width: '100%',
+                height: '100%',
+                resizeMode: 'cover'
+              }}
+            />
+            
+            {/* Badge overlay on image */}
+            {item.badge && (
+              <View style={{
+                position: 'absolute',
+                top: theme.sizes.xs,
+                left: theme.sizes.xs,
+                backgroundColor: theme.colors.error,
+                paddingHorizontal: theme.sizes.xs,
+                paddingVertical: 2,
+                borderRadius: theme.borderRadius.xs,
+                zIndex: 1,
+              }}>
+                <Text style={{
+                  color: '#FFFFFF',
+                  fontSize: 10,
+                  fontWeight: '700',
+                }}>
+                  {item.badge}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Badge fallback (when no image) */}
+        {!item.image && item.badge && (
           <View style={{
             position: 'absolute',
             top: theme.sizes.sm,
             right: theme.sizes.sm,
-            backgroundColor: theme.colors.primary,
+            backgroundColor: theme.colors.error,
             paddingHorizontal: theme.sizes.sm,
             paddingVertical: theme.sizes.xs,
             borderRadius: theme.borderRadius.sm,
@@ -262,16 +325,57 @@ export function HorizontalCardScroll({
           </View>
         )}
 
+        {/* Product Title */}
+        {item.title && (
+          <Text style={{
+            fontSize: theme.fontSizes.md,
+            fontWeight: '600',
+            marginBottom: theme.sizes.xs,
+            marginTop: imageNoPadding && item.image ? theme.sizes.sm : 0,
+            marginHorizontal: imageNoPadding ? theme.sizes.md : 0,
+            color: theme.colors.text,
+          }} numberOfLines={2}>
+            {item.title}
+          </Text>
+        )}
+
+        {/* Description */}
+        {item.description && !item.description.startsWith('$') && (
+          <Text style={{
+            fontSize: theme.fontSizes.sm,
+            color: theme.colors.textSecondary,
+            marginBottom: theme.sizes.xs,
+            marginHorizontal: imageNoPadding ? theme.sizes.md : 0,
+          }} numberOfLines={2}>
+            {item.description}
+          </Text>
+        )}
+
         {/* Price */}
         {item.price && (
-          <View style={{ marginTop: theme.sizes.sm }}>
+          <View style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center',
+            marginTop: theme.sizes.xs,
+            marginHorizontal: imageNoPadding ? theme.sizes.md : 0
+          }}>
             <Text style={{
-              fontSize: theme.fontSizes.lg,
+              fontSize: theme.fontSizes.md,
               fontWeight: '700',
               color: theme.colors.primary,
             }}>
               {item.price}
             </Text>
+            {item.description && item.description.startsWith('$') && (
+              <Text style={{
+                fontSize: theme.fontSizes.sm,
+                textDecorationLine: 'line-through',
+                color: theme.colors.textSecondary,
+                marginLeft: theme.sizes.xs,
+              }}>
+                {item.description}
+              </Text>
+            )}
           </View>
         )}
 
@@ -280,7 +384,8 @@ export function HorizontalCardScroll({
           <View style={{ 
             flexDirection: 'row', 
             alignItems: 'center', 
-            marginTop: theme.sizes.xs 
+            marginTop: theme.sizes.xs,
+            marginHorizontal: imageNoPadding ? theme.sizes.md : 0
           }}>
             {[...Array(5)].map((_, i) => (
               <Icon
@@ -307,6 +412,7 @@ export function HorizontalCardScroll({
             flexDirection: 'row', 
             flexWrap: 'wrap',
             marginTop: theme.sizes.sm,
+            marginHorizontal: imageNoPadding ? theme.sizes.md : 0,
             gap: theme.sizes.xs,
           }}>
             {item.tags.slice(0, 3).map((tag, tagIndex) => (
@@ -330,6 +436,11 @@ export function HorizontalCardScroll({
               </View>
             ))}
           </View>
+        )}
+        
+        {/* Bottom padding when imageNoPadding is enabled */}
+        {imageNoPadding && (
+          <View style={{ height: theme.sizes.md }} />
         )}
       </Card>
     );
@@ -550,7 +661,7 @@ export function HorizontalCardScroll({
         {hasMore && (
           <View style={{
             width: 80,
-            height: finalCardHeight,
+            ...(cardHeight ? { height: finalCardHeight } : { minHeight: 120 }),
             justifyContent: 'center',
             alignItems: 'center',
             marginLeft: finalSpacing,

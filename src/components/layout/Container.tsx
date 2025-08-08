@@ -10,7 +10,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 interface ContainerProps extends ViewProps {
   children: React.ReactNode;
   safeArea?: boolean;
-  padding?: 'none' | 'small' | 'medium' | 'large';
+  padding?: 'none' | 'small' | 'medium' | 'large' | 'sm' | 'md' | 'lg' | 'xl';
   backgroundColor?: string;
 }
 
@@ -27,6 +27,7 @@ export function Container({
   const getContainerStyle = () => {
     const paddingStyles = {
       none: {},
+      // Legacy padding options
       small: {
         paddingHorizontal: theme.sizes.sm,
         paddingTop: theme.sizes.md,
@@ -38,6 +39,23 @@ export function Container({
       large: {
         paddingHorizontal: theme.sizes.lg,
         paddingTop: theme.sizes.lg,
+      },
+      // Direct theme size values
+      sm: {
+        paddingHorizontal: theme.sizes.sm,
+        paddingTop: theme.sizes.sm,
+      },
+      md: {
+        paddingHorizontal: theme.sizes.md,
+        paddingTop: theme.sizes.md,
+      },
+      lg: {
+        paddingHorizontal: theme.sizes.lg,
+        paddingTop: theme.sizes.lg,
+      },
+      xl: {
+        paddingHorizontal: theme.sizes.xl,
+        paddingTop: theme.sizes.xl,
       },
     };
 
