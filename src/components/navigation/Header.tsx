@@ -20,6 +20,7 @@ interface HeaderProps extends ViewProps {
   borderBottom?: boolean;
   paddingHorizontal?: 'none' | 'small' | 'medium' | 'large';
   marginBottom?: HeaderMarginBottom;
+  rightSectionWidth?: number;
 }
 
 export function Header({
@@ -35,6 +36,7 @@ export function Header({
   borderBottom = false,
   paddingHorizontal = 'large',
   marginBottom = 'medium',
+  rightSectionWidth = 55,
   style,
   ...props
 }: HeaderProps) {
@@ -165,7 +167,7 @@ export function Header({
     if (rightComponent) {
       return (
         <View style={{
-          width: 55, // Fixed width for right section
+          width: rightSectionWidth, // Configurable width for right section
           alignItems: 'center',
           justifyContent: 'center',
         }}>
@@ -174,7 +176,7 @@ export function Header({
       );
     }
 
-    return <View style={{ width: 55 }} />;
+    return <View style={{ width: rightSectionWidth }} />;
   };
 
   return (

@@ -101,6 +101,10 @@ export interface AuthScreenProps {
   layout?: AuthScreenLayout;
   theme?: AuthScreenTheme;
 
+  // Navigation
+  showBackButton?: boolean;
+  onBackPress?: () => void;
+
   // Content
   content?: AuthScreenContent;
   logo?: React.ReactNode;
@@ -165,6 +169,8 @@ export function AuthScreen({
   variant = 'login',
   layout = 'default',
   theme: authTheme,
+  showBackButton = false,
+  onBackPress,
   content = {},
   logo,
   logoSource,
@@ -667,9 +673,45 @@ export function AuthScreen({
     );
   };
 
+  // Render back button
+  const renderBackButton = () => {
+    if (!showBackButton) return null;
+
+    return (
+      <Animated.View
+        style={[
+          {
+            alignSelf: 'flex-start',
+            marginBottom: theme.sizes.md,
+          },
+          enableAnimations && {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={onBackPress}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: theme.borderRadius.md,
+            backgroundColor: colors.surface,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: colors.border,
+          }}
+        >
+          <Icon name="chevron-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
+
   // Render top left logo
   const renderTopLeftLogo = () => {
-    if (!showTopLeftLogo) return null;
+    if (!showTopLeftLogo || showBackButton) return null; // Don't show logo if back button is shown
 
     // Smart logo selection based on theme
     const getSmartLogoSource = () => {
@@ -1408,6 +1450,7 @@ export function AuthScreen({
           keyboardShouldPersistTaps="handled"
           bounces={true}
         >
+          {renderBackButton()}
           {renderTopLeftLogo()}
           {renderLogo()}
           {renderFormContent()}
