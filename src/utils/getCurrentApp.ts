@@ -2,7 +2,7 @@
  * Utility to get the current app name from the config file
  */
 
-import appConfig from '../../app.config.json';
+import appConfig from '../../current-app.json';
 
 export function getCurrentApp(): string {
   return appConfig.currentApp || '_default';
