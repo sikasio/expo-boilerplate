@@ -10,7 +10,6 @@ import {
   Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Image,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Card, CardProps } from './Card';
@@ -18,6 +17,7 @@ import { Text } from './Text';
 import { Button } from './Button';
 import { Icon, IconName } from './Icon';
 import { LoadingSpinner } from './LoadingSpinner';
+import { LazyImage, LoadingSpinnerSize, LoadingSpinnerVariant } from './LazyImage';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -72,6 +72,10 @@ export interface HorizontalCardScrollProps extends Omit<ScrollViewProps, 'horizo
   renderError?: (error: string) => React.ReactNode;
   renderLoading?: () => React.ReactNode;
   imageNoPadding?: boolean;
+  // LazyImage props
+  loadingTimeout?: number;
+  spinnerSize?: LoadingSpinnerSize;
+  spinnerVariant?: LoadingSpinnerVariant;
 }
 
 export function HorizontalCardScroll({
@@ -103,6 +107,10 @@ export function HorizontalCardScroll({
   renderError,
   renderLoading,
   imageNoPadding = false,
+  // LazyImage props
+  loadingTimeout,
+  spinnerSize,
+  spinnerVariant,
   style,
   ...scrollViewProps
 }: HorizontalCardScrollProps) {
@@ -270,13 +278,16 @@ export function HorizontalCardScroll({
             overflow: 'hidden',
             position: 'relative'
           }}>
-            <Image
+            <LazyImage
               source={{ uri: item.image }}
               style={{
                 width: '100%',
                 height: '100%',
-                resizeMode: 'cover'
               }}
+              resizeMode="cover"
+              loadingTimeout={loadingTimeout}
+              spinnerSize={spinnerSize}
+              spinnerVariant={spinnerVariant}
             />
             
             {/* Badge overlay on image */}
