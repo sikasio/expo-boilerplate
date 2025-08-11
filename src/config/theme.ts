@@ -21,11 +21,6 @@ export const lightTheme: Theme = {
   sizes: SIZES,
   fontSizes: FONT_SIZES,
   borderRadius: BORDER_RADIUS,
-  lazyImage: {
-    spinnerSize: 'medium',
-    spinnerVariant: 'circle',
-    defaultTimeout: 500,
-  },
   isDark: false,
 };
 
@@ -34,11 +29,6 @@ export const darkTheme: Theme = {
   sizes: SIZES,
   fontSizes: FONT_SIZES,
   borderRadius: BORDER_RADIUS,
-  lazyImage: {
-    spinnerSize: 'medium',
-    spinnerVariant: 'pulse',
-    defaultTimeout: 2000,
-  },
   isDark: true,
 };
 
@@ -50,6 +40,11 @@ export const getTheme = (isDark: boolean, colorScheme: string = 'blue'): Theme =
     const colors = isDark ? schemeColors.dark : schemeColors.light;
     return {
       ...baseTheme,
+      lazyImage: {
+        spinnerSize: 'medium',
+        spinnerVariant: 'circle',
+        defaultTimeout: 500,
+      },
       colors: {
         ...baseTheme.colors,
         primary: colors.primary,
