@@ -8,8 +8,10 @@ import {
   Animated,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
+import { getFlexDirection, getRTLMargin } from '@/utils';
 
 export type CheckboxVariant = 'default' | 'success' | 'warning' | 'error';
 export type CheckboxSize = 'small' | 'medium' | 'large';
@@ -58,6 +60,8 @@ export function Checkbox({
   ...props
 }: CheckboxProps) {
   const { theme } = useTheme();
+  
+  const { isRTL } = useRTL();
   const scaleAnimation = useRef(new Animated.Value(checked || indeterminate ? 1 : 0.8)).current;
   const opacityAnimation = useRef(new Animated.Value(checked || indeterminate ? 1 : 0)).current;
 
@@ -238,16 +242,18 @@ export function Checkbox({
 
   const renderContent = () => {
     if (!label && !description) return null;
+    
+    const margin = getRTLMargin(isRTL);
 
     return (
-      <View style={{ flex: 1, marginLeft: sizeConfig.spacing }}>
+      <View style={[{ flex: 1 }, margin.marginStart(sizeConfig.spacing)]}>
         {label && (
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: getFlexDirection(isRTL), alignItems: 'center' }}>
             <Text style={getLabelStyle()}>
               {label}
             </Text>
             {required && (
-              <Text style={{ color: theme.colors.error, marginLeft: 2 }}>
+              <Text style={[{ color: theme.colors.error }, margin.marginStart(2)]}>
                 *
               </Text>
             )}
@@ -275,7 +281,7 @@ export function Checkbox({
     <TouchableOpacity
       style={[
         {
-          flexDirection: 'row',
+          flexDirection: getFlexDirection(isRTL),
           alignItems: 'flex-start',
           opacity: disabled ? 0.6 : 1,
         },

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Icon } from '../ui/Icon';
 import { Text } from '../ui/Text';
 import { List, ListItem } from '../ui/List';
@@ -38,6 +39,7 @@ export function GlobalConfigPanel({
   testID = 'global-config-panel',
 }: GlobalConfigPanelProps) {
   const { theme, toggleTheme, colorScheme, setColorScheme } = useTheme();
+  const { isRTL, toggleRTL } = useRTL();
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = Dimensions.get('window');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -66,7 +68,7 @@ export function GlobalConfigPanel({
     console.log(`Color scheme changed to: ${selectedColor?.label} (Primary: ${selectedColor?.primary}, Secondary: ${selectedColor?.secondary})`);
   };
 
-  // Configuration options - Theme and Color Scheme
+  // Configuration options - Theme, RTL, and Color Scheme
   const configOptions: ConfigOption[] = [
     {
       id: 'dark-mode-toggle',
@@ -78,6 +80,21 @@ export function GlobalConfigPanel({
       onToggle: (value: boolean) => {
         if (value !== theme.isDark) {
           toggleTheme();
+        }
+        setIsMenuOpen(false);
+        setTimeout(() => slideOut(), 300);
+      },
+    },
+    {
+      id: 'rtl-direction-toggle',
+      label: 'RTL Direction',
+      icon: 'text-outline',
+      description: 'Use Right-to-Left layout',
+      type: 'toggle',
+      value: isRTL,
+      onToggle: (value: boolean) => {
+        if (value !== isRTL) {
+          toggleRTL();
         }
         setIsMenuOpen(false);
         setTimeout(() => slideOut(), 300);

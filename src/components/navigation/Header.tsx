@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, ViewStyle, ViewProps } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Text } from '@/components/ui/Text';
 import { BackButton, BackButtonProps } from './BackButton';
 import { IconName } from '@/components/ui/Icon';
+import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
 
 export type HeaderMarginBottom = 'none' | 'small' | 'medium' | 'large';
 
@@ -41,6 +43,8 @@ export function Header({
   ...props
 }: HeaderProps) {
   const { theme } = useTheme();
+  
+  const { isRTL } = useRTL();
 
   const getMarginBottom = () => {
     switch (marginBottom) {
@@ -53,8 +57,8 @@ export function Header({
   };
 
   const getHeaderStyle = (): ViewStyle => {
-    return {
-      flexDirection: 'row',
+    const baseStyle: ViewStyle = {
+      flexDirection: getFlexDirection(isRTL),
       alignItems: 'center',
       minHeight: 56,
       paddingHorizontal: theme.sizes.sm,
@@ -70,6 +74,8 @@ export function Header({
       shadowRadius: 4,
       elevation: 2,
     };
+
+    return createRTLStyle(baseStyle, {}, isRTL);
   };
 
   const renderLeftSection = () => {
@@ -129,6 +135,7 @@ export function Header({
           {title && (
             <Text
               variant="subtitle"
+              // RTL handled internally by Text component
               style={{
                 fontSize: theme.fontSizes[titleSize],
                 fontWeight: '600',
@@ -144,6 +151,7 @@ export function Header({
           {subtitle && (
             <Text
               variant="caption"
+              // RTL handled internally by Text component
               style={{
                 color: theme.colors.textSecondary,
                 textAlign: 'center',

@@ -415,7 +415,7 @@ export function SettingsScreen({
               { label: '22px', value: 22 },
               { label: '24px', value: 24 },
             ];
-            
+
             Alert.alert(
               'Select Font Size',
               'Choose your preferred font size',
@@ -474,7 +474,7 @@ export function SettingsScreen({
               { label: 'Wi-Fi + Cellular', value: 'all' },
               { label: 'Ask Every Time', value: 'ask' },
             ];
-            
+
             Alert.alert(
               'Data Usage',
               'Choose when to use mobile data',
@@ -787,12 +787,12 @@ export function SettingsScreen({
     );
   };
 
-  // Render setting item
+  // Render setting item using our RTL-aware ListItem component
   const renderSettingItem = (item: SettingItem) => {
-    const itemColor = item.color || colors.text;
     const isDisabled = item.disabled || false;
 
-    const rightContent = () => {
+    // Create rightContent for different item types
+    const getRightContent = () => {
       switch (item.type) {
         case 'toggle':
           return (
@@ -839,140 +839,64 @@ export function SettingsScreen({
             </Text>
           ) : null;
         default:
-          return item.badge ? (
-            <View style={{
-              backgroundColor: theme.colors.primary,
-              paddingHorizontal: theme.sizes.sm,
-              paddingVertical: 2,
-              borderRadius: theme.borderRadius.sm,
-              marginRight: theme.sizes.xs,
-            }}>
-              <Text style={{
-                color: '#FFFFFF',
-                fontSize: theme.fontSizes.xs,
-                fontWeight: '600',
-              }}>
-                {item.badge}
-              </Text>
-            </View>
-          ) : null;
+          return null;
       }
     };
 
-    const Container = item.onPress && !isDisabled ? TouchableOpacity : View;
-
     return (
-      <Container
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
+      <ListItem
+        title={item.title}
+        subtitle={item.subtitle}
+        leftIcon={item.icon}
+        rightIcon={item.type === 'navigation' ? item.rightIcon : undefined}
+        rightContent={getRightContent()}
+        badge={item.badge ? { text: item.badge } : undefined}
+        onPress={!isDisabled ? item.onPress : undefined}
+        disabled={isDisabled}
+        titleStyle={{
+          fontSize: theme.fontSizes.sm,
+          color: item.destructive ? theme.colors.error : (item.color || colors.text),
+          fontWeight: '500',
+        }}
+        subtitleStyle={{
+          fontSize: theme.fontSizes.xs,
+          color: colors.textSecondary,
+        }}
+        itemStyle={{
           paddingVertical: theme.sizes.md,
-          paddingLeft: theme.sizes.sm + 4,
-          paddingRight: theme.sizes.md,
           opacity: isDisabled ? 0.5 : 1,
         }}
-        onPress={!isDisabled ? item.onPress : undefined}
-        activeOpacity={0.7}
-      >
-        {/* Custom larger icon */}
-        <View style={{
-          marginRight: theme.sizes.md,
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: 28,
-          height: 28,
-        }}>
-          <Icon
-            name={item.icon}
-            size={24} // Increased from 20 to 24
-            color={item.destructive ? theme.colors.error : (isDisabled ? colors.textSecondary : colors.text)}
-          />
-        </View>
-
-        {/* Content */}
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <Text
-            style={{
-              fontSize: theme.fontSizes.sm,
-              color: item.destructive ? theme.colors.error : itemColor,
-              fontWeight: '500',
-              marginBottom: item.subtitle ? 2 : 0,
-            }}
-          >
-            {item.title}
-          </Text>
-
-          {item.subtitle && (
-            <Text
-              style={{
-                fontSize: theme.fontSizes.xs,
-                color: colors.textSecondary,
-              }}
-            >
-              {item.subtitle}
-            </Text>
-          )}
-        </View>
-
-        {/* Right content */}
-        {rightContent()}
-
-        {/* Right chevron for navigation items */}
-        {item.type === 'navigation' && item.rightIcon && (
-          <View style={{ marginLeft: theme.sizes.sm }}>
-            <Icon
-              name={item.rightIcon}
-              size={20}
-              color={colors.textSecondary}
-            />
-          </View>
-        )}
-      </Container>
+      />
     );
   };
 
-  // Render settings sections
+  // Render settings sections using our RTL-aware List components
   const renderSettingsSections = () => (
     <View>
       {sections.map((section, sectionIndex) => (
-        <Card key={section.id} style={{ marginBottom: theme.sizes.lg }}>
-          <View style={{ marginBottom: theme.sizes.md }}>
-            <View style={{ marginBottom: theme.sizes.xs }}>
-              <Text variant="subtitle" style={{
-                fontWeight: '600',
-                fontSize: theme.fontSizes.md,
-                color: theme.colors.primary,
-              }}>
-                {section.title}
-              </Text>
-            </View>
-            {section.subtitle && (
-              <Text variant="caption" style={{
-                color: colors.textSecondary,
-                fontSize: theme.fontSizes.xs,
-              }}>
-                {section.subtitle}
-              </Text>
-            )}
-          </View>
-
-          <View style={{
-            marginHorizontal: -theme.sizes.md,
-            marginBottom: -theme.sizes.md,
-          }}>
-            {section.items.map((item, itemIndex) => (
+        <List key={section.id} variant="default" showDividers={true} dividerVariant="full"
+          style={{ marginBottom: theme.sizes.lg, backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md }}
+        >
+          <ListSection
+            title={section.title}
+            subtitle={section.subtitle}
+            titleStyle={{
+              fontWeight: '600',
+              fontSize: theme.fontSizes.md,
+              color: theme.colors.primary,
+            }}
+            subtitleStyle={{
+              color: colors.textSecondary,
+              fontSize: theme.fontSizes.xs,
+            }}
+          >
+            {section.items.map((item) => (
               <React.Fragment key={item.id}>
                 {renderSettingItem(item)}
-                {itemIndex < section.items.length - 1 && (
-                  <View style={{
-                    height: 1,
-                    backgroundColor: theme.colors.border + '20', // Much lighter border color
-                  }} />
-                )}
               </React.Fragment>
             ))}
-          </View>
-        </Card>
+          </ListSection>
+        </List>
       ))}
     </View>
   );
@@ -1000,7 +924,6 @@ export function SettingsScreen({
         contentContainerStyle={{
           paddingHorizontal: theme.sizes.lg,
           paddingTop: theme.sizes.lg,
-          paddingBottom: Math.max(insets.bottom, theme.sizes.lg) + 100,
         }}
         showsVerticalScrollIndicator={false}
         refreshControl={

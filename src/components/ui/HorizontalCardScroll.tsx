@@ -12,12 +12,14 @@ import {
   NativeSyntheticEvent,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Card, CardProps } from './Card';
 import { Text } from './Text';
 import { Button } from './Button';
 import { Icon, IconName } from './Icon';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LazyImage, LoadingSpinnerSize, LoadingSpinnerVariant } from './LazyImage';
+import { getFlexDirection, getRTLMargin } from '@/utils';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -115,6 +117,7 @@ export function HorizontalCardScroll({
   ...scrollViewProps
 }: HorizontalCardScrollProps) {
   const { theme } = useTheme();
+  const { isRTL } = useRTL();
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scrollX, setScrollX] = useState(0);
@@ -239,10 +242,11 @@ export function HorizontalCardScroll({
   }, [currentIndex, data.length, scrollToIndex]);
 
   const renderDefaultCard = (item: CardData, index: number) => {
+    const margin = getRTLMargin(isRTL);
     const cardStyle: ViewStyle = {
       width: finalCardWidth,
       ...(cardHeight ? { height: finalCardHeight } : {}),
-      marginRight: index === data.length - 1 ? 0 : finalSpacing,
+      ...margin.marginEnd(index === data.length - 1 ? 0 : finalSpacing),
     };
 
     if (centerMode && variant === 'hero') {
@@ -259,7 +263,12 @@ export function HorizontalCardScroll({
         key={item.id}
         onPress={item.onPress}
         variant={variant === 'hero' ? 'elevated' : 'outlined'}
-        style={cardStyle}
+        style={[
+          cardStyle,
+          {
+            transform: isRTL ? [{ scaleX: -1 }] : undefined,
+          },
+        ]}
         padding={imageNoPadding ? "none" : "medium"}
         {...item.cardProps}
       >
@@ -295,7 +304,7 @@ export function HorizontalCardScroll({
               <View style={{
                 position: 'absolute',
                 top: theme.sizes.xs,
-                left: theme.sizes.xs,
+                ...(isRTL ? { right: theme.sizes.xs } : { left: theme.sizes.xs }),
                 backgroundColor: theme.colors.error,
                 paddingHorizontal: theme.sizes.xs,
                 paddingVertical: 2,
@@ -319,7 +328,7 @@ export function HorizontalCardScroll({
           <View style={{
             position: 'absolute',
             top: theme.sizes.sm,
-            right: theme.sizes.sm,
+            ...(isRTL ? { left: theme.sizes.sm } : { right: theme.sizes.sm }),
             backgroundColor: theme.colors.error,
             paddingHorizontal: theme.sizes.sm,
             paddingVertical: theme.sizes.xs,
@@ -365,7 +374,7 @@ export function HorizontalCardScroll({
         {/* Price */}
         {item.price && (
           <View style={{ 
-            flexDirection: 'row', 
+            flexDirection: getFlexDirection(isRTL), 
             alignItems: 'center',
             marginTop: theme.sizes.xs,
             marginHorizontal: imageNoPadding ? theme.sizes.md : 0
@@ -382,7 +391,7 @@ export function HorizontalCardScroll({
                 fontSize: theme.fontSizes.sm,
                 textDecorationLine: 'line-through',
                 color: theme.colors.textSecondary,
-                marginLeft: theme.sizes.xs,
+                ...margin.marginStart(theme.sizes.xs),
               }}>
                 {item.description}
               </Text>
@@ -393,7 +402,7 @@ export function HorizontalCardScroll({
         {/* Rating */}
         {item.rating && (
           <View style={{ 
-            flexDirection: 'row', 
+            flexDirection: getFlexDirection(isRTL), 
             alignItems: 'center', 
             marginTop: theme.sizes.xs,
             marginHorizontal: imageNoPadding ? theme.sizes.md : 0
@@ -404,13 +413,13 @@ export function HorizontalCardScroll({
                 name={i < Math.floor(item.rating!) ? 'star' : 'star-outline'}
                 size={12}
                 color={theme.colors.warning}
-                style={{ marginRight: 2 }}
+                style={margin.marginEnd(2)}
               />
             ))}
             <Text style={{
               fontSize: theme.fontSizes.xs,
               color: theme.colors.textSecondary,
-              marginLeft: theme.sizes.xs,
+              ...margin.marginStart(theme.sizes.xs),
             }}>
               {item.rating.toFixed(1)}
             </Text>
@@ -420,7 +429,7 @@ export function HorizontalCardScroll({
         {/* Tags */}
         {item.tags && item.tags.length > 0 && (
           <View style={{ 
-            flexDirection: 'row', 
+            flexDirection: getFlexDirection(isRTL), 
             flexWrap: 'wrap',
             marginTop: theme.sizes.sm,
             marginHorizontal: imageNoPadding ? theme.sizes.md : 0,
@@ -561,7 +570,7 @@ export function HorizontalCardScroll({
       {/* Header */}
       {(title || subtitle || headerAction) && (
         <View style={{ 
-          flexDirection: 'row',
+          flexDirection: getFlexDirection(isRTL),
           justifyContent: 'space-between',
           alignItems: headerAction ? 'center' : 'flex-start',
           paddingHorizontal: finalContentPadding,
@@ -599,7 +608,7 @@ export function HorizontalCardScroll({
       {/* Scroll Buttons */}
       {showScrollButtons && data.length > 1 && (
         <View style={{
-          flexDirection: 'row',
+          flexDirection: getFlexDirection(isRTL),
           justifyContent: 'space-between',
           alignItems: 'center',
           position: 'absolute',
@@ -610,7 +619,7 @@ export function HorizontalCardScroll({
           paddingHorizontal: finalContentPadding,
         }}>
           <TouchableOpacity
-            onPress={scrollLeft}
+            onPress={isRTL ? scrollRight : scrollLeft}
             disabled={currentIndex === 0}
             style={{
               backgroundColor: theme.colors.background,
@@ -624,11 +633,11 @@ export function HorizontalCardScroll({
               elevation: 4,
             }}
           >
-            <Icon name="chevron-back" size={20} color={theme.colors.text} />
+            <Icon name={isRTL ? "chevron-forward" : "chevron-back"} size={20} color={theme.colors.text} />
           </TouchableOpacity>
           
           <TouchableOpacity
-            onPress={scrollRight}
+            onPress={isRTL ? scrollLeft : scrollRight}
             disabled={currentIndex === data.length - 1}
             style={{
               backgroundColor: theme.colors.background,
@@ -642,7 +651,7 @@ export function HorizontalCardScroll({
               elevation: 4,
             }}
           >
-            <Icon name="chevron-forward" size={20} color={theme.colors.text} />
+            <Icon name={isRTL ? "chevron-back" : "chevron-forward"} size={20} color={theme.colors.text} />
           </TouchableOpacity>
         </View>
       )}
@@ -654,6 +663,10 @@ export function HorizontalCardScroll({
         showsHorizontalScrollIndicator={showIndicators}
         contentContainerStyle={{
           paddingHorizontal: finalContentPadding,
+          flexDirection: isRTL ? 'row-reverse' : 'row',
+        }}
+        style={{
+          transform: isRTL ? [{ scaleX: -1 }] : undefined,
         }}
         snapToInterval={snapToCards ? finalCardWidth + finalSpacing : undefined}
         decelerationRate={snapToCards ? 'fast' : 'normal'}
@@ -675,7 +688,7 @@ export function HorizontalCardScroll({
             ...(cardHeight ? { height: finalCardHeight } : { minHeight: 120 }),
             justifyContent: 'center',
             alignItems: 'center',
-            marginLeft: finalSpacing,
+            ...getRTLMargin(isRTL).marginStart(finalSpacing),
           }}>
             <ActivityIndicator size="small" color={theme.colors.primary} />
             <Text style={{
@@ -692,7 +705,7 @@ export function HorizontalCardScroll({
       {/* Page Indicators */}
       {snapToCards && data.length > 1 && variant !== 'compact' && (
         <View style={{
-          flexDirection: 'row',
+          flexDirection: getFlexDirection(isRTL),
           justifyContent: 'center',
           alignItems: 'center',
           marginTop: theme.sizes.md,

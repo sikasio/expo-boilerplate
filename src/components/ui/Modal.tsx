@@ -18,6 +18,8 @@ import { Text } from './Text';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
+import { getFlexDirection, getRTLMargin, getRTLPadding } from '@/utils';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -124,6 +126,7 @@ export const Modal: React.FC<ModalProps> = ({
   onRequestClose,
 }) => {
   const { theme } = useTheme();
+  const { isRTL } = useRTL();
   const insets = useSafeAreaInsets();
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [internalVisible, setInternalVisible] = useState(visible);
@@ -282,12 +285,18 @@ export const Modal: React.FC<ModalProps> = ({
   const getVariantStyles = () => {
     switch (variant) {
       case 'alert':
-        return {
+        return isRTL ? {
+          borderRightWidth: 4,
+          borderRightColor: theme.colors.warning,
+        } : {
           borderLeftWidth: 4,
           borderLeftColor: theme.colors.warning,
         };
       case 'confirmation':
-        return {
+        return isRTL ? {
+          borderRightWidth: 4,
+          borderRightColor: theme.colors.primary,
+        } : {
           borderLeftWidth: 4,
           borderLeftColor: theme.colors.primary,
         };
@@ -315,11 +324,14 @@ export const Modal: React.FC<ModalProps> = ({
           borderBottomColor: theme.colors.border,
         }
       ]}>
-        <View style={styles.headerContent}>
+        <View style={[styles.headerContent, { flexDirection: getFlexDirection(isRTL) }]}>
           {headerIcon && (
             <View style={[
               styles.headerIcon,
-              { backgroundColor: theme.colors.primary + '20' }
+              { 
+                backgroundColor: theme.colors.primary + '20',
+                ...getRTLMargin(isRTL).marginEnd(12),
+              }
             ]}>
               <Icon
                 name={headerIcon as any}
@@ -354,14 +366,17 @@ export const Modal: React.FC<ModalProps> = ({
             )}
           </View>
 
-          <View style={styles.headerActions}>
+          <View style={[styles.headerActions, { flexDirection: getFlexDirection(isRTL) }]}>
             {headerActions}
             {showCloseButton && (
               <TouchableOpacity
                 onPress={handleClose}
                 style={[
                   styles.closeButton,
-                  { backgroundColor: theme.colors.background }
+                  { 
+                    backgroundColor: theme.colors.background,
+                    ...getRTLMargin(isRTL).marginStart(8),
+                  }
                 ]}
                 disabled={!dismissible}
               >
@@ -422,7 +437,7 @@ export const Modal: React.FC<ModalProps> = ({
         {actions.length > 0 && (
           <View style={[
             styles.actions,
-            actions.length > 2 ? styles.actionsColumn : styles.actionsRow
+            actions.length > 2 ? styles.actionsColumn : [styles.actionsRow, { flexDirection: getFlexDirection(isRTL) }]
           ]}>
             {actions.map((action, index) => (
               <Button
@@ -436,7 +451,7 @@ export const Modal: React.FC<ModalProps> = ({
                 leftIcon={action.icon as any}
                 style={[
                   actions.length > 2 ? styles.actionButtonColumn : styles.actionButtonRow,
-                  index === actions.length - 1 && actions.length <= 2 ? { marginLeft: theme.sizes.sm } : undefined,
+                  index === actions.length - 1 && actions.length <= 2 ? getRTLMargin(isRTL).marginStart(theme.sizes.sm) : undefined,
                   {
                     paddingVertical: theme.sizes.sm,
                     paddingHorizontal: theme.sizes.md,
@@ -527,7 +542,6 @@ const styles = StyleSheet.create({
     // Styling applied dynamically
   },
   headerContent: {
-    flexDirection: 'row',
     alignItems: 'flex-start',
   },
   headerIcon: {
@@ -536,7 +550,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
   headerText: {
     flex: 1,
@@ -551,7 +564,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   headerActions: {
-    flexDirection: 'row',
     alignItems: 'center',
   },
   closeButton: {
@@ -560,7 +572,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
   },
   content: {
     // Styling applied dynamically
@@ -575,7 +586,6 @@ const styles = StyleSheet.create({
     // Base styling for actions container
   },
   actionsRow: {
-    flexDirection: 'row',
     justifyContent: 'flex-end',
   },
   actionsColumn: {

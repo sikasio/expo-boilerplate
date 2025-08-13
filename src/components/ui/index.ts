@@ -34,6 +34,13 @@ export { HorizontalCardScroll } from './HorizontalCardScroll';
 export { Modal } from './Modal';
 export { LazyImage } from './LazyImage';
 export { GallerySlider } from './GallerySlider';
+export { 
+  SkeletonCard, 
+  BookCardSkeleton, 
+  ProfileCardSkeleton, 
+  ArticleCardSkeleton, 
+  ListItemSkeleton 
+} from './SkeletonCard';
 export { GlobalConfigPanel } from '../overlays/GlobalConfigPanel';
 export type { IconName } from './Icon';
 export type { IconFamily, IconName as EnhancedIconName } from './EnhancedIcon';
@@ -49,3 +56,4 @@ export type { CardData, HorizontalCardScrollProps, HorizontalCardScrollVariant, 
 export type { ModalSize, ModalPosition, ModalVariant, ModalAnimation, ModalAction, ModalProps } from './Modal';
 export type { LazyImageProps } from './LazyImage';
 export type { GallerySliderItem, GallerySliderProps } from './GallerySlider';
+export type { SkeletonCardVariant, SkeletonCardSize, SkeletonAnimation, SkeletonShape } from './SkeletonCard';

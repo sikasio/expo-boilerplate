@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Text } from '@/components/ui/Text';
 import { Icon, IconName } from '@/components/ui/Icon';
+import { getFlexDirection, getRTLMargin, getRTLPadding, getTextAlign, createRTLStyle, getRTLIconName } from '@/utils';
 
 interface TextInputProps extends RNTextInputProps {
   label?: string;
@@ -33,6 +35,8 @@ export function TextInput({
   ...props
 }: TextInputProps) {
   const { theme } = useTheme();
+  
+  const { isRTL } = useRTL();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   // Detect if this is a password field with toggle enabled
@@ -67,8 +71,8 @@ export function TextInput({
       paddingHorizontal: leftIcon || getEffectiveRightIcon() ? theme.sizes.sm : theme.sizes.md,
       paddingVertical: theme.sizes.sm,
       minHeight: 40,
-      textAlign: 'left' as const,
-      writingDirection: 'ltr' as const,
+      textAlign: getTextAlign(isRTL),
+      writingDirection: isRTL ? 'rtl' as const : 'ltr' as const,
     };
   };
 
@@ -77,7 +81,7 @@ export function TextInput({
       borderWidth: 1,
       borderRadius: theme.borderRadius.sm,
       backgroundColor: theme.colors.surface,
-      flexDirection: 'row' as const,
+      flexDirection: getFlexDirection(isRTL),
       alignItems: 'center' as const,
       minHeight: theme.sizes.xxl, // Use theme size instead of hardcoded 48
     };
@@ -95,6 +99,13 @@ export function TextInput({
     };
   };
 
+  // RTL-aware icon positioning 
+  // In RTL: prefix icon (leftIcon) goes to visual right side, suffix icon (rightIcon) goes to visual left side
+  const startIcon = leftIcon;                                 // Prefix icon always at start (left in LTR, right in RTL)
+  const endIcon = getEffectiveRightIcon();                    // Suffix icon always at end (right in LTR, left in RTL)
+  const isStartIconInteractive = false;                       // Prefix icons are not interactive
+  const isEndIconInteractive = isRightIconInteractive;        // Suffix icons can be interactive (password toggle)
+
   return (
     <View style={[{ marginBottom: theme.sizes.md }, containerStyle]}>
       {label && (
@@ -110,12 +121,12 @@ export function TextInput({
       )}
 
       <View style={getContainerStyle()}>
-        {leftIcon && (
-          <View style={{ paddingLeft: theme.sizes.md }}>
+        {startIcon && (
+          <View style={{ ...getRTLPadding(isRTL).paddingStart(theme.sizes.md) }}>
             <Icon
-              name={leftIcon}
+              name={getRTLIconName(startIcon, isRTL)}
               color={theme.colors.textSecondary}
-              size={theme.fontSizes.lg} // Use theme font size instead of hardcoded 20
+              size={theme.fontSizes.lg}
             />
           </View>
         )}
@@ -125,24 +136,40 @@ export function TextInput({
           placeholderTextColor={theme.colors.placeholder}
           editable={props.editable !== false}
           selectTextOnFocus={true}
-          textAlign="left"
+          // textAlign handled by style
           secureTextEntry={actualSecureTextEntry}
-          {...props}
+          // Prevent iOS password auto-fill and "Use Strong Password" suggestions
+          autoComplete={isPasswordField ? "off" : props.autoComplete}
+          textContentType={isPasswordField ? "oneTimeCode" : props.textContentType}
+          passwordRules={isPasswordField ? "" : undefined}
+          autoCorrect={isPasswordField ? false : props.autoCorrect}
+          spellCheck={isPasswordField ? false : props.spellCheck}
+          autoCapitalize={isPasswordField ? "none" : props.autoCapitalize}
+          keyboardType={isPasswordField ? "default" : props.keyboardType}
+          {...(isPasswordField ? 
+            // For password fields, filter out props that might trigger iOS suggestions
+            Object.fromEntries(
+              Object.entries(props).filter(([key]) => 
+                !['secureTextEntry', 'autoComplete', 'textContentType', 'passwordRules', 'autoCorrect', 'spellCheck', 'autoCapitalize', 'keyboardType'].includes(key)
+              )
+            ) : 
+            props
+          )}
         />
 
-        {getEffectiveRightIcon() && (
+        {endIcon && (
           <TouchableOpacity
-            onPress={isRightIconInteractive ? togglePasswordVisibility : undefined}
+            onPress={isEndIconInteractive ? togglePasswordVisibility : undefined}
             style={{ 
-              paddingRight: theme.sizes.md,
-              paddingLeft: theme.sizes.xs,
+              ...getRTLPadding(isRTL).paddingEnd(theme.sizes.md),
+              ...getRTLPadding(isRTL).paddingStart(theme.sizes.xs),
               justifyContent: 'center',
             }}
-            activeOpacity={isRightIconInteractive ? 0.7 : 1}
+            activeOpacity={isEndIconInteractive ? 0.7 : 1}
             disabled={!isRightIconInteractive}
           >
             <Icon
-              name={getEffectiveRightIcon()!}
+              name={getRTLIconName(endIcon, isRTL)}
               color={theme.colors.textSecondary}
               size={theme.fontSizes.lg}
             />

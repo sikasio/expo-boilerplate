@@ -6,6 +6,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
+import { createRTLStyle } from '@/utils';
 
 interface ContainerProps extends ViewProps {
   children: React.ReactNode;
@@ -23,6 +25,8 @@ export function Container({
   ...props
 }: ContainerProps) {
   const { theme } = useTheme();
+  
+  const { isRTL } = useRTL();
 
   const getContainerStyle = () => {
     const paddingStyles = {
@@ -65,14 +69,17 @@ export function Container({
       ...paddingStyles[padding],
     };
 
-    return baseStyle;
+    // Apply RTL transformations to the base style
+    return createRTLStyle(baseStyle, {}, isRTL);
   };
 
   const getSafeAreaStyle = () => {
-    return {
+    const baseStyle = {
       flex: 1,
       backgroundColor: backgroundColor || theme.colors.background,
     };
+    
+    return createRTLStyle(baseStyle, {}, isRTL);
   };
 
   if (safeArea) {

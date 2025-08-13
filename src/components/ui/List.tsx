@@ -16,8 +16,10 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
+import { getRTLMargin, getRTLIconName, getFlexDirection } from '@/utils';
 import { Avatar, AvatarSize } from './Avatar';
 
 export type ListVariant = 'default' | 'inset' | 'sidebar' | 'card';
@@ -39,6 +41,8 @@ interface ListItemProps extends TouchableOpacityProps {
   description?: string;
   leftIcon?: IconName;
   rightIcon?: IconName;
+  iconSize?: number;
+  iconBackground?: string;
   leftAvatar?: {
     source?: any;
     title?: string;
@@ -159,6 +163,8 @@ export function ListItem({
   description,
   leftIcon,
   rightIcon,
+  iconSize = 20,
+  iconBackground,
   leftAvatar,
   rightContent,
   badge,
@@ -186,6 +192,8 @@ export function ListItem({
   ...props
 }: ListItemProps) {
   const { theme } = useTheme();
+  
+  const { isRTL } = useRTL();
   
   // Internal state for uncontrolled collapsible
   const [internalExpanded, setInternalExpanded] = useState(false);
@@ -218,7 +226,7 @@ export function ListItem({
     const nestPadding = nested ? (nestLevel + 1) * theme.sizes.md : theme.sizes.md;
     
     const baseStyle: ViewStyle = {
-      flexDirection: 'row',
+      flexDirection: getFlexDirection(isRTL),
       alignItems: variant === 'compact' ? 'center' : 'flex-start',
       paddingHorizontal: nestPadding,
       paddingVertical: variant === 'compact' ? theme.sizes.sm : theme.sizes.md,
@@ -226,11 +234,18 @@ export function ListItem({
       opacity: disabled ? 0.6 : 1,
     };
 
-    // Add visual indicators for nested items
+    // Add visual indicators for nested items (RTL-aware)
     if (nested && nestLevel > 0) {
-      baseStyle.borderLeftWidth = 2;
-      baseStyle.borderLeftColor = theme.colors.border;
-      baseStyle.marginLeft = nestLevel * theme.sizes.xs;
+      const margin = getRTLMargin(isRTL);
+      if (isRTL) {
+        baseStyle.borderRightWidth = 2;
+        baseStyle.borderRightColor = theme.colors.border;
+      } else {
+        baseStyle.borderLeftWidth = 2;
+        baseStyle.borderLeftColor = theme.colors.border;
+      }
+      // Apply RTL-aware margin
+      Object.assign(baseStyle, margin.marginStart(nestLevel * theme.sizes.xs));
     }
 
     const variantStyles = {
@@ -243,8 +258,13 @@ export function ListItem({
       },
       action: {
         paddingVertical: theme.sizes.md,
-        borderLeftWidth: 4,
-        borderLeftColor: selected ? theme.colors.primary : 'transparent',
+        ...(isRTL ? {
+          borderRightWidth: 4,
+          borderRightColor: selected ? theme.colors.primary : 'transparent',
+        } : {
+          borderLeftWidth: 4,
+          borderLeftColor: selected ? theme.colors.primary : 'transparent',
+        }),
       },
     };
 
@@ -271,8 +291,9 @@ export function ListItem({
 
   const renderLeftContent = () => {
     if (leftAvatar) {
+      const margin = getRTLMargin(isRTL);
       return (
-        <View style={{ marginRight: theme.sizes.md }}>
+        <View style={margin.marginEnd(theme.sizes.md)}>
           <Avatar
             source={leftAvatar.source}
             title={leftAvatar.title}
@@ -284,17 +305,23 @@ export function ListItem({
     }
 
     if (leftIcon) {
+      const margin = getRTLMargin(isRTL);
       return (
-        <View style={{ 
-          marginRight: theme.sizes.md,
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: 24,
-          height: 24,
-        }}>
+        <View style={[ 
+          margin.marginEnd(theme.sizes.md),
+          {
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignSelf: 'center',
+            width: Math.max(24, iconSize + 8),
+            minHeight: Math.max(24, iconSize + 8),
+            backgroundColor: iconBackground,
+            borderRadius: iconBackground ? theme.borderRadius.md : 0,
+          }
+        ]}>
           <Icon
-            name={leftIcon}
-            size={20}
+            name={getRTLIconName(leftIcon, isRTL)}
+            size={iconSize}
             color={selected ? theme.colors.primary : theme.colors.text}
           />
         </View>
@@ -305,8 +332,10 @@ export function ListItem({
   };
 
   const renderRightContent = () => {
+    const margin = getRTLMargin(isRTL);
+    
     if (rightContent) {
-      return <View style={{ marginLeft: theme.sizes.sm }}>{rightContent}</View>;
+      return <View style={margin.marginStart(theme.sizes.sm)}>{rightContent}</View>;
     }
 
     const rightItems: React.ReactNode[] = [];
@@ -317,16 +346,18 @@ export function ListItem({
         <TouchableOpacity
           key="collapse-toggle"
           onPress={handleToggleExpand}
-          style={{
-            marginLeft: theme.sizes.sm,
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: theme.sizes.xs,
-          }}
+          style={[
+            margin.marginStart(theme.sizes.sm),
+            {
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: theme.sizes.xs,
+            }
+          ]}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Icon
-            name={expanded ? "chevron-up-outline" : "chevron-down-outline"}
+            name={getRTLIconName(expanded ? "chevron-up-outline" : "chevron-down-outline", isRTL)}
             size={16}
             color={theme.colors.textSecondary}
           />
@@ -351,7 +382,7 @@ export function ListItem({
             paddingHorizontal: theme.sizes.xs,
             paddingVertical: 2,
             borderRadius: theme.borderRadius.xs,
-            marginLeft: theme.sizes.sm,
+            ...margin.marginStart(theme.sizes.sm),
           }}
         >
           <Text
@@ -373,13 +404,13 @@ export function ListItem({
         <View
           key="right-icon"
           style={{
-            marginLeft: theme.sizes.sm,
+            ...margin.marginStart(theme.sizes.sm),
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
           <Icon
-            name={rightIcon}
+            name={getRTLIconName(rightIcon, isRTL)}
             size={20}
             color={theme.colors.textSecondary}
           />
@@ -392,13 +423,13 @@ export function ListItem({
         <View
           key="chevron"
           style={{
-            marginLeft: theme.sizes.sm,
+            ...margin.marginStart(theme.sizes.sm),
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
           <Icon
-            name="chevron-forward-outline"
+            name={getRTLIconName("chevron-forward-outline", isRTL)}
             size={16}
             color={theme.colors.textSecondary}
           />
@@ -407,7 +438,7 @@ export function ListItem({
     }
 
     return rightItems.length > 0 ? (
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{ flexDirection: getFlexDirection(isRTL), alignItems: 'center' }}>
         {rightItems}
       </View>
     ) : null;
@@ -530,6 +561,7 @@ export function ListSection({
   headerIcon,
 }: ListSectionProps) {
   const { theme } = useTheme();
+  const { isRTL } = useRTL();
   
   // Internal state for uncontrolled collapsible
   const [internalExpanded, setInternalExpanded] = useState(true);
@@ -558,20 +590,20 @@ export function ListSection({
             paddingHorizontal: theme.sizes.md,
             paddingTop: theme.sizes.lg,
             paddingBottom: theme.sizes.sm,
-            flexDirection: 'row',
+            flexDirection: getFlexDirection(isRTL),
             justifyContent: 'space-between',
             alignItems: 'center',
           },
           headerStyle,
         ]}
       >
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 1, flexDirection: getFlexDirection(isRTL), alignItems: 'center' }}>
           {headerIcon && (
             <Icon
-              name={headerIcon}
+              name={getRTLIconName(headerIcon, isRTL)}
               size={18}
               color={theme.colors.primary}
-              style={{ marginRight: theme.sizes.sm }}
+              style={getRTLMargin(isRTL).marginEnd(theme.sizes.sm)}
             />
           )}
           <View style={{ flex: 1 }}>
@@ -617,7 +649,7 @@ export function ListSection({
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Icon
-              name={expanded ? "chevron-up-outline" : "chevron-down-outline"}
+              name={getRTLIconName(expanded ? "chevron-up-outline" : "chevron-down-outline", isRTL)}
               size={20}
               color={theme.colors.textSecondary}
             />
@@ -652,6 +684,7 @@ export function ListSection({
 
 export function ListDivider({ variant = 'full', style }: ListDividerProps) {
   const { theme } = useTheme();
+  const { isRTL } = useRTL();
 
   const getDividerStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
@@ -659,10 +692,11 @@ export function ListDivider({ variant = 'full', style }: ListDividerProps) {
       backgroundColor: theme.colors.border,
     };
 
+    const margin = getRTLMargin(isRTL);
     const variantStyles = {
       full: {},
       inset: {
-        marginLeft: theme.sizes.md,
+        ...margin.marginStart(theme.sizes.md),
       },
       middle: {
         marginHorizontal: theme.sizes.md,

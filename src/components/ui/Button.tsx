@@ -9,8 +9,10 @@ import {
   View,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
+import { getFlexDirection, getRTLMargin, createRTLStyle, getRTLIconName } from '@/utils';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'outline-white' | 'ghost' | 'success' | 'warning' | 'error';
 export type ButtonSize = 'xs' | 'small' | 'medium' | 'large' | 'xl';
@@ -25,6 +27,7 @@ interface ButtonProps extends TouchableOpacityProps {
   rightIcon?: IconName;
   textStyle?: TextStyle;
   iconColor?: string;
+  iconStyle?: TextStyle;
 }
 
 export function Button({
@@ -37,15 +40,18 @@ export function Button({
   rightIcon,
   textStyle,
   iconColor,
+  iconStyle,
   style,
   onPress,
   ...props
 }: ButtonProps) {
   const { theme } = useTheme();
+  
+  const { isRTL } = useRTL();
 
   const getButtonStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
-      flexDirection: 'row',
+      flexDirection: getFlexDirection(isRTL),
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: theme.borderRadius.sm,
@@ -119,12 +125,14 @@ export function Button({
       opacity: 0.6,
     } : {};
 
-    return {
+    const finalStyle = createRTLStyle({
       ...baseStyle,
       ...sizeStyles[size],
       ...variantStyles[variant],
       ...disabledStyle,
-    };
+    }, {}, isRTL);
+
+    return finalStyle;
   };
 
   const getTextColor = () => {
@@ -169,6 +177,25 @@ export function Button({
     }
   };
 
+  // RTL-aware icon positioning and spacing
+  const margin = getRTLMargin(isRTL);
+  
+  // In RTL mode, we need to swap the visual positions of left and right icons
+  const startIcon = isRTL ? rightIcon : leftIcon;   // What appears on the start side
+  const endIcon = isRTL ? leftIcon : rightIcon;     // What appears on the end side
+  
+  // Simple approach: add horizontal margins to text when icons are present
+  const textMargins = () => {
+    const spacing = theme.sizes.sm;
+    const hasStartIcon = Boolean(startIcon);
+    const hasEndIcon = Boolean(endIcon);
+    
+    return {
+      marginLeft: hasStartIcon ? spacing : 0,
+      marginRight: hasEndIcon ? spacing : 0,
+    };
+  };
+
   return (
     <TouchableOpacity
       style={[getButtonStyle(), style]}
@@ -184,10 +211,10 @@ export function Button({
         />
       ) : (
         <>
-          {leftIcon && (
-            <View style={{ marginRight: title ? theme.sizes.sm : 0 }}>
+          {startIcon && (
+            <View style={iconStyle}>
               <Icon 
-                name={leftIcon} 
+                name={getRTLIconName(startIcon, isRTL)} 
                 color={iconColor || textStyle?.color || getTextColor()} 
                 size={getFontSize()} 
               />
@@ -196,11 +223,13 @@ export function Button({
           
           {title && (
             <Text
+              // RTL handled internally by Text component
               style={[
                 {
                   color: getTextColor(),
                   fontSize: getFontSize(),
                   fontWeight: '600',
+                  ...textMargins(), // Add margins for spacing from icons
                 },
                 textStyle
               ]}
@@ -209,10 +238,10 @@ export function Button({
             </Text>
           )}
           
-          {rightIcon && (
-            <View style={{ marginLeft: title ? theme.sizes.sm : 0 }}>
+          {endIcon && (
+            <View style={iconStyle}>
               <Icon 
-                name={rightIcon} 
+                name={getRTLIconName(endIcon, isRTL)} 
                 color={iconColor || textStyle?.color || getTextColor()} 
                 size={getFontSize()} 
               />

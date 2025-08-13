@@ -8,9 +8,11 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
 import { Button } from './Button';
+import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
 
 export type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled';
 export type CardSize = 'small' | 'medium' | 'large';
@@ -78,6 +80,7 @@ export function Card({
   ...props
 }: CardProps) {
   const { theme } = useTheme();
+  const { isRTL } = useRTL();
 
   // Get size-based dimensions
   const getSizeDimensions = () => {
@@ -171,7 +174,7 @@ export function Card({
     const baseStyle: ViewStyle = {
       backgroundColor: schemeColors.backgroundColor,
       borderRadius: sizeDimensions.borderRadius,
-      flexDirection: horizontal ? 'row' : 'column',
+      flexDirection: horizontal ? getFlexDirection(isRTL) : 'column',
       overflow: 'hidden',
       marginBottom: theme.sizes.md,
     };
@@ -211,11 +214,13 @@ export function Card({
       },
     };
 
-    return {
+    const finalStyle = createRTLStyle({
       ...variantStyles[variant],
       ...(padding !== 'none' ? paddingStyles[padding] : {}),
       opacity: disabled ? 0.6 : 1,
-    };
+    }, {}, isRTL);
+
+    return finalStyle;
   };
 
   const getBadgeColor = () => {
@@ -229,13 +234,16 @@ export function Card({
     }
   };
 
-  const getBadgeStyle = () => ({
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: theme.borderRadius.md,
-    marginLeft: 8,
-    backgroundColor: getBadgeColor(),
-  });
+  const getBadgeStyle = () => {
+    const margin = getRTLMargin(isRTL);
+    return {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: theme.borderRadius.md,
+      ...margin.marginStart(8),
+      backgroundColor: getBadgeColor(),
+    };
+  };
 
   const getHeaderBottomMargin = () => {
     if (!title && !subtitle && !headerIcon && !headerActions && !badge) return 0;
@@ -269,24 +277,74 @@ export function Card({
     return baseStyle;
   };
 
+  // RTL-aware dynamic styles
+  const getDynamicStyles = () => {
+    const margin = getRTLMargin(isRTL);
+    
+    return {
+      header: createRTLStyle({
+        flexDirection: 'row' as const,
+        alignItems: 'flex-start' as const,
+        justifyContent: 'space-between' as const,
+      }, {}, isRTL),
+      headerLeft: createRTLStyle({
+        flexDirection: 'row' as const,
+        alignItems: 'flex-start' as const,
+        flex: 1,
+      }, {}, isRTL),
+      headerIcon: {
+        ...margin.marginEnd(8),
+        marginTop: 2,
+      },
+      headerRight: {
+        ...createRTLStyle({
+          flexDirection: 'row' as const,
+          alignItems: 'center' as const,
+        }, {}, isRTL),
+        ...margin.marginStart(12),
+      },
+      horizontalContent: createRTLStyle({
+        flexDirection: 'row' as const,
+      }, {}, isRTL),
+      horizontalImage: {
+        marginBottom: 0,
+        width: 80,
+        height: 80,
+        ...margin.marginEnd(12),
+      },
+      actions: createRTLStyle({
+        flexDirection: 'row' as const,
+        flexWrap: 'wrap' as const,
+        marginTop: 8,
+      }, {}, isRTL),
+      actionButton: {
+        marginBottom: 8,
+        ...margin.marginEnd(8),
+      },
+    };
+  };
+
+  const dynamicStyles = getDynamicStyles();
+
   const renderHeader = () => {
     if (!title && !subtitle && !headerIcon && !headerActions && !badge) return null;
 
     return (
-      <View style={[styles.header, getHeaderStyle()]}>
-        <View style={styles.headerLeft}>
+      <View style={[dynamicStyles.header, getHeaderStyle()]}>
+        <View style={dynamicStyles.headerLeft}>
           {headerIcon && (
             <Icon
               name={headerIcon}
               size={sizeDimensions.iconSize}
               color={schemeColors.titleColor}
-              style={styles.headerIcon}
+              style={dynamicStyles.headerIcon}
             />
           )}
           <View style={styles.headerText}>
             {title && (
               <Text
                 variant="subtitle"
+                // RTL handled internally by Text component
                 style={[
                   { fontSize: sizeDimensions.titleSize, color: schemeColors.titleColor },
                   styles.title
@@ -299,6 +357,7 @@ export function Card({
             {subtitle && (
               <Text
                 variant="body"
+                // RTL handled internally by Text component
                 style={[
                   { fontSize: sizeDimensions.subtitleSize, color: theme.colors.textSecondary },
                   styles.subtitle
@@ -311,7 +370,7 @@ export function Card({
           </View>
         </View>
 
-        <View style={styles.headerRight}>
+        <View style={dynamicStyles.headerRight}>
           {badge && (
             <View style={getBadgeStyle()}>
               <Text variant="caption" style={styles.badgeText}>
@@ -329,9 +388,9 @@ export function Card({
     if (!children && !image) return null;
 
     return (
-      <View style={[styles.content, horizontal && styles.horizontalContent]}>
+      <View style={[styles.content, horizontal && dynamicStyles.horizontalContent]}>
         {image && (
-          <View style={[styles.imageContainer, horizontal && styles.horizontalImage]}>
+          <View style={[styles.imageContainer, horizontal && dynamicStyles.horizontalImage]}>
             {image}
           </View>
         )}
@@ -351,7 +410,7 @@ export function Card({
       <View style={styles.footer}>
         {footer}
         {actions && actions.length > 0 && (
-          <View style={styles.actions}>
+          <View style={dynamicStyles.actions}>
             {actions.map((action, index) => (
               <Button
                 key={index}
@@ -361,7 +420,8 @@ export function Card({
                 onPress={action.onPress}
                 leftIcon={action.leftIcon}
                 rightIcon={action.rightIcon}
-                style={[styles.actionButton, index > 0 && styles.actionButtonSpacing]}
+                // RTL handled internally by Text component
+                style={[dynamicStyles.actionButton, index > 0 && styles.actionButtonSpacing]}
               />
             ))}
           </View>

@@ -98,6 +98,7 @@ export const STORAGE_KEYS = {
   COLOR_SCHEME: 'app_color_scheme',
   LANGUAGE: 'app_language',
   ONBOARDING_COMPLETED: 'app_onboarding_completed',
+  RTL_DIRECTION: 'app_rtl_direction',
 } as const;
 
 export const API_ENDPOINTS = {
