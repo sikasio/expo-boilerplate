@@ -96,6 +96,25 @@ interface AuthScreenContent {
   footerLinkText?: string;
 }
 
+interface AuthInputLabels {
+  nameLabel?: string;
+  namePlaceholder?: string;
+  emailLabel?: string;
+  emailPlaceholder?: string;
+  phoneLabel?: string;
+  phonePlaceholder?: string;
+  passwordLabel?: string;
+  passwordPlaceholder?: string;
+  confirmPasswordLabel?: string;
+  confirmPasswordPlaceholder?: string;
+  verificationCodeLabel?: string;
+  rememberMeLabel?: string;
+  termsLabel?: string;
+  forgotPasswordLabel?: string;
+  biometricLabel?: string;
+  continueWithLabel?: string;
+}
+
 export interface AuthScreenProps {
   variant?: AuthScreenVariant;
   layout?: AuthScreenLayout;
@@ -107,6 +126,7 @@ export interface AuthScreenProps {
 
   // Content
   content?: AuthScreenContent;
+  inputLabels?: AuthInputLabels;
   logo?: React.ReactNode;
   logoSource?: ImageSourcePropType;
   logoSize?: number;
@@ -172,6 +192,7 @@ export function AuthScreen({
   showBackButton = false,
   onBackPress,
   content = {},
+  inputLabels = {},
   logo,
   logoSource,
   logoSize = 80,
@@ -857,8 +878,8 @@ export function AuthScreen({
           rules={getValidationRules('name')}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              label="Full Name"
-              placeholder="Enter your full name"
+              label={inputLabels.nameLabel || "Full Name"}
+              placeholder={inputLabels.namePlaceholder || "Enter your full name"}
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -881,8 +902,8 @@ export function AuthScreen({
           rules={getValidationRules('email')}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              label="Email"
-              placeholder="Enter your email"
+              label={inputLabels.emailLabel || "Email"}
+              placeholder={inputLabels.emailPlaceholder || "Enter your email"}
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -908,14 +929,18 @@ export function AuthScreen({
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               label={
-                variant === 'forgot-password-whatsapp' ? 'WhatsApp Number' :
-                variant === 'login-phone' ? 'Phone Number' :
-                'Phone Number (Optional)'
+                inputLabels.phoneLabel || (
+                  variant === 'forgot-password-whatsapp' ? 'WhatsApp Number' :
+                  variant === 'login-phone' ? 'Phone Number' :
+                  'Phone Number (Optional)'
+                )
               }
               placeholder={
-                variant === 'forgot-password-whatsapp' ? 'Enter your WhatsApp number' :
-                variant === 'login-phone' ? 'Enter your phone number' :
-                'Enter your phone number'
+                inputLabels.phonePlaceholder || (
+                  variant === 'forgot-password-whatsapp' ? 'Enter your WhatsApp number' :
+                  variant === 'login-phone' ? 'Enter your phone number' :
+                  'Enter your phone number'
+                )
               }
               value={value}
               onChangeText={onChange}
@@ -940,8 +965,8 @@ export function AuthScreen({
           rules={getValidationRules('password')}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              label="Password"
-              placeholder="Enter your password"
+              label={inputLabels.passwordLabel || "Password"}
+              placeholder={inputLabels.passwordPlaceholder || "Enter your password"}
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -967,8 +992,8 @@ export function AuthScreen({
           rules={getValidationRules('confirmPassword')}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              label="Confirm Password"
-              placeholder="Confirm your password"
+              label={inputLabels.confirmPasswordLabel || "Confirm Password"}
+              placeholder={inputLabels.confirmPasswordPlaceholder || "Confirm your password"}
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
@@ -998,7 +1023,7 @@ export function AuthScreen({
               onChangeText={onChange}
               onComplete={onChange}
               error={errors.code?.message}
-              label="Verification Code"
+              label={inputLabels?.verificationCodeLabel || "Verification Code"}
               autoFocus={true}
             />
           )}
@@ -1017,7 +1042,7 @@ export function AuthScreen({
       <View style={{ marginBottom: theme.sizes.lg }}>
         {showRememberMe && ['login-email', 'login-phone'].includes(variant) && (
           <Checkbox
-            label="Remember me"
+            label={inputLabels.rememberMeLabel || "Remember me"}
             checked={rememberMe}
             onPress={() => setRememberMe(!rememberMe)}
             style={{ marginBottom: theme.sizes.sm }}
@@ -1026,7 +1051,7 @@ export function AuthScreen({
 
         {showTermsCheckbox && variant === 'register' && (
           <Checkbox
-            label="I agree to the Terms of Service and Privacy Policy"
+            label={inputLabels.termsLabel || "I agree to the Terms of Service and Privacy Policy"}
             checked={agreeToTerms}
             onPress={() => setAgreeToTerms(!agreeToTerms)}
             style={{ marginBottom: theme.sizes.sm }}
@@ -1039,7 +1064,7 @@ export function AuthScreen({
 
         {showForgotPassword && ['login-email', 'login-phone'].includes(variant) && (
           <Button
-            title="Forgot Password?"
+            title={inputLabels?.forgotPasswordLabel || "Forgot Password?"}
             variant="ghost"
             size="small"
             onPress={onForgotPassword}
@@ -1184,7 +1209,7 @@ export function AuthScreen({
             return (
               <Button
                 key={index}
-                title={`Continue with ${provider.name}`}
+                title={inputLabels?.continueWithLabel ? `${inputLabels.continueWithLabel} ${provider.name}` : `Continue with ${provider.name}`}
                 variant={provider.name.toLowerCase() === 'google' ? 'outline' : 'primary'}
                 leftIcon={provider.icon}
                 onPress={provider.onPress}
@@ -1208,7 +1233,7 @@ export function AuthScreen({
 
     return (
       <Button
-        title="Use Biometric"
+        title={inputLabels?.biometricLabel || "Use Biometric"}
         variant="outline"
         size="medium"
         leftIcon="finger-print-outline"
