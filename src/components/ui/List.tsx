@@ -79,6 +79,7 @@ interface ListSectionProps {
   title?: string;
   subtitle?: string;
   children: React.ReactNode;
+  style?: ViewStyle;
   headerStyle?: ViewStyle;
   titleStyle?: TextStyle;
   subtitleStyle?: TextStyle;
@@ -551,6 +552,7 @@ export function ListSection({
   title,
   subtitle,
   children,
+  style,
   headerStyle,
   titleStyle,
   subtitleStyle,
@@ -670,7 +672,7 @@ export function ListSection({
   };
 
   return (
-    <View>
+    <View style={style}>
       {renderHeader()}
       <View style={{ 
         overflow: 'hidden',
