@@ -126,9 +126,9 @@ export function HorizontalCardScroll({
   // Get default values based on variant and size
   const getDefaultCardWidth = () => {
     if (cardWidth) return cardWidth;
-    
+
     const sizeMultiplier = size === 'small' ? 0.8 : size === 'large' ? 1.2 : 1;
-    
+
     switch (variant) {
       case 'compact':
         return 120 * sizeMultiplier;
@@ -143,9 +143,9 @@ export function HorizontalCardScroll({
 
   const getDefaultCardHeight = () => {
     if (cardHeight) return cardHeight;
-    
+
     const sizeMultiplier = size === 'small' ? 0.8 : size === 'large' ? 1.2 : 1;
-    
+
     switch (variant) {
       case 'compact':
         return 80 * sizeMultiplier;
@@ -215,7 +215,7 @@ export function HorizontalCardScroll({
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset } = event.nativeEvent;
     setScrollX(contentOffset.x);
-    
+
     if (snapToCards) {
       const index = Math.round(contentOffset.x / (finalCardWidth + finalSpacing));
       setCurrentIndex(Math.max(0, Math.min(index, data.length - 1)));
@@ -298,7 +298,7 @@ export function HorizontalCardScroll({
               spinnerSize={spinnerSize}
               spinnerVariant={spinnerVariant}
             />
-            
+
             {/* Badge overlay on image */}
             {item.badge && (
               <View style={{
@@ -373,8 +373,8 @@ export function HorizontalCardScroll({
 
         {/* Price */}
         {item.price && (
-          <View style={{ 
-            flexDirection: getFlexDirection(isRTL), 
+          <View style={{
+            flexDirection: getFlexDirection(isRTL),
             alignItems: 'center',
             marginTop: theme.sizes.xs,
             marginHorizontal: imageNoPadding ? theme.sizes.md : 0
@@ -401,9 +401,9 @@ export function HorizontalCardScroll({
 
         {/* Rating */}
         {item.rating && (
-          <View style={{ 
-            flexDirection: getFlexDirection(isRTL), 
-            alignItems: 'center', 
+          <View style={{
+            flexDirection: getFlexDirection(isRTL),
+            alignItems: 'center',
             marginTop: theme.sizes.xs,
             marginHorizontal: imageNoPadding ? theme.sizes.md : 0
           }}>
@@ -428,8 +428,8 @@ export function HorizontalCardScroll({
 
         {/* Tags */}
         {item.tags && item.tags.length > 0 && (
-          <View style={{ 
-            flexDirection: getFlexDirection(isRTL), 
+          <View style={{
+            flexDirection: getFlexDirection(isRTL),
             flexWrap: 'wrap',
             marginTop: theme.sizes.sm,
             marginHorizontal: imageNoPadding ? theme.sizes.md : 0,
@@ -457,7 +457,7 @@ export function HorizontalCardScroll({
             ))}
           </View>
         )}
-        
+
         {/* Bottom padding when imageNoPadding is enabled */}
         {imageNoPadding && (
           <View style={{ height: theme.sizes.md }} />
@@ -473,10 +473,10 @@ export function HorizontalCardScroll({
       alignItems: 'center',
       paddingVertical: theme.sizes.xl,
     }}>
-      <Icon 
-        name="albums-outline" 
-        size={48} 
-        color={theme.colors.textSecondary} 
+      <Icon
+        name="albums-outline"
+        size={48}
+        color={theme.colors.textSecondary}
       />
       <Text style={{
         color: theme.colors.textSecondary,
@@ -495,10 +495,10 @@ export function HorizontalCardScroll({
       alignItems: 'center',
       paddingVertical: theme.sizes.xl,
     }}>
-      <Icon 
-        name="alert-circle-outline" 
-        size={48} 
-        color={theme.colors.error} 
+      <Icon
+        name="alert-circle-outline"
+        size={48}
+        color={theme.colors.error}
       />
       <Text style={{
         color: theme.colors.error,
@@ -569,7 +569,7 @@ export function HorizontalCardScroll({
     <View style={[containerStyle, style]}>
       {/* Header */}
       {(title || subtitle || headerAction) && (
-        <View style={{ 
+        <View style={{
           flexDirection: getFlexDirection(isRTL),
           justifyContent: 'space-between',
           alignItems: headerAction ? 'center' : 'flex-start',
@@ -578,7 +578,7 @@ export function HorizontalCardScroll({
         }}>
           <View style={{ flex: 1 }}>
             {title && (
-              <Text variant="subtitle" style={{ 
+              <Text variant="subtitle" style={{
                 fontWeight: '600',
                 marginBottom: subtitle ? theme.sizes.xs : 0,
               }}>
@@ -586,7 +586,7 @@ export function HorizontalCardScroll({
               </Text>
             )}
             {subtitle && (
-              <Text variant="body" style={{ 
+              <Text variant="body" style={{
                 color: theme.colors.textSecondary,
               }}>
                 {subtitle}
@@ -635,7 +635,7 @@ export function HorizontalCardScroll({
           >
             <Icon name={isRTL ? "chevron-forward" : "chevron-back"} size={20} color={theme.colors.text} />
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             onPress={isRTL ? scrollLeft : scrollRight}
             disabled={currentIndex === data.length - 1}
@@ -677,10 +677,10 @@ export function HorizontalCardScroll({
         ) : undefined}
         {...scrollViewProps}
       >
-        {data.map((item, index) => 
+        {data.map((item, index) =>
           renderCard ? renderCard(item, index) : renderDefaultCard(item, index)
         )}
-        
+
         {/* Load More Indicator */}
         {hasMore && (
           <View style={{
@@ -719,8 +719,8 @@ export function HorizontalCardScroll({
                 width: currentIndex === index ? 20 : 8,
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: currentIndex === index 
-                  ? theme.colors.primary 
+                backgroundColor: currentIndex === index
+                  ? theme.colors.primary
                   : theme.colors.textSecondary + '40',
               }}
             />

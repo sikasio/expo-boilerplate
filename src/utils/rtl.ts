@@ -16,9 +16,18 @@ export interface RTLProps {
 /**
  * Check if current device/app is in RTL mode
  * Uses React Native's I18nManager to detect RTL
+ * Note: For dynamic RTL switching, use useRTL() hook from RTLContext instead
  */
 export const isRTL = (): boolean => {
   return I18nManager.isRTL;
+};
+
+/**
+ * Check RTL state from context (for dynamic RTL switching)
+ * This should be used instead of isRTL() when you need dynamic RTL support
+ */
+export const isRTLFromContext = (contextRTL: boolean): boolean => {
+  return contextRTL;
 };
 
 /**
@@ -32,11 +41,25 @@ export const forceRTL = (enable: boolean): void => {
 /**
  * Get flex direction based on RTL prop or global RTL state
  * @param rtl - Optional RTL override
- * @returns 'row' for LTR, 'row-reverse' for RTL
+ * @param flexDir - The base flex direction to transform
+ * @returns Appropriate flex direction for RTL/LTR
  */
-export const getFlexDirection = (rtl?: boolean): 'row' | 'row-reverse' => {
-  const isRTLActive = rtl !== undefined ? rtl : isRTL();
-  return isRTLActive ? 'row-reverse' : 'row';
+export const getFlexDirection = (rtl?: boolean, flexDir: 'row' | 'column' | 'row-reverse' | 'column-reverse' = 'row'): 'row' | 'column' | 'row-reverse' | 'column-reverse' => {
+  const isRTLActive = rtl !== undefined ? rtl : false; // Default to false - manual RTL control
+  
+  if (!isRTLActive) {
+    return flexDir;
+  }
+  
+  // Transform row directions for RTL
+  if (flexDir === 'row') {
+    return 'row-reverse';
+  } else if (flexDir === 'row-reverse') {
+    return 'row';
+  }
+  
+  // Column directions don't change
+  return flexDir;
 };
 
 /**
@@ -46,7 +69,7 @@ export const getFlexDirection = (rtl?: boolean): 'row' | 'row-reverse' => {
  * @returns Appropriate text alignment for RTL/LTR
  */
 export const getTextAlign = (rtl?: boolean, align?: TextStyle['textAlign']): TextStyle['textAlign'] => {
-  const isRTLActive = rtl !== undefined ? rtl : isRTL();
+  const isRTLActive = rtl !== undefined ? rtl : false; // Default to false when no context provided
   
   if (align === 'center' || align === 'justify') {
     return align;
@@ -65,10 +88,10 @@ export const getTextAlign = (rtl?: boolean, align?: TextStyle['textAlign']): Tex
 };
 
 /**
- * RTL-aware margin utilities
+ * RTL-aware margin utilities (helper functions)
  */
 export const getRTLMargin = (rtl?: boolean) => {
-  const isRTLActive = rtl !== undefined ? rtl : isRTL();
+  const isRTLActive = rtl !== undefined ? rtl : false; // Default to false - manual RTL control
   
   return {
     /**
@@ -88,10 +111,10 @@ export const getRTLMargin = (rtl?: boolean) => {
 };
 
 /**
- * RTL-aware padding utilities
+ * RTL-aware padding utilities (helper functions)
  */
 export const getRTLPadding = (rtl?: boolean) => {
-  const isRTLActive = rtl !== undefined ? rtl : isRTL();
+  const isRTLActive = rtl !== undefined ? rtl : false; // Default to false - manual RTL control
   
   return {
     /**
@@ -140,9 +163,9 @@ export const getRTLBorder = (rtl?: boolean) => {
  * Automatically converts margin/padding left/right properties
  */
 export const transformRTLStyle = (style: ViewStyle | TextStyle, rtl?: boolean): ViewStyle | TextStyle => {
-  const isRTLActive = rtl !== undefined ? rtl : isRTL();
+  const isRTLActive = rtl !== undefined ? rtl : false; // Default to false - manual RTL control
   
-  if (!isRTLActive) {
+  if (!isRTLActive || !style) {
     return style;
   }
   
@@ -232,7 +255,7 @@ export const createRTLStyle = (
   rtlStyle?: Partial<ViewStyle | TextStyle>,
   rtl?: boolean
 ): ViewStyle | TextStyle => {
-  const isRTLActive = rtl !== undefined ? rtl : isRTL();
+  const isRTLActive = rtl !== undefined ? rtl : false; // Default to false - manual RTL control
   
   if (!isRTLActive) {
     return baseStyle;
@@ -253,7 +276,7 @@ export const createRTLStyle = (
  * Automatically converts directional icons for RTL mode
  */
 export const getRTLIconName = (iconName: string, rtl?: boolean): string => {
-  const isRTLActive = rtl !== undefined ? rtl : isRTL();
+  const isRTLActive = rtl !== undefined ? rtl : false; // Default to false when no context provided
   
   if (!isRTLActive) {
     return iconName;
@@ -302,7 +325,7 @@ export const getRTLIconName = (iconName: string, rtl?: boolean): string => {
  * Icon direction utilities for RTL
  */
 export const getIconDirection = (rtl?: boolean) => {
-  const isRTLActive = rtl !== undefined ? rtl : isRTL();
+  const isRTLActive = rtl !== undefined ? rtl : false; // Default to false when no context provided
   
   return {
     /**

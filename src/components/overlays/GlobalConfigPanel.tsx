@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ViewStyle,
   TouchableWithoutFeedback,
-  Switch,
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,6 +15,7 @@ import { useRTL } from '@/contexts/RTLContext';
 import { Icon } from '../ui/Icon';
 import { Text } from '../ui/Text';
 import { List, ListItem } from '../ui/List';
+import { Switch } from '../ui/Switch';
 
 interface GlobalConfigPanelProps {
   style?: ViewStyle;
@@ -318,13 +318,11 @@ export function GlobalConfigPanel({
                   const rightContent = (
                     <Switch
                       value={option.value as boolean}
-                      onValueChange={option.onToggle}
-                      trackColor={{
-                        false: theme.colors.border || '#E5E5E5',
-                        true: (theme.colors.primary || '#007AFF') + '40',
-                      }}
-                      thumbColor={(option.value as boolean) ? (theme.colors.primary || '#007AFF') : '#FFFFFF'}
-                      style={{ transform: [{ scaleX: 0.7 }, { scaleY: 0.7 }] }}
+                      onValueChange={option.onToggle || (() => {})}
+                      size="small"
+                      activeColor={theme.colors.primary}
+                      inactiveColor={theme.colors.border}
+                      disabled={false}
                     />
                   );
 

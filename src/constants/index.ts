@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 export const APP_CONFIG = {
   APP_NAME: 'Expo Boilerplate',
   VERSION: '1.0.0',
@@ -34,35 +36,35 @@ export const DARK_COLORS = {
 } as const;
 
 export const COLOR_SCHEMES = {
-  blue: { 
-    light: { primary: '#007AFF', secondary: '#5856D6' }, 
-    dark: { primary: '#0A84FF', secondary: '#5E5CE6' } 
+  blue: {
+    light: { primary: '#007AFF', secondary: '#5856D6' },
+    dark: { primary: '#0A84FF', secondary: '#5E5CE6' }
   },
-  green: { 
-    light: { primary: '#34C759', secondary: '#32ADE6' }, 
-    dark: { primary: '#30D158', secondary: '#64D2FF' } 
+  green: {
+    light: { primary: '#34C759', secondary: '#32ADE6' },
+    dark: { primary: '#30D158', secondary: '#64D2FF' }
   },
-  purple: { 
-    light: { primary: '#AF52DE', secondary: '#007AFF' }, 
-    dark: { primary: '#BF5AF2', secondary: '#0A84FF' } 
+  purple: {
+    light: { primary: '#AF52DE', secondary: '#007AFF' },
+    dark: { primary: '#BF5AF2', secondary: '#0A84FF' }
   },
-  orange: { 
-    light: { primary: '#FF9500', secondary: '#FF3B30' }, 
-    dark: { primary: '#FF9F0A', secondary: '#FF453A' } 
+  orange: {
+    light: { primary: '#FF9500', secondary: '#FF3B30' },
+    dark: { primary: '#FF9F0A', secondary: '#FF453A' }
   },
-  red: { 
-    light: { primary: '#FF3B30', secondary: '#FF9500' }, 
-    dark: { primary: '#FF453A', secondary: '#FF9F0A' } 
+  red: {
+    light: { primary: '#FF3B30', secondary: '#FF9500' },
+    dark: { primary: '#FF453A', secondary: '#FF9F0A' }
   },
-  teal: { 
-    light: { primary: '#5AC8FA', secondary: '#34C759' }, 
-    dark: { primary: '#64D2FF', secondary: '#30D158' } 
+  teal: {
+    light: { primary: '#5AC8FA', secondary: '#34C759' },
+    dark: { primary: '#64D2FF', secondary: '#30D158' }
   },
 } as const;
 
 export const SIZES = {
   xs: 4,
-  sm: 8,
+  sm: Platform.OS === 'android' ? 8 : 8,
   md: 16,
   lg: 24,
   xl: 32,

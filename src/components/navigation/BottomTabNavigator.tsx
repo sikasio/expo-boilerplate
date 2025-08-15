@@ -27,6 +27,10 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
 
   const getTabBarStyle = () => {
     const dimensions = getTabBarDimensions(design);
+    // Android-only: Add small extra padding
+    const androidExtraTopPadding = Platform.OS === 'android' ? 8 : 0;
+    const androidExtraBottomPadding = Platform.OS === 'android' ? 8 : 0;
+
     const baseStyle = {
       backgroundColor: theme.colors.surface,
       borderTopColor: theme.colors.border,
@@ -40,9 +44,9 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
           marginHorizontal: 16,
           backgroundColor: theme.colors.surface,
           borderRadius: theme.borderRadius.xxl,
-          paddingTop: dimensions.paddingTop,
-          paddingBottom: dimensions.paddingBottom,
-          height: dimensions.height,
+          paddingTop: dimensions.paddingTop + androidExtraTopPadding,
+          paddingBottom: dimensions.paddingBottom + androidExtraBottomPadding,
+          height: dimensions.height + androidExtraTopPadding + androidExtraBottomPadding,
           borderTopWidth: 0,
           shadowColor: theme.colors.text,
           shadowOffset: { width: 0, height: 4 },
@@ -51,12 +55,21 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
           elevation: 15,
         };
 
+      case 'default':
+        return {
+          backgroundColor: theme.colors.surface,
+          paddingTop: dimensions.paddingTop + androidExtraTopPadding,
+          paddingBottom: dimensions.paddingBottom + androidExtraBottomPadding,
+          height: dimensions.height + androidExtraTopPadding + androidExtraBottomPadding,
+          borderTopWidth: 0.2,
+        };
+
       default:
         return {
           ...baseStyle,
-          paddingTop: dimensions.paddingTop,
-          paddingBottom: dimensions.paddingBottom,
-          height: dimensions.height,
+          paddingTop: dimensions.paddingTop + androidExtraTopPadding,
+          paddingBottom: dimensions.paddingBottom + androidExtraBottomPadding,
+          height: dimensions.height + androidExtraTopPadding + androidExtraBottomPadding,
           shadowColor: theme.colors.text,
           shadowOffset: { width: 0, height: -1 },
           shadowOpacity: 0.05,
@@ -72,8 +85,12 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
       if (isSplashActive) {
         return null;
       }
-      
+
       const dimensions = getTabBarDimensions(design);
+      // Android-only: Add small extra padding for bubble design
+      const androidExtraBottomPadding = Platform.OS === 'android' ? 8 : 0;
+      const androidExtraTopPadding = Platform.OS === 'android' ? 8 : 0;
+
       return (
         <View style={{
           position: 'absolute',
@@ -83,6 +100,8 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
+          paddingTop: androidExtraTopPadding,
+          paddingBottom: androidExtraBottomPadding,
         }}>
           <View
             key={`bubble-container-${state.index}`}

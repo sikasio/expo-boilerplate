@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ViewStyle, ViewProps } from 'react-native';
+import { View, ViewStyle, ViewProps, StatusBar, Platform } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRTL } from '@/contexts/RTLContext';
 import { Text } from '@/components/ui/Text';
@@ -43,7 +43,6 @@ export function Header({
   ...props
 }: HeaderProps) {
   const { theme } = useTheme();
-  
   const { isRTL } = useRTL();
 
   const getMarginBottom = () => {
@@ -57,22 +56,29 @@ export function Header({
   };
 
   const getHeaderStyle = (): ViewStyle => {
+    // Android-only: Add top margin for status bar
+    const androidTopMargin = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0;
+    
     const baseStyle: ViewStyle = {
       flexDirection: getFlexDirection(isRTL),
       alignItems: 'center',
       minHeight: 56,
       paddingHorizontal: theme.sizes.sm,
       paddingVertical: theme.sizes.sm,
+      marginTop: androidTopMargin, // Android-only status bar margin
       marginBottom: getMarginBottom(),
       backgroundColor: backgroundColor || theme.colors.surface,
       borderRadius: theme.borderRadius.md,
       borderBottomWidth: borderBottom ? 1 : 0,
       borderBottomColor: theme.colors.border,
-      shadowColor: theme.colors.text,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 4,
-      elevation: 2,
+      // Only apply shadows/elevation if not transparent background
+      ...(backgroundColor === 'transparent' ? {} : {
+        shadowColor: theme.colors.text,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: Platform.OS === 'android' ? 0 : 2, // Remove Android elevation, keep iOS shadow
+      }),
     };
 
     return createRTLStyle(baseStyle, {}, isRTL);

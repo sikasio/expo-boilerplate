@@ -10,7 +10,8 @@ export {
   SimpleLoading, 
   DetailedLoading, 
   ProgressLoading, 
-  ErrorScreen 
+  ErrorScreen,
+  SafeActivityIndicator 
 } from './LoadingScreen';
 export type { 
   LoadingScreenVariant, 
@@ -36,6 +37,7 @@ export { Modal } from './Modal';
 export { LazyImage } from './LazyImage';
 export { GallerySlider } from './GallerySlider';
 export { StarRating } from './StarRating';
+export { Switch } from './Switch';
 export { 
   SkeletonCard, 
   BookCardSkeleton, 

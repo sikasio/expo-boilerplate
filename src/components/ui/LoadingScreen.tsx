@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StatusBar, ViewStyle, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StatusBar, ViewStyle, ActivityIndicator, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { SplashScreen, SplashScreenProps } from '@/screens/SplashScreen';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -339,6 +339,32 @@ export interface SimpleLoadingProps {
   testID?: string;
 }
 
+// Safe ActivityIndicator wrapper for Android - prevents ProgressBar measurement issues
+export const SafeActivityIndicator = ({ size, color }: { size: "small" | "large", color: string }) => {
+  const [shouldRender, setShouldRender] = useState(Platform.OS !== 'android');
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      // Delay Android ActivityIndicator rendering to prevent measurement issues
+      const timer = setTimeout(() => {
+        setShouldRender(true);
+      }, 16); // One frame delay
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  if (!shouldRender) {
+    return <View style={{ width: size === 'large' ? 36 : 20, height: size === 'large' ? 36 : 20 }} />;
+  }
+
+  return (
+    <ActivityIndicator
+      size={size}
+      color={color}
+    />
+  );
+};
+
 export function SimpleLoading({
   visible = true,
   testID = 'simple-loading',
@@ -347,27 +373,64 @@ export function SimpleLoading({
 
   if (!visible) return null;
 
+  const overlayStyle = {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    zIndex: 9999,
+    elevation: Platform.OS === 'android' ? 9999 : undefined, // Android specific
+  };
+
+  const spinnerContainer = (
+    <View style={{ width: 50, height: 50, justifyContent: 'center', alignItems: 'center' }}>
+      {Platform.OS === 'android' ? (
+        // Use regular ActivityIndicator on Android for loading screens to avoid delay issues
+        <ActivityIndicator
+          size="large"
+          color={theme.colors.primary}
+        />
+      ) : (
+        <SafeActivityIndicator
+          size="large"
+          color={theme.colors.primary}
+        />
+      )}
+    </View>
+  );
+
+  // Use BlurView on iOS, solid overlay on Android
+  if (Platform.OS === 'ios') {
+    return (
+      <BlurView
+        intensity={25}
+        tint="light"
+        style={overlayStyle}
+        testID={testID}
+      >
+        {spinnerContainer}
+      </BlurView>
+    );
+  }
+
+  // Android: Use solid overlay with proper opacity
   return (
-    <BlurView
-      intensity={25}  // Reduced from 50 to 25 for more subtle effect
-      tint="light"
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 9999,
-      }}
+    <View
+      style={[
+        overlayStyle,
+        {
+          backgroundColor: theme.isDark 
+            ? 'rgba(0, 0, 0, 0.90)' 
+            : 'rgba(255, 255, 255, 0.95)',
+        }
+      ]}
       testID={testID}
     >
-      <ActivityIndicator
-        size="large"
-        color={theme.colors.primary}
-      />
-    </BlurView>
+      {spinnerContainer}
+    </View>
   );
 }
 
