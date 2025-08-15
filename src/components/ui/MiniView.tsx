@@ -4,7 +4,7 @@ import { useRTL } from '@/contexts/RTLContext';
 import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
 
 /**
- * RTL-Aware View Component
+ * RTL-Aware MiniView Component
  * 
  * A wrapper around React Native's View component with opt-in RTL (Right-to-Left) support.
  * Only applies RTL transformations when explicitly requested through props.
@@ -13,32 +13,32 @@ import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
  * Reads RTL configuration from the global RTLContext when enabled.
  * 
  * @example
- * // Basic View (no RTL applied by default)
- * <View>
+ * // Basic MiniView (no RTL applied by default)
+ * <MiniView>
  *   <Text>Regular LTR content</Text>
- * </View>
+ * </MiniView>
  * 
  * @example
  * // Enable RTL from global context - only overrides direction properties
- * <View enableRTL style={{ flexDirection: 'row', backgroundColor: 'red' }}>
+ * <MiniView enableRTL style={{ flexDirection: 'row', backgroundColor: 'red' }}>
  *   <Text>flexDirection becomes 'row-reverse', backgroundColor preserved</Text>
- * </View>
+ * </MiniView>
  * 
  * @example
  * // Force RTL regardless of context
- * <View forceRTL>
+ * <MiniView forceRTL>
  *   <Text>Always RTL</Text>
- * </View>
+ * </MiniView>
  * 
  * @example
  * // Force LTR regardless of context
- * <View forceLTR>
+ * <MiniView forceLTR>
  *   <Text>Always LTR</Text>
- * </View>
+ * </MiniView>
  * 
  * @example
  * // RTL-aware styling - only direction properties are overridden
- * <View 
+ * <MiniView 
  *   enableRTL
  *   style={{ 
  *     flexDirection: 'row',     // Overridden: becomes 'row-reverse' in RTL
@@ -48,10 +48,10 @@ import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
  *   }}
  * >
  *   <Text>Direction properties overridden, others preserved</Text>
- * </View>
+ * </MiniView>
  */
 
-interface RTLViewProps extends RNViewProps {
+interface RTLMiniViewProps extends RNViewProps {
   children?: React.ReactNode;
   
   // RTL-aware style props
@@ -77,7 +77,7 @@ interface RTLViewProps extends RNViewProps {
   forceLTR?: boolean; // When true, forces LTR behavior regardless of context
 }
 
-export function View({
+export function MiniView({
   children,
   style,
   flexDirection,
@@ -97,7 +97,7 @@ export function View({
   forceRTL = false,
   forceLTR = false,
   ...props
-}: RTLViewProps) {
+}: RTLMiniViewProps) {
   const { isRTL } = useRTL();
   
   // Determine RTL behavior based on props
@@ -251,11 +251,11 @@ export function View({
 }
 
 // Export type for external use
-export type ViewProps = RTLViewProps;
+export type MiniViewProps = RTLMiniViewProps;
 
 /**
- * Default View export for easy replacement of React Native's View
+ * Default MiniView export for easy replacement of React Native's View
  * Can be used as a drop-in replacement for React Native View.
  * RTL support is opt-in through props (enableRTL, forceRTL, forceLTR).
  */
-export default View;
+export default MiniView;

@@ -18,6 +18,7 @@ interface TextInputProps extends RNTextInputProps {
   helperText?: string;
   leftIcon?: IconName;
   rightIcon?: IconName;
+  onRightIconPress?: () => void;
   containerStyle?: ViewStyle;
   showPasswordToggle?: boolean;
 }
@@ -28,6 +29,7 @@ export function TextInput({
   helperText,
   leftIcon,
   rightIcon,
+  onRightIconPress,
   containerStyle,
   style,
   secureTextEntry,
@@ -60,8 +62,16 @@ export function TextInput({
     }
   };
 
+  const handleRightIconPress = () => {
+    if (shouldShowPasswordToggle) {
+      togglePasswordVisibility();
+    } else if (onRightIconPress) {
+      onRightIconPress();
+    }
+  };
+
   // Determine if right icon should be interactive
-  const isRightIconInteractive = shouldShowPasswordToggle;
+  const isRightIconInteractive = shouldShowPasswordToggle || Boolean(onRightIconPress);
 
   const getInputStyle = () => {
     return {
@@ -159,14 +169,14 @@ export function TextInput({
 
         {endIcon && (
           <TouchableOpacity
-            onPress={isEndIconInteractive ? togglePasswordVisibility : undefined}
+            onPress={isEndIconInteractive ? handleRightIconPress : undefined}
             style={{ 
               ...getRTLPadding(isRTL).paddingEnd(theme.sizes.md),
               ...getRTLPadding(isRTL).paddingStart(theme.sizes.xs),
               justifyContent: 'center',
             }}
             activeOpacity={isEndIconInteractive ? 0.7 : 1}
-            disabled={!isRightIconInteractive}
+            disabled={!isEndIconInteractive}
           >
             <Icon
               name={getRTLIconName(endIcon, isRTL)}

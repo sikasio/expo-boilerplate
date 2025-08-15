@@ -2,7 +2,7 @@ export { Text } from './Text';
 export { Button } from './Button';
 export { ButtonGroup } from './ButtonGroup';
 export { Card } from './Card';
-export { View } from './View';
+export { MiniView } from './MiniView';
 export { LoadingSpinner } from './LoadingSpinner';
 export type { LoadingSpinnerSize, LoadingSpinnerVariant, LoadingSpinnerPosition } from './LoadingSpinner';
 export { 
@@ -35,6 +35,7 @@ export { HorizontalCardScroll } from './HorizontalCardScroll';
 export { Modal } from './Modal';
 export { LazyImage } from './LazyImage';
 export { GallerySlider } from './GallerySlider';
+export { StarRating } from './StarRating';
 export { 
   SkeletonCard, 
   BookCardSkeleton, 
@@ -58,4 +59,5 @@ export type { ModalSize, ModalPosition, ModalVariant, ModalAnimation, ModalActio
 export type { LazyImageProps } from './LazyImage';
 export type { GallerySliderItem, GallerySliderProps } from './GallerySlider';
 export type { SkeletonCardVariant, SkeletonCardSize, SkeletonAnimation, SkeletonShape } from './SkeletonCard';
-export type { ViewProps } from './View';
+export type { MiniViewProps } from './MiniView';
+export type { StarRatingProps } from './StarRating';
