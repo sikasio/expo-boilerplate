@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { StorageService } from '@/services/storage';
+import { logger } from '@/utils/logger';
 
 export function useStorage<T>(
   key: string,
@@ -26,7 +27,7 @@ export function useStorage<T>(
         setStoredValue(JSON.parse(item));
       }
     } catch (error) {
-      console.error('Error loading stored value:', error);
+      logger.error('Error loading stored value:', error, { function: 'loadStoredValue', hook: 'useStorage', key, secure });
     }
   };
 
@@ -41,7 +42,7 @@ export function useStorage<T>(
         await StorageService.setItem(key, valueToStore);
       }
     } catch (error) {
-      console.error('Error storing value:', error);
+      logger.error('Error storing value:', error, { function: 'setValue', hook: 'useStorage', key, secure });
       throw error;
     }
   }, [key, secure]);
@@ -56,7 +57,7 @@ export function useStorage<T>(
         await StorageService.removeItem(key);
       }
     } catch (error) {
-      console.error('Error removing stored value:', error);
+      logger.error('Error removing stored value:', error, { function: 'removeValue', hook: 'useStorage', key, secure });
       throw error;
     }
   }, [key, initialValue, secure]);

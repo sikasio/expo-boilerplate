@@ -2,6 +2,7 @@ import { apiClient } from '@/config/api';
 import { StorageService } from './storage';
 import { STORAGE_KEYS, API_ENDPOINTS } from '@/constants';
 import { User, ApiResponse } from '@/types';
+import { logger } from '@/utils/logger';
 
 export interface LoginCredentials {
   email: string;
@@ -37,7 +38,11 @@ export class AuthService {
 
       return response.data;
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login failed', error, { 
+        function: 'login',
+        component: 'AuthService',
+        email: credentials.email
+      });
       throw error;
     }
   }
@@ -57,7 +62,11 @@ export class AuthService {
 
       return response.data;
     } catch (error) {
-      console.error('Register error:', error);
+      logger.error('Registration failed', error, { 
+        function: 'register',
+        component: 'AuthService',
+        email: credentials.email
+      });
       throw error;
     }
   }
@@ -66,7 +75,10 @@ export class AuthService {
     try {
       await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout failed', error, { 
+        function: 'logout',
+        component: 'AuthService'
+      });
     } finally {
       // Clear stored auth data
       await StorageService.removeSecureItem(STORAGE_KEYS.USER_TOKEN);
@@ -79,7 +91,10 @@ export class AuthService {
       const user = await StorageService.getObject<User>(STORAGE_KEYS.USER_DATA);
       return user;
     } catch (error) {
-      console.error('Get current user error:', error);
+      logger.error('Get current user failed', error, { 
+        function: 'getCurrentUser',
+        component: 'AuthService'
+      });
       return null;
     }
   }
@@ -88,7 +103,10 @@ export class AuthService {
     try {
       return await StorageService.getSecureItem(STORAGE_KEYS.USER_TOKEN);
     } catch (error) {
-      console.error('Get token error:', error);
+      logger.error('Get token failed', error, { 
+        function: 'getToken',
+        component: 'AuthService'
+      });
       return null;
     }
   }
@@ -98,7 +116,10 @@ export class AuthService {
       const token = await this.getToken();
       return !!token;
     } catch (error) {
-      console.error('Check authentication error:', error);
+      logger.error('Check authentication failed', error, { 
+        function: 'isAuthenticated',
+        component: 'AuthService'
+      });
       return false;
     }
   }
@@ -107,7 +128,11 @@ export class AuthService {
     try {
       await apiClient.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
     } catch (error) {
-      console.error('Forgot password error:', error);
+      logger.error('Forgot password failed', error, { 
+        function: 'forgotPassword',
+        component: 'AuthService',
+        email
+      });
       throw error;
     }
   }
@@ -119,7 +144,10 @@ export class AuthService {
         password,
       });
     } catch (error) {
-      console.error('Reset password error:', error);
+      logger.error('Reset password failed', error, { 
+        function: 'resetPassword',
+        component: 'AuthService'
+      });
       throw error;
     }
   }

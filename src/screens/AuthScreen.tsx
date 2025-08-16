@@ -145,6 +145,18 @@ export interface AuthScreenProps {
   showForgotPassword?: boolean;
   showTermsCheckbox?: boolean;
   enableBiometric?: boolean;
+  
+  // Conditional Input Visibility
+  conditionalInputs?: {
+    // Hide phone input until email is valid
+    hidePhoneUntilValidEmail?: boolean;
+    // Hide confirm password until password has minimum length
+    hideConfirmPasswordUntilMinLength?: number; // e.g., 3 for 3 characters
+    // Custom conditions for any field
+    customConditions?: {
+      [fieldName: string]: (formData: AuthFormData) => boolean;
+    };
+  };
 
   // Verification Configuration
   verificationContact?: string; // Phone number or email for verification
@@ -207,6 +219,7 @@ export function AuthScreen({
   showForgotPassword = true,
   showTermsCheckbox = false,
   enableBiometric = false,
+  conditionalInputs,
   verificationContact,
   enableValidation = true,
   customValidation,
@@ -244,6 +257,49 @@ export function AuthScreen({
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Watch form values for conditional input visibility
+  const watchedEmail = watch('email');
+  const watchedPassword = watch('password');
+
+  // Helper functions for conditional input visibility
+  const isEmailValid = (email: string): boolean => {
+    if (!email) return false;
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+    return emailRegex.test(email);
+  };
+
+  const shouldShowPhoneInput = (): boolean => {
+    if (!conditionalInputs?.hidePhoneUntilValidEmail) {
+      return true; // Show by default if condition not enabled
+    }
+    return isEmailValid(watchedEmail || '');
+  };
+
+  const shouldShowConfirmPasswordInput = (): boolean => {
+    if (!conditionalInputs?.hideConfirmPasswordUntilMinLength) {
+      return true; // Show by default if condition not enabled
+    }
+    const minLength = conditionalInputs.hideConfirmPasswordUntilMinLength;
+    return (watchedPassword || '').length >= minLength;
+  };
+
+  const shouldShowCustomField = (fieldName: string): boolean => {
+    const customCondition = conditionalInputs?.customConditions?.[fieldName];
+    if (!customCondition) {
+      return true; // Show by default if no custom condition
+    }
+    return customCondition({
+      email: watchedEmail,
+      password: watchedPassword,
+      confirmPassword: watch('confirmPassword'),
+      name: watch('name'),
+      phone: watch('phone'),
+      code: watch('code'),
+      rememberMe,
+      agreeToTerms,
+    });
+  };
 
   // Start animations on mount
   React.useEffect(() => {
@@ -919,7 +975,7 @@ export function AuthScreen({
     }
 
     // Phone field (for registration, WhatsApp reset, and phone login only)
-    if (variant === 'register' || variant === 'forgot-password-whatsapp' || variant === 'login-phone') {
+    if ((variant === 'register' || variant === 'forgot-password-whatsapp' || variant === 'login-phone') && shouldShowPhoneInput()) {
       fields.push(
         <Controller
           key="phone"
@@ -983,7 +1039,7 @@ export function AuthScreen({
     }
 
     // Confirm password field
-    if (['register', 'reset-password'].includes(variant)) {
+    if (['register', 'reset-password'].includes(variant) && shouldShowConfirmPasswordInput()) {
       fields.push(
         <Controller
           key="confirmPassword"

@@ -1,4 +1,5 @@
 import * as Notifications from 'expo-notifications';
+import { logger } from '@/utils/logger';
 
 export class NotificationService {
   static async initialize(): Promise<void> {
@@ -26,13 +27,20 @@ export class NotificationService {
       }
 
       if (finalStatus !== 'granted') {
-        console.warn('Failed to get push token for push notification!');
+        logger.warn('Failed to get push token for push notification!', {
+          function: 'requestPermissions',
+          component: 'NotificationService',
+          finalStatus
+        });
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error requesting notification permissions:', error);
+      logger.error('Error requesting notification permissions', error, {
+        function: 'requestPermissions',
+        component: 'NotificationService'
+      });
       return false;
     }
   }
@@ -42,7 +50,10 @@ export class NotificationService {
       const { data: token } = await Notifications.getExpoPushTokenAsync();
       return token;
     } catch (error) {
-      console.error('Error getting push token:', error);
+      logger.error('Error getting push token', error, {
+        function: 'getPushToken',
+        component: 'NotificationService'
+      });
       return null;
     }
   }
@@ -63,7 +74,11 @@ export class NotificationService {
       });
       return id;
     } catch (error) {
-      console.error('Error scheduling notification:', error);
+      logger.error('Error scheduling notification', error, {
+        function: 'scheduleNotification',
+        component: 'NotificationService',
+        title
+      });
       throw error;
     }
   }
@@ -72,7 +87,11 @@ export class NotificationService {
     try {
       await Notifications.cancelScheduledNotificationAsync(notificationId);
     } catch (error) {
-      console.error('Error canceling notification:', error);
+      logger.error('Error canceling notification', error, {
+        function: 'cancelNotification',
+        component: 'NotificationService',
+        notificationId
+      });
       throw error;
     }
   }
@@ -81,7 +100,10 @@ export class NotificationService {
     try {
       await Notifications.cancelAllScheduledNotificationsAsync();
     } catch (error) {
-      console.error('Error canceling all notifications:', error);
+      logger.error('Error canceling all notifications', error, {
+        function: 'cancelAllNotifications',
+        component: 'NotificationService'
+      });
       throw error;
     }
   }
@@ -90,7 +112,10 @@ export class NotificationService {
     try {
       return await Notifications.getBadgeCountAsync();
     } catch (error) {
-      console.error('Error getting badge count:', error);
+      logger.error('Error getting badge count', error, {
+        function: 'getBadgeCount',
+        component: 'NotificationService'
+      });
       return 0;
     }
   }
@@ -99,7 +124,11 @@ export class NotificationService {
     try {
       await Notifications.setBadgeCountAsync(count);
     } catch (error) {
-      console.error('Error setting badge count:', error);
+      logger.error('Error setting badge count', error, {
+        function: 'setBadgeCount',
+        component: 'NotificationService',
+        count
+      });
     }
   }
 

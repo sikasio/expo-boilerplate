@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types';
 import { AuthService, LoginCredentials, RegisterCredentials } from '@/services/auth';
+import { logger } from '@/utils/logger';
 
 interface AuthContextType {
   user: User | null;
@@ -30,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(currentUser);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      logger.error('Auth check failed:', error, { function: 'checkAuthStatus', component: 'AuthProvider' });
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await AuthService.logout();
       setUser(null);
     } catch (error) {
-      console.error('Logout failed:', error);
+      logger.error('Logout failed:', error, { function: 'logout', component: 'AuthProvider' });
       // Still clear user data locally even if API call fails
       setUser(null);
     } finally {
@@ -79,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const currentUser = await AuthService.getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      console.error('Refresh user failed:', error);
+      logger.error('Refresh user failed:', error, { function: 'refreshUser', component: 'AuthProvider' });
       setUser(null);
     }
   };

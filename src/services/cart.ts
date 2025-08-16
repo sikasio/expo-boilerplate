@@ -1,5 +1,6 @@
 import { StorageService } from './storage';
 import { CartItem, BaseProduct, CartSummary, CartConfiguration, DEFAULT_CART_CONFIG } from '../types/cart';
+import { logger } from '@/utils/logger';
 
 const CART_STORAGE_KEY = 'cart_items';
 
@@ -15,7 +16,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
       const cartItems = await StorageService.getAppObject<CartItem<T>[]>(CART_STORAGE_KEY);
       return cartItems || [];
     } catch (error) {
-      console.error('Error getting cart items:', error);
+      logger.error('Error getting cart items:', error, { function: 'getCartItems', service: 'CartService' });
       return [];
     }
   }
@@ -24,7 +25,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
     try {
       await StorageService.setAppObject(CART_STORAGE_KEY, cartItems);
     } catch (error) {
-      console.error('Error saving cart items:', error);
+      logger.error('Error saving cart items:', error, { function: 'saveCartItems', service: 'CartService' });
       throw error;
     }
   }
@@ -54,7 +55,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
 
       await this.saveCartItems(cartItems);
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      logger.error('Error adding to cart:', error, { function: 'addToCart', service: 'CartService', itemId: item.id });
       throw error;
     }
   }
@@ -69,7 +70,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
         await this.saveCartItems(cartItems);
       }
     } catch (error) {
-      console.error('Error updating cart item:', error);
+      logger.error('Error updating cart item:', error, { function: 'updateCartItem', service: 'CartService', itemId });
       throw error;
     }
   }
@@ -80,7 +81,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
       const filteredItems = cartItems.filter(item => item.id !== itemId);
       await this.saveCartItems(filteredItems);
     } catch (error) {
-      console.error('Error removing from cart:', error);
+      logger.error('Error removing from cart:', error, { function: 'removeFromCart', service: 'CartService', itemId });
       throw error;
     }
   }
@@ -94,7 +95,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
 
       await this.updateCartItem(itemId, { quantity });
     } catch (error) {
-      console.error('Error updating quantity:', error);
+      logger.error('Error updating quantity:', error, { function: 'updateQuantity', service: 'CartService', itemId, quantity });
       throw error;
     }
   }
@@ -103,7 +104,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
     try {
       await StorageService.removeAppItem(CART_STORAGE_KEY);
     } catch (error) {
-      console.error('Error clearing cart:', error);
+      logger.error('Error clearing cart:', error, { function: 'clearCart', service: 'CartService' });
       throw error;
     }
   }
@@ -131,7 +132,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
         itemCount
       };
     } catch (error) {
-      console.error('Error calculating cart summary:', error);
+      logger.error('Error calculating cart summary:', error, { function: 'getCartSummary', service: 'CartService' });
       return {
         subtotal: 0,
         shipping: 0,
@@ -148,7 +149,7 @@ export class CartService<T extends BaseProduct = BaseProduct> {
       const cartItems = await this.getCartItems();
       return cartItems.some(item => item.id === productId);
     } catch (error) {
-      console.error('Error checking if item is in cart:', error);
+      logger.error('Error checking if item is in cart:', error, { function: 'isInCart', service: 'CartService', productId });
       return false;
     }
   }

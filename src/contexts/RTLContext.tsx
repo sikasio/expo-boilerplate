@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { I18nManager, Platform } from 'react-native';
 import { StorageService } from '@/services/storage';
 import { STORAGE_KEYS } from '@/constants';
+import { logger } from '@/utils/logger';
 
 // Import current app configuration
 const currentAppConfig = require('../../current-app.json');
@@ -36,8 +37,12 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
         const rtlEnabled = savedRTL === 'true';
         setIsRTLState(rtlEnabled);
         
-        console.log(`Loaded RTL setting: ${rtlEnabled ? 'RTL' : 'LTR'}`);
-        console.log('I18nManager forced to LTR, using manual RTL control');
+        logger.debug('RTL setting loaded', {
+          component: 'RTLContext',
+          function: 'loadRTLSetting',
+          direction: rtlEnabled ? 'RTL' : 'LTR',
+          manualControl: true
+        });
       } else {
         // No saved preference, use app-specific default
         const defaultRTL = getDefaultRTL();
@@ -45,10 +50,18 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
         // Save the default for this app
         await StorageService.setItem(STORAGE_KEYS.RTL_DIRECTION, defaultRTL.toString());
         
-        console.log(`No saved RTL setting, using default for ${currentAppConfig?.currentApp}: ${defaultRTL ? 'RTL' : 'LTR'}`);
+        logger.debug('No saved RTL setting, using app default', {
+          component: 'RTLContext',
+          function: 'loadRTLSetting',
+          app: currentAppConfig?.currentApp,
+          direction: defaultRTL ? 'RTL' : 'LTR'
+        });
       }
     } catch (error) {
-      console.error('Failed to load RTL setting:', error);
+      logger.error('Failed to load RTL setting', error, {
+        component: 'RTLContext',
+        function: 'loadRTLSetting'
+      });
       // Fallback to app default on error
       setIsRTLState(getDefaultRTL());
     }
@@ -64,10 +77,19 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
       // We want manual control over RTL behavior through our custom components
       // I18nManager.forceRTL(enabled);
       
-      console.log(`RTL direction changed to: ${enabled ? 'RTL' : 'LTR'}`);
-      console.log(`Platform: ${Platform.OS}, Manual RTL control enabled`);
+      logger.debug('RTL direction changed', {
+        component: 'RTLContext',
+        function: 'setRTL',
+        direction: enabled ? 'RTL' : 'LTR',
+        platform: Platform.OS,
+        manualControl: true
+      });
     } catch (error) {
-      console.error('Failed to save RTL setting:', error);
+      logger.error('Failed to save RTL setting', error, {
+        component: 'RTLContext',
+        function: 'setRTL',
+        enabled
+      });
     }
   };
 

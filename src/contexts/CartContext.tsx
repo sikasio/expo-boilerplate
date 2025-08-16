@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { CartItem, BaseProduct, CartSummary, CartConfiguration } from '../types/cart';
 import { CartService } from '../services/cart';
+import { logger } from '@/utils/logger';
 
 interface CartContextType<T extends BaseProduct = BaseProduct> {
   cartItems: CartItem<T>[];
@@ -53,7 +54,7 @@ export function CartProvider<T extends BaseProduct = BaseProduct>({
       setCartItems(items);
       setCartSummary(summary);
     } catch (error) {
-      console.error('Error loading cart items:', error);
+      logger.error('Error loading cart items:', error, { function: 'loadCartItems', component: 'CartProvider' });
     } finally {
       setLoading(false);
     }
@@ -64,7 +65,7 @@ export function CartProvider<T extends BaseProduct = BaseProduct>({
       await cartService.addToCart(item);
       await loadCartItems();
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      logger.error('Error adding to cart:', error, { function: 'addToCart', component: 'CartProvider', itemId: item.id });
       throw error;
     }
   };
@@ -74,7 +75,7 @@ export function CartProvider<T extends BaseProduct = BaseProduct>({
       await cartService.updateQuantity(itemId, quantity);
       await loadCartItems();
     } catch (error) {
-      console.error('Error updating quantity:', error);
+      logger.error('Error updating quantity:', error, { function: 'updateQuantity', component: 'CartProvider', itemId, quantity });
       throw error;
     }
   };
@@ -84,7 +85,7 @@ export function CartProvider<T extends BaseProduct = BaseProduct>({
       await cartService.removeFromCart(itemId);
       await loadCartItems();
     } catch (error) {
-      console.error('Error removing from cart:', error);
+      logger.error('Error removing from cart:', error, { function: 'removeFromCart', component: 'CartProvider', itemId });
       throw error;
     }
   };
@@ -94,7 +95,7 @@ export function CartProvider<T extends BaseProduct = BaseProduct>({
       await cartService.clearCart();
       await loadCartItems();
     } catch (error) {
-      console.error('Error clearing cart:', error);
+      logger.error('Error clearing cart:', error, { function: 'clearCart', component: 'CartProvider' });
       throw error;
     }
   };

@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { getAppPrefix } from '../utils/getCurrentApp';
+import { logger } from '@/utils/logger';
 
 export class StorageService {
   /**
@@ -15,7 +16,11 @@ export class StorageService {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      console.error('Error storing data:', error);
+      logger.error('Error storing data', error, {
+        function: 'setItem',
+        component: 'StorageService',
+        key
+      });
       throw error;
     }
   }
@@ -28,7 +33,11 @@ export class StorageService {
       const appKey = this.getAppKey(key);
       await AsyncStorage.setItem(appKey, value);
     } catch (error) {
-      console.error('Error storing app data:', error);
+      logger.error('Error storing app data', error, {
+        function: 'setAppItem',
+        component: 'StorageService',
+        key
+      });
       throw error;
     }
   }
@@ -37,7 +46,11 @@ export class StorageService {
     try {
       return await AsyncStorage.getItem(key);
     } catch (error) {
-      console.error('Error getting data:', error);
+      logger.error('Error getting data', error, {
+        function: 'getItem',
+        component: 'StorageService',
+        key
+      });
       return null;
     }
   }
@@ -50,7 +63,11 @@ export class StorageService {
       const appKey = this.getAppKey(key);
       return await AsyncStorage.getItem(appKey);
     } catch (error) {
-      console.error('Error getting app data:', error);
+      logger.error('Error getting app data', error, {
+        function: 'getAppItem',
+        component: 'StorageService',
+        key
+      });
       return null;
     }
   }
@@ -59,7 +76,11 @@ export class StorageService {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error('Error removing data:', error);
+      logger.error('Error removing data', error, {
+        function: 'removeItem',
+        component: 'StorageService',
+        key
+      });
       throw error;
     }
   }
@@ -72,7 +93,11 @@ export class StorageService {
       const appKey = this.getAppKey(key);
       await AsyncStorage.removeItem(appKey);
     } catch (error) {
-      console.error('Error removing app data:', error);
+      logger.error('Error removing app data', error, {
+        function: 'removeAppItem',
+        component: 'StorageService',
+        key
+      });
       throw error;
     }
   }
@@ -81,7 +106,10 @@ export class StorageService {
     try {
       await AsyncStorage.clear();
     } catch (error) {
-      console.error('Error clearing storage:', error);
+      logger.error('Error clearing storage', error, {
+        function: 'clear',
+        component: 'StorageService'
+      });
       throw error;
     }
   }
@@ -96,7 +124,10 @@ export class StorageService {
       const appKeys = keys.filter(key => key.startsWith(prefix));
       await AsyncStorage.multiRemove(appKeys);
     } catch (error) {
-      console.error('Error clearing app storage:', error);
+      logger.error('Error clearing app storage', error, {
+        function: 'clearApp',
+        component: 'StorageService'
+      });
       throw error;
     }
   }
@@ -112,7 +143,10 @@ export class StorageService {
         .filter(key => key.startsWith(prefix))
         .map(key => key.replace(prefix, ''));
     } catch (error) {
-      console.error('Error getting app keys:', error);
+      logger.error('Error getting app keys', error, {
+        function: 'getAppKeys',
+        component: 'StorageService'
+      });
       return [];
     }
   }
@@ -122,7 +156,11 @@ export class StorageService {
     try {
       await SecureStore.setItemAsync(key, value);
     } catch (error) {
-      console.error('Error storing secure data:', error);
+      logger.error('Error storing secure data', error, {
+        function: 'setSecureItem',
+        component: 'StorageService',
+        key
+      });
       throw error;
     }
   }
@@ -131,7 +169,11 @@ export class StorageService {
     try {
       return await SecureStore.getItemAsync(key);
     } catch (error) {
-      console.error('Error getting secure data:', error);
+      logger.error('Error getting secure data', error, {
+        function: 'getSecureItem',
+        component: 'StorageService',
+        key
+      });
       return null;
     }
   }
@@ -140,7 +182,11 @@ export class StorageService {
     try {
       await SecureStore.deleteItemAsync(key);
     } catch (error) {
-      console.error('Error removing secure data:', error);
+      logger.error('Error removing secure data', error, {
+        function: 'removeSecureItem',
+        component: 'StorageService',
+        key
+      });
       throw error;
     }
   }
@@ -151,7 +197,11 @@ export class StorageService {
       const jsonValue = JSON.stringify(value);
       await this.setItem(key, jsonValue);
     } catch (error) {
-      console.error('Error storing object:', error);
+      logger.error('Error storing object', error, {
+        function: 'setObject',
+        component: 'StorageService',
+        key
+      });
       throw error;
     }
   }
@@ -161,7 +211,11 @@ export class StorageService {
       const jsonValue = await this.getItem(key);
       return jsonValue ? JSON.parse(jsonValue) : null;
     } catch (error) {
-      console.error('Error getting object:', error);
+      logger.error('Error getting object', error, {
+        function: 'getObject',
+        component: 'StorageService',
+        key
+      });
       return null;
     }
   }
@@ -172,7 +226,11 @@ export class StorageService {
       const jsonValue = JSON.stringify(value);
       await this.setAppItem(key, jsonValue);
     } catch (error) {
-      console.error('Error storing app object:', error);
+      logger.error('Error storing app object', error, {
+        function: 'setAppObject',
+        component: 'StorageService',
+        key
+      });
       throw error;
     }
   }
@@ -182,7 +240,11 @@ export class StorageService {
       const jsonValue = await this.getAppItem(key);
       return jsonValue ? JSON.parse(jsonValue) : null;
     } catch (error) {
-      console.error('Error getting app object:', error);
+      logger.error('Error getting app object', error, {
+        function: 'getAppObject',
+        component: 'StorageService',
+        key
+      });
       return null;
     }
   }

@@ -1,4 +1,5 @@
 import { StorageService } from './storage';
+import { logger } from '@/utils/logger';
 
 /**
  * Generic First-Time Service
@@ -46,7 +47,7 @@ export class FirstTimeService {
       const data = await StorageService.getAppObject<FirstTimeData>(storageKey);
       return data === null || !data.completed;
     } catch (error) {
-      console.error(`FirstTimeService: Error checking first time status for ${config.key}:`, error);
+      logger.error(`FirstTimeService: Error checking first time status for ${config.key}:`, error, { function: 'isFirstTime', service: 'FirstTimeService', key: config.key, version: config.version });
       // On error, assume it's first time to be safe
       return true;
     }
@@ -67,9 +68,9 @@ export class FirstTimeService {
         version: config.version
       };
       await StorageService.setAppObject(storageKey, data);
-      console.log(`FirstTimeService: Marked ${config.key} as not first time`);
+      logger.debug(`FirstTimeService: Marked ${config.key} as not first time`, null, { function: 'markAsNotFirstTime', service: 'FirstTimeService', key: config.key });
     } catch (error) {
-      console.error(`FirstTimeService: Error marking first time as complete for ${config.key}:`, error);
+      logger.error(`FirstTimeService: Error marking first time as complete for ${config.key}:`, error, { function: 'markAsNotFirstTime', service: 'FirstTimeService', key: config.key, version: config.version });
     }
   }
 
@@ -82,9 +83,9 @@ export class FirstTimeService {
     try {
       const storageKey = this.getStorageKey(config.key, config.version);
       await StorageService.removeAppItem(storageKey);
-      console.log(`FirstTimeService: Reset first time status for ${config.key}`);
+      logger.debug(`FirstTimeService: Reset first time status for ${config.key}`, null, { function: 'resetFirstTime', service: 'FirstTimeService', key: config.key });
     } catch (error) {
-      console.error(`FirstTimeService: Error resetting first time status for ${config.key}:`, error);
+      logger.error(`FirstTimeService: Error resetting first time status for ${config.key}:`, error, { function: 'resetFirstTime', service: 'FirstTimeService', key: config.key, version: config.version });
     }
   }
 
@@ -107,7 +108,7 @@ export class FirstTimeService {
       
       return data;
     } catch (error) {
-      console.error('FirstTimeService: Error getting all first time data:', error);
+      logger.error('FirstTimeService: Error getting all first time data:', error, { function: 'getAllFirstTimeData', service: 'FirstTimeService' });
       return {};
     }
   }
@@ -126,10 +127,10 @@ export class FirstTimeService {
       }
       
       if (firstTimeKeys.length > 0) {
-        console.log(`FirstTimeService: Cleared ${firstTimeKeys.length} first-time records for current app`);
+        logger.debug(`FirstTimeService: Cleared ${firstTimeKeys.length} first-time records for current app`, null, { function: 'clearAllFirstTimeData', service: 'FirstTimeService', recordsCleared: firstTimeKeys.length });
       }
     } catch (error) {
-      console.error('FirstTimeService: Error clearing all first time data:', error);
+      logger.error('FirstTimeService: Error clearing all first time data:', error, { function: 'clearAllFirstTimeData', service: 'FirstTimeService' });
     }
   }
 }

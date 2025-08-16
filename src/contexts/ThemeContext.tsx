@@ -4,6 +4,7 @@ import { Theme, getTheme } from '@/config/theme';
 import { ThemeMode } from '@/types';
 import { StorageService } from '@/services/storage';
 import { STORAGE_KEYS } from '@/constants';
+import { logger } from '@/utils/logger';
 
 interface ThemeContextType {
   theme: Theme;
@@ -33,7 +34,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setThemeModeState(savedMode as ThemeMode);
       }
     } catch (error) {
-      console.error('Failed to load theme mode:', error);
+      logger.error('Failed to load theme mode', error, {
+        function: 'loadThemeMode',
+        component: 'ThemeContext'
+      });
     }
   };
 
@@ -44,7 +48,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setColorSchemeState(savedScheme);
       }
     } catch (error) {
-      console.error('Failed to load color scheme:', error);
+      logger.error('Failed to load color scheme', error, {
+        function: 'loadColorScheme',
+        component: 'ThemeContext'
+      });
     }
   };
 
@@ -53,7 +60,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setThemeModeState(mode);
       await StorageService.setItem(STORAGE_KEYS.THEME, mode);
     } catch (error) {
-      console.error('Failed to save theme mode:', error);
+      logger.error('Failed to save theme mode', error, {
+        function: 'setThemeMode',
+        component: 'ThemeContext',
+        mode
+      });
     }
   };
 
@@ -62,7 +73,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setColorSchemeState(scheme);
       await StorageService.setItem(STORAGE_KEYS.COLOR_SCHEME, scheme);
     } catch (error) {
-      console.error('Failed to save color scheme:', error);
+      logger.error('Failed to save color scheme', error, {
+        function: 'setColorScheme',
+        component: 'ThemeContext',
+        scheme
+      });
     }
   };
 

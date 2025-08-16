@@ -1,5 +1,6 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { logger } from '@/utils/logger';
 
 // Try to import other icon families, but handle if they're not available
 let MaterialIcons: any, MaterialCommunityIcons: any, FontAwesome: any;
@@ -23,7 +24,7 @@ try {
   SimpleLineIcons = VectorIcons.SimpleLineIcons;
   Zocial = VectorIcons.Zocial;
 } catch (error) {
-  console.warn('Some icon families are not available:', error);
+  logger.warn('Some icon families are not available:', error, { function: 'iconFamilyLoad', component: 'EnhancedIcon' });
 }
 import { useTheme } from '@/contexts/ThemeContext';
 
