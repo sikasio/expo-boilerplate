@@ -3,6 +3,9 @@ import { I18nManager, Platform } from 'react-native';
 import { StorageService } from '@/services/storage';
 import { STORAGE_KEYS } from '@/constants';
 
+// Import current app configuration
+const currentAppConfig = require('../../current-app.json');
+
 interface RTLContextType {
   isRTL: boolean;
   setRTL: (enabled: boolean) => Promise<void>;
@@ -12,7 +15,12 @@ interface RTLContextType {
 const RTLContext = createContext<RTLContextType | undefined>(undefined);
 
 export function RTLProvider({ children }: { children: React.ReactNode }) {
-  const [isRTL, setIsRTLState] = useState<boolean>(false); // Start with LTR, load from storage
+  // For audiobook app, default to RTL (true), otherwise LTR (false)
+  const getDefaultRTL = () => {
+    return currentAppConfig?.currentApp === 'audiobooks';
+  };
+
+  const [isRTL, setIsRTLState] = useState<boolean>(getDefaultRTL());
 
   useEffect(() => {
     loadRTLSetting();
@@ -30,9 +38,19 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
         
         console.log(`Loaded RTL setting: ${rtlEnabled ? 'RTL' : 'LTR'}`);
         console.log('I18nManager forced to LTR, using manual RTL control');
+      } else {
+        // No saved preference, use app-specific default
+        const defaultRTL = getDefaultRTL();
+        setIsRTLState(defaultRTL);
+        // Save the default for this app
+        await StorageService.setItem(STORAGE_KEYS.RTL_DIRECTION, defaultRTL.toString());
+        
+        console.log(`No saved RTL setting, using default for ${currentAppConfig?.currentApp}: ${defaultRTL ? 'RTL' : 'LTR'}`);
       }
     } catch (error) {
       console.error('Failed to load RTL setting:', error);
+      // Fallback to app default on error
+      setIsRTLState(getDefaultRTL());
     }
   };
 

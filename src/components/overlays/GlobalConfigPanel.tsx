@@ -38,6 +38,11 @@ export function GlobalConfigPanel({
   style,
   testID = 'global-config-panel',
 }: GlobalConfigPanelProps) {
+  // Only show in development mode
+  if (!__DEV__) {
+    return null;
+  }
+
   const { theme, toggleTheme, colorScheme, setColorScheme } = useTheme();
   const { isRTL, toggleRTL } = useRTL();
   const insets = useSafeAreaInsets();
