@@ -3,9 +3,7 @@ import { I18nManager, Platform } from 'react-native';
 import { StorageService } from '@/services/storage';
 import { STORAGE_KEYS } from '@/constants';
 import { logger } from '@/utils/logger';
-
-// Import current app configuration
-const currentAppConfig = require('../../current-app.json');
+import { getCurrentApp } from '@/utils/getCurrentApp';
 
 interface RTLContextType {
   isRTL: boolean;
@@ -18,7 +16,7 @@ const RTLContext = createContext<RTLContextType | undefined>(undefined);
 export function RTLProvider({ children }: { children: React.ReactNode }) {
   // For audiobook app, default to RTL (true), otherwise LTR (false)
   const getDefaultRTL = () => {
-    return currentAppConfig?.currentApp === 'audiobooks';
+    return getCurrentApp() === 'audiobooks';
   };
 
   const [isRTL, setIsRTLState] = useState<boolean>(getDefaultRTL());
@@ -53,7 +51,7 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
         logger.debug('No saved RTL setting, using app default', {
           component: 'RTLContext',
           function: 'loadRTLSetting',
-          app: currentAppConfig?.currentApp,
+          app: getCurrentApp(),
           direction: defaultRTL ? 'RTL' : 'LTR'
         });
       }
