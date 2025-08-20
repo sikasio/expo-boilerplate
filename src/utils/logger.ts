@@ -2,7 +2,7 @@
  * Centralized Logger Utility for UpSmart Boilerplate
  *
  * Provides consistent logging across all apps with development/production control
- * Only logs in development mode (__DEV__) to keep production clean
+ * Always logs to console for debugging, but respects production environment for UI elements
  */
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
@@ -20,8 +20,16 @@ class Logger {
   private appName: string;
 
   constructor() {
-    this.isDev = __DEV__;
+    // Always allow console logging, but track production mode for UI elements
+    this.isDev = true; // Always log to console
     this.appName = 'BP';
+  }
+
+  /**
+   * Check if we're in production environment (for UI elements, not console logging)
+   */
+  private get isProduction(): boolean {
+    return process.env.EXPO_PUBLIC_APP_ENV === 'production';
   }
 
   /**
@@ -29,6 +37,13 @@ class Logger {
    */
   setApp(appName: string) {
     this.appName = appName;
+  }
+
+  /**
+   * Check if we should show UI error overlays (false in production)
+   */
+  get shouldShowErrorOverlays(): boolean {
+    return !this.isProduction;
   }
 
   /**
@@ -224,6 +239,10 @@ export const logPerformance = (metric: string, value: number, unit?: string, con
 export const logState = (action: string, context?: LogContext) => logger.state(action, context);
 export const logDatabase = (operation: string, collection?: string, context?: LogContext) => logger.database(operation, collection, context);
 export const logLifecycle = (component: string, event: string, context?: LogContext) => logger.lifecycle(component, event, context);
+
+// Export production environment checks
+export const shouldShowErrorOverlays = () => logger.shouldShowErrorOverlays;
+export const isProductionMode = () => process.env.EXPO_PUBLIC_APP_ENV === 'production';
 
 // Default export
 export default logger;

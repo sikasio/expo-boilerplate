@@ -45,7 +45,7 @@ export const AppConfig = {
   
   // API Configuration
   api: {
-    baseUrl: __DEV__ ? 'https://dev-api.igniteapp.com' : 'https://api.igniteapp.com',
+    baseUrl: process.env.EXPO_PUBLIC_APP_ENV !== 'production' ? 'https://dev-api.igniteapp.com' : 'https://api.igniteapp.com',
     timeout: 10000,
     retryAttempts: 3,
   },
@@ -83,9 +83,9 @@ export const AppConfig = {
   
   // Development
   dev: {
-    enableFlipperIntegration: __DEV__,
-    enableReduxDevTools: __DEV__,
-    logLevel: __DEV__ ? 'debug' : 'error',
+    enableFlipperIntegration: process.env.EXPO_PUBLIC_APP_ENV !== 'production',
+    enableReduxDevTools: process.env.EXPO_PUBLIC_APP_ENV !== 'production',
+    logLevel: process.env.EXPO_PUBLIC_APP_ENV !== 'production' ? 'debug' : 'error',
   },
 } as const;
 

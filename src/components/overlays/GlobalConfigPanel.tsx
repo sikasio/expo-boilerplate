@@ -38,8 +38,8 @@ export function GlobalConfigPanel({
   style,
   testID = 'global-config-panel',
 }: GlobalConfigPanelProps) {
-  // Only show in development mode
-  if (!__DEV__) {
+  // Only show in development mode, hide in production builds
+  if (process.env.EXPO_PUBLIC_APP_ENV === 'production') {
     return null;
   }
 
