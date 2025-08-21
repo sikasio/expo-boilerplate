@@ -145,7 +145,7 @@ export function TextInput({
           style={getInputStyle()}
           placeholderTextColor={theme.colors.placeholder}
           editable={props.editable !== false}
-          selectTextOnFocus={true}
+          selectTextOnFocus={false}
           // textAlign handled by style
           secureTextEntry={actualSecureTextEntry}
           // Prevent iOS password auto-fill and "Use Strong Password" suggestions

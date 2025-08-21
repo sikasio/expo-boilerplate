@@ -173,7 +173,7 @@ export function OTPInput({
               onBlur={handleBlur}
               keyboardType="numeric"
               maxLength={1}
-              selectTextOnFocus={true}
+              selectTextOnFocus={false}
               textAlign="center"
               autoCorrect={false}
               autoComplete="sms-otp"

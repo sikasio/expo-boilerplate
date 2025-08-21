@@ -11,8 +11,12 @@ import {
   UIManager,
 } from 'react-native';
 
-// Enable LayoutAnimation on Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+// Enable LayoutAnimation on Android (skip in New Architecture to avoid warning)
+if (
+  Platform.OS === 'android' && 
+  UIManager.setLayoutAnimationEnabledExperimental &&
+  !global?.RN$Bridgeless
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 import { useTheme } from '@/contexts/ThemeContext';

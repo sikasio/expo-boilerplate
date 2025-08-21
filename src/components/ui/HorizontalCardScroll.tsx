@@ -400,7 +400,7 @@ export function HorizontalCardScroll({
         )}
 
         {/* Rating */}
-        {item.rating && (
+        {(item.rating !== undefined && item.rating > 0) && (
           <View style={{
             flexDirection: getFlexDirection(isRTL),
             alignItems: 'center',
@@ -410,7 +410,7 @@ export function HorizontalCardScroll({
             {[...Array(5)].map((_, i) => (
               <Icon
                 key={i}
-                name={i < Math.floor(item.rating!) ? 'star' : 'star-outline'}
+                name={i < Math.floor(item.rating || 0) ? 'star' : 'star-outline'}
                 size={12}
                 color={theme.colors.warning}
                 style={margin.marginEnd(2)}
@@ -421,7 +421,7 @@ export function HorizontalCardScroll({
               color: theme.colors.textSecondary,
               ...margin.marginStart(theme.sizes.xs),
             }}>
-              {item.rating.toFixed(1)}
+              {(item.rating || 0).toFixed(1)}
             </Text>
           </View>
         )}
