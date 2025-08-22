@@ -152,7 +152,7 @@ export function LazyImage({
 
   const containerDefaultStyle: ViewStyle = {
     position: 'relative',
-    backgroundColor: theme.colors.surface,
+    backgroundColor: 'transparent',
     overflow: 'hidden',
   };
 
@@ -164,7 +164,7 @@ export function LazyImage({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
+    backgroundColor: 'transparent',
   };
 
   const renderLoadingComponent = useCallback(() => {

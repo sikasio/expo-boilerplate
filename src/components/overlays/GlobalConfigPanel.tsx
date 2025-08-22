@@ -65,6 +65,7 @@ export function GlobalConfigPanel({
     { label: 'Orange', value: 'orange', primary: '#FF9500', secondary: '#FF3B30' },
     { label: 'Red', value: 'red', primary: '#FF3B30', secondary: '#FF9500' },
     { label: 'Teal', value: 'teal', primary: '#5AC8FA', secondary: '#34C759' },
+    { label: 'Tilawah', value: 'tilawah', primary: '#317775', secondary: '#BAD398' },
   ];
 
   const handleColorSchemeChange = (newColorScheme: string) => {
@@ -469,13 +470,14 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 8,
     backgroundColor: 'transparent',
   },
   colorOptionButton: {
     alignItems: 'center',
     width: 45,
-    marginVertical: 4,
   },
   colorRectangleContainer: {
     width: 32,
