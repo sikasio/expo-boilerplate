@@ -2,6 +2,7 @@ import React from 'react';
 import { Text as RNText, TextProps as RNTextProps, StyleSheet, Platform } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRTL } from '@/contexts/RTLContext';
+import { useFont } from '@/contexts/FontContext';
 import { getTextAlign, createRTLStyle } from '@/utils';
 
 type TextVariant = 'title' | 'subtitle' | 'body' | 'caption' | 'label';
@@ -20,67 +21,160 @@ export function Text({
   ...props
 }: TextProps) {
   const { theme } = useTheme();
-
   const { isRTL } = useRTL();
+  
+  // Try to use FontContext, fallback to theme if not available
+  let getFontStyle, fontSizes, lineHeightMultiplier, fontFamily;
+  try {
+    const fontContext = useFont();
+    getFontStyle = fontContext.getFontStyle;
+    fontSizes = fontContext.fontSizes;
+    lineHeightMultiplier = fontContext.lineHeightMultiplier;
+    fontFamily = fontContext.fontFamily;
+  } catch (error) {
+    // FontContext not available, use theme defaults
+    getFontStyle = () => ({});
+    fontSizes = theme.fontSizes;
+    lineHeightMultiplier = 1.2;
+    fontFamily = null;
+  }
+
+  // Extract fontWeight and italic from user styles
+  const { requestedFontWeight, isItalic } = React.useMemo(() => {
+    if (!style) return { requestedFontWeight: null, isItalic: false };
+    
+    // Handle both single style object and style arrays
+    const styleArray = Array.isArray(style) ? style : [style];
+    
+    // Check for italic
+    const hasItalic = styleArray.some(s => s && typeof s === 'object' && s.fontStyle === 'italic');
+    
+    // Check for fontWeight
+    let weight = null;
+    for (const s of styleArray) {
+      if (s && typeof s === 'object' && s.fontWeight) {
+        const fw = s.fontWeight;
+        if (fw === 'bold' || fw === '700') weight = 'bold';
+        else if (fw === '600') weight = 'semiBold';
+        else if (fw === '500') weight = 'medium';
+        else if (fw === '300') weight = 'light';
+        else if (fw === '200') weight = 'extraLight';
+        else if (fw === '100') weight = 'thin';
+        break;
+      }
+    }
+    
+    return { requestedFontWeight: weight, isItalic: hasItalic };
+  }, [style]);
+
+  // Helper to get the best available font weight
+  const getAvailableFontWeight = (variantWeight: string, requestedWeight: string | null) => {
+    // If no FontContext, just use variant weight
+    if (!fontFamily) return variantWeight;
+    
+    // Determine the final weight to try
+    const finalWeight = requestedWeight || variantWeight;
+    
+    // Check if the font family has this weight
+    const hasWeight = fontFamily.weights[finalWeight as keyof typeof fontFamily.weights];
+    
+    if (hasWeight) {
+      return finalWeight;
+    }
+    
+    // Fallback: try to find the closest available weight
+    const availableWeights = Object.keys(fontFamily.weights);
+    
+    // Weight hierarchy for fallbacks
+    const weightHierarchy = {
+      'thin': ['extraLight', 'light', 'regular'],
+      'extraLight': ['thin', 'light', 'regular'],
+      'light': ['extraLight', 'regular', 'thin'],
+      'regular': ['medium', 'light', 'bold'],
+      'medium': ['regular', 'semiBold', 'light'],
+      'semiBold': ['medium', 'bold', 'regular'],
+      'bold': ['semiBold', 'extraBold', 'medium', 'regular'],
+      'extraBold': ['bold', 'black', 'semiBold'],
+      'black': ['extraBold', 'bold', 'semiBold'],
+    };
+    
+    // Try fallbacks for the requested weight
+    const fallbacks = weightHierarchy[finalWeight as keyof typeof weightHierarchy] || ['regular'];
+    
+    for (const fallback of fallbacks) {
+      if (availableWeights.includes(fallback)) {
+        return fallback;
+      }
+    }
+    
+    // Last resort: use any available weight
+    return availableWeights[0] || 'regular';
+  };
 
   const getVariantStyle = () => {
-    // Helper function to get Android-specific lineHeight
+    // Use font context line height multiplier
     const getLineHeight = (fontSize: number) => {
-      if (Platform.OS === 'android') {
-        return fontSize * 1.2; // Reduced lineHeight for Android (20% of fontSize)
-      }
-      return fontSize * 1.2; // Standard lineHeight for iOS (40% of fontSize)
+      return fontSize * lineHeightMultiplier;
     };
 
     const baseStyle = {
-      fontSize: theme.fontSizes.md,
-      lineHeight: getLineHeight(theme.fontSizes.md),
+      fontSize: fontSizes.md,
+      lineHeight: getLineHeight(fontSizes.md),
       color: color || theme.colors.text,
     };
 
     switch (variant) {
       case 'title':
+        const titleWeight = getAvailableFontWeight('bold', requestedFontWeight);
         return {
           ...baseStyle,
-          fontSize: theme.fontSizes.xxxl,
-          lineHeight: getLineHeight(theme.fontSizes.xxxl),
-          fontWeight: 'bold' as const,
+          ...getFontStyle(titleWeight, isItalic),
+          fontSize: fontSizes.xxxl,
+          lineHeight: getLineHeight(fontSizes.xxxl),
           color: color || theme.colors.text,
         };
       case 'subtitle':
+        const subtitleWeight = getAvailableFontWeight('medium', requestedFontWeight);
         return {
           ...baseStyle,
-          fontSize: theme.fontSizes.xl,
-          lineHeight: getLineHeight(theme.fontSizes.xl),
-          fontWeight: '600' as const,
+          ...getFontStyle(subtitleWeight, isItalic),
+          fontSize: fontSizes.xl,
+          lineHeight: getLineHeight(fontSizes.xl),
           color: color || theme.colors.text,
         };
       case 'body':
+        const bodyWeight = getAvailableFontWeight('regular', requestedFontWeight);
         return {
           ...baseStyle,
-          fontSize: theme.fontSizes.md,
-          lineHeight: getLineHeight(theme.fontSizes.md),
-          fontWeight: 'normal' as const,
+          ...getFontStyle(bodyWeight, isItalic),
+          fontSize: fontSizes.md,
+          lineHeight: getLineHeight(fontSizes.md),
           color: color || theme.colors.text,
         };
       case 'caption':
+        const captionWeight = getAvailableFontWeight('regular', requestedFontWeight);
         return {
           ...baseStyle,
-          fontSize: theme.fontSizes.sm,
-          lineHeight: getLineHeight(theme.fontSizes.sm),
-          fontWeight: 'normal' as const,
+          ...getFontStyle(captionWeight, isItalic),
+          fontSize: fontSizes.sm,
+          lineHeight: getLineHeight(fontSizes.sm),
           color: color || theme.colors.textSecondary,
         };
       case 'label':
+        const labelWeight = getAvailableFontWeight('medium', requestedFontWeight);
         return {
           ...baseStyle,
-          fontSize: theme.fontSizes.sm,
-          lineHeight: getLineHeight(theme.fontSizes.sm),
-          fontWeight: '500' as const,
+          ...getFontStyle(labelWeight, isItalic),
+          fontSize: fontSizes.sm,
+          lineHeight: getLineHeight(fontSizes.sm),
           color: color || theme.colors.text,
         };
       default:
-        return baseStyle;
+        const defaultWeight = getAvailableFontWeight('regular', requestedFontWeight);
+        return {
+          ...baseStyle,
+          ...getFontStyle(defaultWeight, isItalic),
+        };
     }
   };
 
@@ -90,6 +184,21 @@ export function Text({
   const rtlTextAlign = getTextAlign(isRTL);
   const rtlWritingDirection = isRTL ? 'rtl' : 'ltr';
 
+  // Process user styles to remove fontStyle and fontWeight since they're handled by FontContext
+  const processedUserStyles = React.useMemo(() => {
+    if (!style) return undefined;
+    
+    const styleArray = Array.isArray(style) ? style : [style];
+    return styleArray.map(s => {
+      if (s && typeof s === 'object') {
+        // Remove fontStyle and fontWeight since they're handled by FontContext
+        const { fontStyle, fontWeight, ...restStyle } = s;
+        return restStyle;
+      }
+      return s;
+    });
+  }, [style]);
+
   // Create the final style array
   const styleArray = [
     variantStyle,
@@ -97,7 +206,7 @@ export function Text({
       textAlign: rtlTextAlign,
       writingDirection: rtlWritingDirection
     }, // RTL-aware default alignment and writing direction
-    style // User styles can still override if needed
+    processedUserStyles // User styles with fontStyle: 'italic' removed
   ];
 
   return (

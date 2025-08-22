@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRTL } from '@/contexts/RTLContext';
+import { useFont } from '@/contexts/FontContext';
 import { Icon } from '../ui/Icon';
 import { Text } from '../ui/Text';
 import { List, ListItem } from '../ui/List';
@@ -27,11 +28,15 @@ interface ConfigOption {
   label: string;
   icon: string;
   description: string;
-  type: 'toggle' | 'colorScheme';
-  value?: boolean | string;
+  type: 'toggle' | 'colorScheme' | 'fontFamily' | 'fontSize';
+  value?: boolean | string | number;
   onToggle?: (value: boolean) => void;
   onPress?: () => void;
-  options?: { label: string; value: string; primary: string; secondary: string }[];
+  onValueChange?: (value: any) => void;
+  options?: { label: string; value: string; primary?: string; secondary?: string; description?: string }[];
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
 export function GlobalConfigPanel({
@@ -45,6 +50,7 @@ export function GlobalConfigPanel({
 
   const { theme, toggleTheme, colorScheme, setColorScheme } = useTheme();
   const { isRTL, toggleRTL } = useRTL();
+  const { fontFamily, fontSize, availableFonts, setFontFamily, setFontSize } = useFont();
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = Dimensions.get('window');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -73,6 +79,23 @@ export function GlobalConfigPanel({
     const selectedColor = colorSchemeOptions.find(c => c.value === newColorScheme);
     console.log(`Color scheme changed to: ${selectedColor?.label} (Primary: ${selectedColor?.primary}, Secondary: ${selectedColor?.secondary})`);
   };
+
+  const handleFontFamilyChange = (fontId: string) => {
+    setFontFamily(fontId);
+    setIsMenuOpen(false);
+    setTimeout(() => slideOut(), 300);
+  };
+
+  const handleFontSizeChange = (size: number) => {
+    setFontSize(size);
+  };
+
+  // Prepare font family options
+  const fontFamilyOptions = availableFonts.map(font => ({
+    label: font.displayName,
+    value: font.id,
+    description: font.description,
+  }));
 
   // Configuration options - Theme, RTL, and Color Scheme
   const configOptions: ConfigOption[] = [
@@ -114,6 +137,28 @@ export function GlobalConfigPanel({
       type: 'colorScheme',
       value: colorScheme,
       options: colorSchemeOptions,
+    },
+    {
+      id: 'font-family',
+      label: 'Font Family',
+      icon: 'text-outline',
+      description: 'Choose your preferred font style',
+      type: 'fontFamily',
+      value: fontFamily.id,
+      options: fontFamilyOptions,
+      onValueChange: handleFontFamilyChange,
+    },
+    {
+      id: 'font-size',
+      label: 'Font Size',
+      icon: 'resize-outline',
+      description: 'Adjust text size for better readability',
+      type: 'fontSize',
+      value: fontSize,
+      min: 12,
+      max: 24,
+      step: 1,
+      onValueChange: handleFontSizeChange,
     },
   ];
 
@@ -404,6 +449,82 @@ export function GlobalConfigPanel({
                       </View>
                     </React.Fragment>
                   );
+                } else if (option.type === 'fontFamily') {
+                  return (
+                    <React.Fragment key={option.id}>
+                      <ListItem
+                        title={option.label}
+                        subtitle={option.description}
+                        leftIcon={option.icon}
+                        variant="compact"
+                      />
+                      {/* Font Family Options */}
+                      <View style={styles.fontOptionsContainer}>
+                        {option.options?.map((fontOption) => (
+                          <TouchableOpacity
+                            key={fontOption.value}
+                            onPress={() => option.onValueChange?.(fontOption.value)}
+                            style={[
+                              styles.fontOptionButton,
+                              {
+                                backgroundColor: option.value === fontOption.value 
+                                  ? theme.colors.primary + '15' 
+                                  : theme.colors.surface,
+                                borderColor: option.value === fontOption.value 
+                                  ? theme.colors.primary 
+                                  : theme.colors.border,
+                              }
+                            ]}
+                            activeOpacity={0.7}
+                          >
+                            <Text style={[
+                              styles.fontOptionText,
+                              {
+                                color: option.value === fontOption.value 
+                                  ? theme.colors.primary 
+                                  : theme.colors.text,
+                                fontWeight: option.value === fontOption.value ? '600' : '500',
+                              }
+                            ]}>
+                              {fontOption.label}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </React.Fragment>
+                  );
+                } else if (option.type === 'fontSize') {
+                  return (
+                    <React.Fragment key={option.id}>
+                      <ListItem
+                        title={option.label}
+                        subtitle={`${option.description} (Current: ${option.value}px)`}
+                        leftIcon={option.icon}
+                        variant="compact"
+                        rightContent={
+                          <View style={styles.fontSizeContainer}>
+                            <TouchableOpacity
+                              onPress={() => option.onValueChange?.(Math.max(option.min || 12, (option.value as number) - 1))}
+                              style={[styles.fontSizeButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                              disabled={(option.value as number) <= (option.min || 12)}
+                            >
+                              <Icon name="remove" size={16} color={theme.colors.text} />
+                            </TouchableOpacity>
+                            <Text style={[styles.fontSizeValue, { color: theme.colors.text }]}>
+                              {option.value}px
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() => option.onValueChange?.(Math.min(option.max || 24, (option.value as number) + 1))}
+                              style={[styles.fontSizeButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                              disabled={(option.value as number) >= (option.max || 24)}
+                            >
+                              <Icon name="add" size={16} color={theme.colors.text} />
+                            </TouchableOpacity>
+                          </View>
+                        }
+                      />
+                    </React.Fragment>
+                  );
                 }
                 return null;
               })}
@@ -500,6 +621,50 @@ const styles = StyleSheet.create({
   },
   colorLabel: {
     fontSize: 10,
+    textAlign: 'center',
+  },
+  fontOptionsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 8,
+  },
+  fontOptionButton: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  fontOptionText: {
+    fontSize: 13,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  fontOptionDescription: {
+    fontSize: 10,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  fontSizeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  fontSizeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fontSizeValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    minWidth: 40,
     textAlign: 'center',
   },
 });

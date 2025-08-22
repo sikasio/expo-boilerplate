@@ -8,7 +8,6 @@ export function ThemeStatusBar() {
   return (
     <StatusBar 
       style={theme.isDark ? 'light' : 'dark'} 
-      backgroundColor={theme.colors.background}
     />
   );
 }

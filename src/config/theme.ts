@@ -1,5 +1,6 @@
 import { COLORS, DARK_COLORS, COLOR_SCHEMES, SIZES, FONT_SIZES, BORDER_RADIUS } from '@/constants';
 import type { LoadingSpinnerSize, LoadingSpinnerVariant } from '@/components/ui/LoadingSpinner';
+import type { FontFamily } from '@/config/fonts';
 
 export interface LazyImageTheme {
   spinnerSize: LoadingSpinnerSize;
@@ -14,6 +15,9 @@ export interface Theme {
   borderRadius: typeof BORDER_RADIUS;
   lazyImage: LazyImageTheme;
   isDark: boolean;
+  // Font-related properties (will be provided by FontContext)
+  fontFamily?: FontFamily;
+  lineHeightMultiplier?: number;
 }
 
 export const lightTheme: Theme = {

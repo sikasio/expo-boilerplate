@@ -145,7 +145,7 @@ export interface AuthScreenProps {
   showForgotPassword?: boolean;
   showTermsCheckbox?: boolean;
   enableBiometric?: boolean;
-  
+
   // Conditional Input Visibility
   conditionalInputs?: {
     // Hide phone input until email is valid
@@ -860,7 +860,6 @@ export function AuthScreen({
           <Text
             variant="title"
             style={{
-              fontSize: theme.fontSizes.xxl,
               fontWeight: '700',
               color: variant === 'account-created-successfully' ? '#22C55E' : colors.text,
               textAlign: layout === 'centered' ? 'center' : 'left',
@@ -879,7 +878,6 @@ export function AuthScreen({
           <Text
             variant="subtitle"
             style={{
-              fontSize: theme.fontSizes.lg,
               color: variant === 'account-created-successfully' ? '#16A34A' : colors.textSecondary,
               textAlign: layout === 'centered' ? 'center' : 'left',
               ...(variant === 'account-created-successfully' && {

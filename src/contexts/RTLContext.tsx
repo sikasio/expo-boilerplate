@@ -29,25 +29,25 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
     try {
       // Force I18nManager to LTR to prevent automatic flipping
       I18nManager.forceRTL(false);
-      
+
       const savedRTL = await StorageService.getItem(STORAGE_KEYS.RTL_DIRECTION);
       if (savedRTL !== null) {
         const rtlEnabled = savedRTL === 'true';
         setIsRTLState(rtlEnabled);
-        
-        logger.debug('RTL setting loaded', {
-          component: 'RTLContext',
-          function: 'loadRTLSetting',
-          direction: rtlEnabled ? 'RTL' : 'LTR',
-          manualControl: true
-        });
+
+        // logger.debug('RTL setting loaded', {
+        //   component: 'RTLContext',
+        //   function: 'loadRTLSetting',
+        //   direction: rtlEnabled ? 'RTL' : 'LTR',
+        //   manualControl: true
+        // });
       } else {
         // No saved preference, use app-specific default
         const defaultRTL = getDefaultRTL();
         setIsRTLState(defaultRTL);
         // Save the default for this app
         await StorageService.setItem(STORAGE_KEYS.RTL_DIRECTION, defaultRTL.toString());
-        
+
         logger.debug('No saved RTL setting, using app default', {
           component: 'RTLContext',
           function: 'loadRTLSetting',
@@ -70,11 +70,11 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
       // Update local state immediately for instant UI response
       setIsRTLState(enabled);
       await StorageService.setItem(STORAGE_KEYS.RTL_DIRECTION, enabled.toString());
-      
+
       // DON'T use I18nManager.forceRTL() - this causes automatic flipping on Android
       // We want manual control over RTL behavior through our custom components
       // I18nManager.forceRTL(enabled);
-      
+
       logger.debug('RTL direction changed', {
         component: 'RTLContext',
         function: 'setRTL',
