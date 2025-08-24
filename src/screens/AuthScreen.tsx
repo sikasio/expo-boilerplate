@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   ViewStyle,
@@ -103,6 +103,7 @@ interface AuthInputLabels {
   emailPlaceholder?: string;
   phoneLabel?: string;
   phonePlaceholder?: string;
+  phoneHelperText?: string;
   passwordLabel?: string;
   passwordPlaceholder?: string;
   confirmPasswordLabel?: string;
@@ -164,10 +165,17 @@ export interface AuthScreenProps {
   // Validation
   enableValidation?: boolean;
   customValidation?: (data: AuthFormData) => { [key: string]: string } | null;
+  registrationFieldRequirements?: {
+    emailRequired?: boolean; // Default: true - Set false to make email optional
+    phoneRequired?: boolean; // Default: false - Set true to make phone required
+  };
 
   // Loading States
   isLoading?: boolean;
   loadingText?: string;
+
+  // Form Data
+  initialValues?: Partial<AuthFormData>;
 
   // Callbacks
   onSubmit?: (data: AuthFormData) => Promise<void> | void;
@@ -223,6 +231,8 @@ export function AuthScreen({
   verificationContact,
   enableValidation = true,
   customValidation,
+  registrationFieldRequirements,
+  initialValues = {},
   isLoading = false,
   loadingText = 'Please wait...',
   onSubmit,
@@ -252,9 +262,11 @@ export function AuthScreen({
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
   // Form state
-  const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AuthFormData>();
-  const [rememberMe, setRememberMe] = useState(false);
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AuthFormData>({
+    defaultValues: initialValues
+  });
+  const [rememberMe, setRememberMe] = useState(initialValues?.rememberMe || false);
+  const [agreeToTerms, setAgreeToTerms] = useState(initialValues?.agreeToTerms || false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -334,6 +346,9 @@ export function AuthScreen({
       scaleAnim.setValue(1);
     }
   }, []);
+
+  // Don't use useEffect to reset form - it causes infinite loops
+  // The form will use the defaultValues from useForm initialization
 
   // Get default content based on variant
   const getDefaultContent = (): AuthScreenContent => {
@@ -549,10 +564,22 @@ export function AuthScreen({
 
     switch (field) {
       case 'email':
-        rules.required = 'Email is required';
-        rules.pattern = {
-          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-          message: 'Invalid email address',
+        // Check if email should be required for registration
+        const isEmailRequiredForReg = registrationFieldRequirements?.emailRequired !== false; // Default: true
+        const isEmailOptional = variant === 'register' && !isEmailRequiredForReg;
+        
+        if (!isEmailOptional) {
+          rules.required = 'Email is required';
+        }
+        // Only validate pattern if email is provided
+        rules.validate = (value: string) => {
+          if (!value || value.trim() === '') {
+            // If email is empty and optional, allow it
+            return isEmailOptional ? true : 'Email is required';
+          }
+          // If email is provided, validate the pattern
+          const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+          return emailPattern.test(value) || 'Invalid email address';
         };
         break;
       case 'password':
@@ -577,9 +604,15 @@ export function AuthScreen({
         };
         break;
       case 'phone':
+        // Check if phone should be required for registration
+        const isPhoneRequiredForReg = registrationFieldRequirements?.phoneRequired === true; // Default: false
+        
+        // Phone is required based on variant and specific configuration
         if (variant === 'forgot-password-whatsapp') {
           rules.required = 'WhatsApp number is required';
         } else if (variant === 'login-phone') {
+          rules.required = 'Phone number is required';
+        } else if (variant === 'register' && isPhoneRequiredForReg) {
           rules.required = 'Phone number is required';
         }
         rules.pattern = {
@@ -946,32 +979,6 @@ export function AuthScreen({
       );
     }
 
-    // Email field (for most variants, excluding phone login)
-    if (['login-email', 'register', 'forgot-password', 'forgot-password-email'].includes(variant)) {
-      fields.push(
-        <Controller
-          key="email"
-          control={control}
-          name="email"
-          rules={getValidationRules('email')}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              label={inputLabels.emailLabel || "Email"}
-              placeholder={inputLabels.emailPlaceholder || "Enter your email"}
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.email?.message}
-              leftIcon="mail-outline"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              style={{ marginBottom: theme.sizes.md }}
-            />
-          )}
-        />
-      );
-    }
-
     // Phone field (for registration, WhatsApp reset, and phone login only)
     if ((variant === 'register' || variant === 'forgot-password-whatsapp' || variant === 'login-phone') && shouldShowPhoneInput()) {
       fields.push(
@@ -996,12 +1003,43 @@ export function AuthScreen({
                   'Enter your phone number'
                 )
               }
+              helperText={
+                variant === 'register' ? (
+                  inputLabels.phoneHelperText || 'Example: +1234567890 or +201234567890'
+                ) : undefined
+              }
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
               error={errors.phone?.message}
               leftIcon={variant === 'forgot-password-whatsapp' ? 'logo-whatsapp' : 'call-outline'}
               keyboardType="phone-pad"
+              style={{ marginBottom: theme.sizes.md }}
+            />
+          )}
+        />
+      );
+    }
+
+    // Email field (for most variants, excluding phone login)
+    if (['login-email', 'register', 'forgot-password', 'forgot-password-email'].includes(variant)) {
+      fields.push(
+        <Controller
+          key="email"
+          control={control}
+          name="email"
+          rules={getValidationRules('email')}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              label={inputLabels.emailLabel || "Email"}
+              placeholder={inputLabels.emailPlaceholder || "Enter your email"}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              error={errors.email?.message}
+              leftIcon="mail-outline"
+              keyboardType="email-address"
+              autoCapitalize="none"
               style={{ marginBottom: theme.sizes.md }}
             />
           )}
@@ -1345,8 +1383,15 @@ export function AuthScreen({
 
   // Handle form submission
   const handleFormSubmit = async (data: AuthFormData) => {
+    // Include additional state values in form data
+    const completeData = {
+      ...data,
+      rememberMe,
+      agreeToTerms,
+    };
+
     if (customValidation) {
-      const validationErrors = customValidation(data);
+      const validationErrors = customValidation(completeData);
       if (validationErrors) {
         // Handle custom validation errors
         return;
@@ -1354,7 +1399,7 @@ export function AuthScreen({
     }
 
     try {
-      await onSubmit?.(data);
+      await onSubmit?.(completeData);
     } catch (error) {
       // Handle error silently or with proper error handling
     }

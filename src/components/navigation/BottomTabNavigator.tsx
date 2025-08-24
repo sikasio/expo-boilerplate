@@ -48,11 +48,13 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
           paddingBottom: dimensions.paddingBottom + androidExtraBottomPadding,
           height: dimensions.height + androidExtraTopPadding + androidExtraBottomPadding,
           borderTopWidth: 0,
-          shadowColor: theme.colors.text,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12,
-          elevation: 15,
+          ...(theme.isDark ? {} : {
+            shadowColor: theme.colors.text,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+            elevation: 15,
+          }),
         };
 
       case 'default':
@@ -70,11 +72,13 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
           paddingTop: dimensions.paddingTop + androidExtraTopPadding,
           paddingBottom: dimensions.paddingBottom + androidExtraBottomPadding,
           height: dimensions.height + androidExtraTopPadding + androidExtraBottomPadding,
-          shadowColor: theme.colors.text,
-          shadowOffset: { width: 0, height: -1 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-          elevation: 5,
+          ...(theme.isDark ? {} : {
+            shadowColor: theme.colors.text,
+            shadowOffset: { width: 0, height: -1 },
+            shadowOpacity: 0.05,
+            shadowRadius: 4,
+            elevation: 5,
+          }),
         };
     }
   };
@@ -112,16 +116,24 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
               borderRadius: theme.borderRadius.xxl,
               paddingHorizontal: 6,
               paddingVertical: dimensions.paddingTop,
-              shadowColor: theme.colors.text,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.2,
-              shadowRadius: 15,
-              elevation: 20,
               justifyContent: 'center',
+              ...(theme.isDark ? {} : {
+                shadowColor: theme.colors.text,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 15,
+                elevation: 20,
+              }),
             }}>
             {state.routes.map((route: any, index: number) => {
               const isFocused = state.index === index;
               const tab = tabs.find(t => t.name === route.name);
+
+              // Skip rendering if tab config is not found (common during auth state changes)
+              if (!tab) {
+                console.log(`Tab config not found for route: ${route.name} (likely due to role change or logout)`);
+                return null;
+              }
 
               const onPress = () => {
                 const event = navigation.emit({
@@ -170,7 +182,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
                     }}
                   >
                     <TabBarIcon
-                      name={isFocused ? tab!.iconFocused : tab!.icon}
+                      name={isFocused ? tab.iconFocused : tab.icon}
                       color={isFocused ? theme.colors.primary : theme.colors.textSecondary}
                       size={isFocused ? 24 : 28}
                     />
@@ -179,20 +191,18 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
                     <Animated.View
                       style={{
                         opacity: 1,
-                        marginTop: 4,
                       }}
                     >
                       <Text
                         variant="caption"
                         style={{
                           color: theme.colors.primary,
-                          fontSize: 11,
                           fontWeight: '600',
                         }}
                         numberOfLines={1}
                         ellipsizeMode="tail"
                       >
-                        {tab!.title}
+                        {tab.title}
                       </Text>
                     </Animated.View>
                   )}

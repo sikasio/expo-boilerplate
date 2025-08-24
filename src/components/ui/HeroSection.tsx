@@ -82,6 +82,12 @@ interface HeroSectionProps extends ViewProps {
   // Animation
   scrollY?: Animated.Value;
   hideOnScroll?: boolean;
+
+  // Spacing control
+  titleSpacing?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | number;
+  subtitleSpacing?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | number;
+  descriptionSpacing?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | number;
+  descriptionBottomSpacing?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | number;
 }
 
 export function HeroSection({
@@ -107,6 +113,10 @@ export function HeroSection({
   scrollable = false,
   scrollY,
   hideOnScroll = false,
+  titleSpacing = 'xs',
+  subtitleSpacing = 'md',
+  descriptionSpacing = 'sm',
+  descriptionBottomSpacing = 'md',
   style,
   ...props
 }: HeroSectionProps) {
@@ -169,7 +179,7 @@ export function HeroSection({
       case 'small':
         return {
           paddingVertical: theme.sizes.lg,
-          titleSize: theme.fontSizes.lg,
+          titleSize: theme.fontSizes.xxl,
           subtitleSize: theme.fontSizes.md,
           descriptionSize: theme.fontSizes.sm,
           iconSize: 20,
@@ -209,6 +219,22 @@ export function HeroSection({
 
   const dimensions = getSizeDimensions();
   const colors = getColorScheme();
+
+  // General spacing helper function
+  const getSpacing = (spacingValue: 'none' | 'xs' | 'sm' | 'md' | 'lg' | number | undefined, defaultValue: 'xs' | 'sm' | 'md' | 'lg' = 'xs') => {
+    if (spacingValue === 'none') return 0;
+    if (typeof spacingValue === 'number') return spacingValue;
+
+    const value = spacingValue || defaultValue;
+
+    switch (value) {
+      case 'xs': return theme.sizes.xs;
+      case 'sm': return theme.sizes.sm;
+      case 'md': return theme.sizes.md;
+      case 'lg': return theme.sizes.lg;
+      default: return theme.sizes.xs;
+    }
+  };
 
   const getStatusBarHeight = () => {
     if (Platform.OS === 'android') {
@@ -292,11 +318,10 @@ export function HeroSection({
 
       {title && (
         <Text
-          variant="title"
           style={{
             color: colors.text,
             fontWeight: 'bold',
-            marginBottom: subtitle || description ? theme.sizes.sm : theme.sizes.md,
+            marginBottom: subtitle || description ? getSpacing(titleSpacing, 'xs') : theme.sizes.md,
             fontSize: dimensions.titleSize,
             textAlign: contentAlign,
           }}
@@ -306,9 +331,8 @@ export function HeroSection({
       )}
 
       {subtitle && (
-        <Animated.View style={{ marginBottom: description ? heroElementsMargin : theme.sizes.md }}>
+        <Animated.View style={{ marginBottom: description ? getSpacing(descriptionSpacing, 'sm') : getSpacing(subtitleSpacing, 'md') }}>
           <Text
-            variant="subtitle"
             style={{
               color: colors.text,
               fontSize: dimensions.subtitleSize,
@@ -329,13 +353,12 @@ export function HeroSection({
           }}
         >
           <Text
-            variant="body"
             style={{
               color: colors.text,
               opacity: 0.9,
               fontSize: dimensions.descriptionSize,
               textAlign: contentAlign,
-              marginBottom: theme.sizes.md,
+              marginBottom: getSpacing(descriptionBottomSpacing, 'md'),
             }}
           >
             {description}

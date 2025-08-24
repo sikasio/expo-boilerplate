@@ -22,7 +22,7 @@ export function Text({
 }: TextProps) {
   const { theme } = useTheme();
   const { isRTL } = useRTL();
-  
+
   // Try to use FontContext, fallback to theme if not available
   let getFontStyle, fontSizes, lineHeightMultiplier, fontFamily;
   try {
@@ -42,13 +42,13 @@ export function Text({
   // Extract fontWeight and italic from user styles
   const { requestedFontWeight, isItalic } = React.useMemo(() => {
     if (!style) return { requestedFontWeight: null, isItalic: false };
-    
+
     // Handle both single style object and style arrays
     const styleArray = Array.isArray(style) ? style : [style];
-    
+
     // Check for italic
     const hasItalic = styleArray.some(s => s && typeof s === 'object' && s.fontStyle === 'italic');
-    
+
     // Check for fontWeight
     let weight = null;
     for (const s of styleArray) {
@@ -63,7 +63,7 @@ export function Text({
         break;
       }
     }
-    
+
     return { requestedFontWeight: weight, isItalic: hasItalic };
   }, [style]);
 
@@ -71,20 +71,20 @@ export function Text({
   const getAvailableFontWeight = (variantWeight: string, requestedWeight: string | null) => {
     // If no FontContext, just use variant weight
     if (!fontFamily) return variantWeight;
-    
+
     // Determine the final weight to try
     const finalWeight = requestedWeight || variantWeight;
-    
+
     // Check if the font family has this weight
     const hasWeight = fontFamily.weights[finalWeight as keyof typeof fontFamily.weights];
-    
+
     if (hasWeight) {
       return finalWeight;
     }
-    
+
     // Fallback: try to find the closest available weight
     const availableWeights = Object.keys(fontFamily.weights);
-    
+
     // Weight hierarchy for fallbacks
     const weightHierarchy = {
       'thin': ['extraLight', 'light', 'regular'],
@@ -97,16 +97,16 @@ export function Text({
       'extraBold': ['bold', 'black', 'semiBold'],
       'black': ['extraBold', 'bold', 'semiBold'],
     };
-    
+
     // Try fallbacks for the requested weight
     const fallbacks = weightHierarchy[finalWeight as keyof typeof weightHierarchy] || ['regular'];
-    
+
     for (const fallback of fallbacks) {
       if (availableWeights.includes(fallback)) {
         return fallback;
       }
     }
-    
+
     // Last resort: use any available weight
     return availableWeights[0] || 'regular';
   };
@@ -130,7 +130,7 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(titleWeight, isItalic),
           fontSize: fontSizes.xxxl,
-          lineHeight: getLineHeight(fontSizes.xxxl),
+          lineHeight: getLineHeight(fontSizes.lg),
           color: color || theme.colors.text,
         };
       case 'subtitle':
@@ -139,7 +139,7 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(subtitleWeight, isItalic),
           fontSize: fontSizes.xl,
-          lineHeight: getLineHeight(fontSizes.xl),
+          lineHeight: getLineHeight(fontSizes.lg),
           color: color || theme.colors.text,
         };
       case 'body':
@@ -148,7 +148,7 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(bodyWeight, isItalic),
           fontSize: fontSizes.md,
-          lineHeight: getLineHeight(fontSizes.md),
+          lineHeight: getLineHeight(fontSizes.sm),
           color: color || theme.colors.text,
         };
       case 'caption':
@@ -157,7 +157,7 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(captionWeight, isItalic),
           fontSize: fontSizes.sm,
-          lineHeight: getLineHeight(fontSizes.sm),
+          lineHeight: getLineHeight(fontSizes.xs),
           color: color || theme.colors.textSecondary,
         };
       case 'label':
@@ -187,7 +187,7 @@ export function Text({
   // Process user styles to remove fontStyle and fontWeight since they're handled by FontContext
   const processedUserStyles = React.useMemo(() => {
     if (!style) return undefined;
-    
+
     const styleArray = Array.isArray(style) ? style : [style];
     return styleArray.map(s => {
       if (s && typeof s === 'object') {
