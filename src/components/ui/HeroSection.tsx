@@ -140,12 +140,12 @@ export function HeroSection({
   // Height animation for collapsing elements (maxHeight values for multi-line support)
   const badgeHeight = React.useMemo(() => {
     if (!hideOnScroll || scrollable || !scrollY) {
-      return 100; // Allow enough space for multi-line badges (no animation)
+      return 'auto'; // Allow natural height for badges (no animation)
     }
 
     return scrollY.interpolate({
       inputRange: [0, 100], // Start collapsing at 0, fully collapsed at 100px scroll
-      outputRange: [100, 0],   // From generous badge height to 0
+      outputRange: [40, 0],   // From reasonable badge height to 0 (was 100, now 40 for better performance)
       extrapolate: 'clamp',
     });
   }, [hideOnScroll, scrollable, scrollY]);
@@ -301,8 +301,10 @@ export function HeroSection({
             alignSelf: isRTL ? 'flex-end' : (contentAlign === 'center' ? 'center' : contentAlign === 'right' ? 'flex-end' : 'flex-start'),
             marginBottom: heroElementsMargin,
             opacity: heroElementsOpacity,
-            maxHeight: badgeHeight,
-            overflow: 'hidden',
+            ...(badgeHeight !== 'auto' && {
+              maxHeight: badgeHeight,
+              overflow: 'hidden',
+            }),
           }}
         >
           <Text
