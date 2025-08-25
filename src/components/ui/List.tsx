@@ -13,7 +13,7 @@ import {
 
 // Enable LayoutAnimation on Android (skip in New Architecture to avoid warning)
 if (
-  Platform.OS === 'android' && 
+  Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental &&
   !global?.RN$Bridgeless
 ) {
@@ -197,9 +197,9 @@ export function ListItem({
   ...props
 }: ListItemProps) {
   const { theme } = useTheme();
-  
+
   const { isRTL } = useRTL();
-  
+
   // Internal state for uncontrolled collapsible
   const [internalExpanded, setInternalExpanded] = useState(false);
   const expanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;
@@ -208,7 +208,7 @@ export function ListItem({
     if (collapsible) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       const newExpanded = !expanded;
-      
+
       if (onToggleExpand) {
         onToggleExpand(newExpanded);
       } else {
@@ -229,7 +229,7 @@ export function ListItem({
   const getItemStyle = (): ViewStyle => {
     // Calculate padding based on nesting level
     const nestPadding = nested ? (nestLevel + 1) * theme.sizes.md : theme.sizes.md;
-    
+
     const baseStyle: ViewStyle = {
       flexDirection: getFlexDirection(isRTL),
       alignItems: variant === 'compact' ? 'center' : 'flex-start',
@@ -282,7 +282,7 @@ export function ListItem({
   const getTextColor = (type: 'title' | 'subtitle' | 'description') => {
     if (disabled) return theme.colors.textSecondary;
     if (selected && type === 'title') return theme.colors.primary;
-    
+
     switch (type) {
       case 'title':
         return theme.colors.text;
@@ -312,7 +312,7 @@ export function ListItem({
     if (leftIcon) {
       const margin = getRTLMargin(isRTL);
       return (
-        <View style={[ 
+        <View style={[
           margin.marginEnd(theme.sizes.md),
           {
             justifyContent: 'center',
@@ -338,7 +338,7 @@ export function ListItem({
 
   const renderRightContent = () => {
     const margin = getRTLMargin(isRTL);
-    
+
     if (rightContent) {
       return <View style={margin.marginStart(theme.sizes.sm)}>{rightContent}</View>;
     }
@@ -451,9 +451,9 @@ export function ListItem({
 
   const renderChildren = () => {
     if (!children || !collapsible) return null;
-    
+
     return (
-      <View style={{ 
+      <View style={{
         overflow: 'hidden',
         display: expanded ? 'flex' : 'none',
       }}>
@@ -475,7 +475,7 @@ export function ListItem({
   const content = (
     <View style={[getItemStyle(), itemStyle, style]}>
       {renderLeftContent()}
-      
+
       <View style={{ flex: 1, justifyContent: 'center' }}>
         <Text
           variant={variant === 'compact' ? 'body' : 'subtitle'}
@@ -491,7 +491,7 @@ export function ListItem({
         >
           {title}
         </Text>
-        
+
         {subtitle && (
           <Text
             variant="body"
@@ -508,7 +508,7 @@ export function ListItem({
             {subtitle}
           </Text>
         )}
-        
+
         {description && (
           <Text
             variant="caption"
@@ -526,7 +526,7 @@ export function ListItem({
           </Text>
         )}
       </View>
-      
+
       {renderRightContent()}
     </View>
   );
@@ -568,7 +568,7 @@ export function ListSection({
 }: ListSectionProps) {
   const { theme } = useTheme();
   const { isRTL } = useRTL();
-  
+
   // Internal state for uncontrolled collapsible
   const [internalExpanded, setInternalExpanded] = useState(true);
   const expanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;
@@ -577,7 +577,7 @@ export function ListSection({
     if (collapsible) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       const newExpanded = !expanded;
-      
+
       if (onToggleExpand) {
         onToggleExpand(newExpanded);
       } else {
@@ -643,7 +643,7 @@ export function ListSection({
             )}
           </View>
         </View>
-        
+
         {collapsible && (
           <TouchableOpacity
             onPress={handleToggleExpand}
@@ -678,7 +678,7 @@ export function ListSection({
   return (
     <View style={style}>
       {renderHeader()}
-      <View style={{ 
+      <View style={{
         overflow: 'hidden',
         display: collapsible ? (expanded ? 'flex' : 'none') : 'flex',
       }}>

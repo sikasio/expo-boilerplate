@@ -58,7 +58,7 @@ export function Header({
   const getHeaderStyle = (): ViewStyle => {
     // Android-only: Add top margin for status bar
     const androidTopMargin = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0;
-    
+
     const baseStyle: ViewStyle = {
       flexDirection: getFlexDirection(isRTL),
       alignItems: 'center',
@@ -140,8 +140,6 @@ export function Header({
         }}>
           {title && (
             <Text
-              variant="subtitle"
-              // RTL handled internally by Text component
               style={{
                 fontSize: theme.fontSizes[titleSize],
                 fontWeight: '600',
@@ -157,7 +155,6 @@ export function Header({
           {subtitle && (
             <Text
               variant="caption"
-              // RTL handled internally by Text component
               style={{
                 color: theme.colors.textSecondary,
                 textAlign: 'center',

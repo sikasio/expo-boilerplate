@@ -131,7 +131,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
 
               // Skip rendering if tab config is not found (common during auth state changes)
               if (!tab) {
-                console.log(`Tab config not found for route: ${route.name} (likely due to role change or logout)`);
+                // console.log(`Tab config not found for route: ${route.name} (likely due to role change or logout)`);
                 return null;
               }
 

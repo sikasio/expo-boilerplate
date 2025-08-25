@@ -254,7 +254,7 @@ export function Card({
         case 'medium': return theme.sizes.md;
         case 'large': return theme.sizes.lg;
         case 'xl': return theme.sizes.xl;
-        default: return theme.sizes.md;
+        default: return theme.sizes.sm;
       }
     }
     return 0;
@@ -280,7 +280,7 @@ export function Card({
   // RTL-aware dynamic styles
   const getDynamicStyles = () => {
     const margin = getRTLMargin(isRTL);
-    
+
     return {
       header: createRTLStyle({
         flexDirection: 'row' as const,
@@ -315,10 +315,9 @@ export function Card({
       actions: createRTLStyle({
         flexDirection: 'row' as const,
         flexWrap: 'wrap' as const,
-        marginTop: 8,
       }, {}, isRTL),
       actionButton: {
-        marginBottom: 8,
+        marginBottom: 4,
         ...margin.marginEnd(8),
       },
     };
@@ -344,7 +343,6 @@ export function Card({
             {title && (
               <Text
                 variant="subtitle"
-                // RTL handled internally by Text component
                 style={[
                   { fontSize: sizeDimensions.titleSize, color: schemeColors.titleColor },
                   styles.title
@@ -357,12 +355,11 @@ export function Card({
             {subtitle && (
               <Text
                 variant="body"
-                // RTL handled internally by Text component
                 style={[
                   { fontSize: sizeDimensions.subtitleSize, color: theme.colors.textSecondary },
                   styles.subtitle
                 ]}
-                numberOfLines={2}
+                numberOfLines={3}
               >
                 {subtitle}
               </Text>
@@ -420,7 +417,6 @@ export function Card({
                 onPress={action.onPress}
                 leftIcon={action.leftIcon}
                 rightIcon={action.rightIcon}
-                // RTL handled internally by Text component
                 style={[dynamicStyles.actionButton, index > 0 && styles.actionButtonSpacing]}
               />
             ))}
@@ -515,8 +511,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footer: {
-    marginTop: 12,
-    paddingTop: 12,
+    marginTop: 8,
+    paddingTop: 8,
   },
   actions: {
     flexDirection: 'row',

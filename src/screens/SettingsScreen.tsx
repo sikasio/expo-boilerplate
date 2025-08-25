@@ -1,31 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
-  ScrollView,
   TouchableOpacity,
-  Switch,
   Alert,
   Linking,
   Animated,
   RefreshControl,
   StatusBar,
-  Platform,
   ViewStyle,
-  TextStyle,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFont } from '@/contexts/FontContext';
 import { Text } from '@/components/ui/Text';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Avatar } from '@/components/ui/Avatar';
 import { Icon, IconName } from '@/components/ui/Icon';
 import { List, ListItem, ListSection, ListDivider } from '@/components/ui/List';
-import { ButtonGroup } from '@/components/ui/ButtonGroup';
+import { Switch } from '@/components/ui/Switch';
 import { AppConfig, LanguageOptions } from '@/config/app';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MiniView } from '@/components';
 
 export type SettingsScreenLayout = 'default' | 'grouped' | 'minimal' | 'detailed';
 export type SettingsScreenTheme = 'auto' | 'light' | 'dark' | 'gradient';
@@ -144,6 +140,8 @@ export interface SettingsScreenProps {
   showSearchBar?: boolean;
   enableRefresh?: boolean;
   customSections?: SettingSection[];
+  visibleSections?: string[]; // Filter which sections to show by their IDs
+  hiddenItems?: string[]; // Hide specific items by their IDs across all sections
   content?: SettingsScreenContent;
   onUserPress?: () => void;
   onSearchPress?: () => void;
@@ -238,6 +236,8 @@ export function SettingsScreen({
   showSearchBar = false,
   enableRefresh = true,
   customSections,
+  visibleSections,
+  hiddenItems,
   content,
   onUserPress,
   onSearchPress,
@@ -248,7 +248,7 @@ export function SettingsScreen({
 }: SettingsScreenProps) {
   const { theme, toggleTheme } = useTheme();
   const { logout } = useAuth();
-  const { fontSize, setFontSize } = useFont();
+  const { fontSize, setFontSize, fontSizes } = useFont();
   const insets = useSafeAreaInsets();
 
   // Merge default content with provided content
@@ -745,7 +745,22 @@ export function SettingsScreen({
     },
   ];
 
-  const sections = customSections || defaultSections;
+  const allSections = customSections || defaultSections;
+
+  // Filter sections based on visibleSections prop
+  let filteredSections = visibleSections
+    ? allSections.filter(section => visibleSections.includes(section.id))
+    : allSections;
+
+  // Filter out hidden items from each section
+  if (hiddenItems && hiddenItems.length > 0) {
+    filteredSections = filteredSections.map(section => ({
+      ...section,
+      items: section.items.filter(item => !hiddenItems.includes(item.id))
+    }));
+  }
+
+  const sections = filteredSections;
 
   // Render animated header
   const renderAnimatedHeader = () => (
@@ -759,10 +774,8 @@ export function SettingsScreen({
         backgroundColor: colors.background,
         opacity: headerOpacity,
         zIndex: 1000,
-        paddingTop: insets.top,
+        paddingTop: insets.top + theme.sizes.sm,
         paddingHorizontal: theme.sizes.lg,
-        flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'space-between',
       }}
     >
@@ -794,12 +807,11 @@ export function SettingsScreen({
         >
           <Avatar
             source={user.avatar ? { uri: user.avatar } : undefined}
-            name={user.name}
             size="lg"
           />
 
-          <View style={{ flex: 1, marginLeft: theme.sizes.md }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+          <View style={{ flex: 1, marginHorizontal: theme.sizes.sm }}>
+            <MiniView enableRTL style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
               <Text variant="subtitle" style={{ fontWeight: '600', marginRight: theme.sizes.xs }}>
                 {user.name}
               </Text>
@@ -814,27 +826,25 @@ export function SettingsScreen({
                 }}>
                   <Text style={{
                     color: theme.colors.warning,
-                    fontSize: theme.fontSizes.xs,
+                    fontSize: fontSizes.xs,
                     fontWeight: '600',
                   }}>
                     PRO
                   </Text>
                 </View>
               )}
-            </View>
+            </MiniView>
 
             <Text variant="caption" style={{ color: colors.textSecondary, marginBottom: 2 }}>
               {user.email}
             </Text>
 
             {user.memberSince && (
-              <Text variant="caption" style={{ color: colors.textSecondary, fontSize: theme.fontSizes.xs }}>
+              <Text variant="caption" style={{ color: colors.textSecondary, fontSize: fontSizes.xs }}>
                 {mergedContent.memberSince} {user.memberSince.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' })}
               </Text>
             )}
           </View>
-
-          <Icon name="chevron-forward-outline" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
       </Card>
     );
@@ -910,7 +920,7 @@ export function SettingsScreen({
               </View>
               <Text variant="caption" style={{
                 color: colors.text,
-                fontSize: theme.fontSizes.xs,
+                fontSize: fontSizes.xs,
                 textAlign: 'center',
               }}>
                 {action.title}
@@ -933,16 +943,9 @@ export function SettingsScreen({
           return (
             <Switch
               value={item.value as boolean}
-              onValueChange={item.onToggle}
+              onValueChange={(value) => item.onToggle?.(value)}
               disabled={isDisabled}
-              trackColor={{
-                false: theme.colors.border,
-                true: theme.colors.primary + '50',
-              }}
-              thumbColor={(item.value as boolean) ? theme.colors.primary : '#FFFFFF'}
-              style={{
-                transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], // Make switch smaller
-              }}
+              size="medium"
             />
           );
         case 'picker':
@@ -950,7 +953,7 @@ export function SettingsScreen({
           return (
             <Text style={{
               color: colors.textSecondary,
-              fontSize: theme.fontSizes.xs,
+              fontSize: fontSizes.xs,
             }}>
               {selectedOption?.label || String(item.value)}
             </Text>
@@ -959,7 +962,7 @@ export function SettingsScreen({
           return (
             <Text style={{
               color: colors.textSecondary,
-              fontSize: theme.fontSizes.xs,
+              fontSize: fontSizes.xs,
             }}>
               {String(item.value)}
             </Text>
@@ -968,7 +971,7 @@ export function SettingsScreen({
           return item.value ? (
             <Text style={{
               color: colors.textSecondary,
-              fontSize: theme.fontSizes.xs,
+              fontSize: fontSizes.xs,
             }}>
               {String(item.value)}
             </Text>
@@ -980,6 +983,7 @@ export function SettingsScreen({
 
     return (
       <ListItem
+        variant="compact"
         title={item.title}
         subtitle={item.subtitle}
         leftIcon={item.icon}
@@ -989,12 +993,12 @@ export function SettingsScreen({
         onPress={!isDisabled ? item.onPress : undefined}
         disabled={isDisabled}
         titleStyle={{
-          fontSize: theme.fontSizes.sm,
+          fontSize: fontSizes.sm,
           color: item.destructive ? theme.colors.error : (item.color || colors.text),
           fontWeight: '500',
         }}
         subtitleStyle={{
-          fontSize: theme.fontSizes.xs,
+          fontSize: fontSizes.xs,
           color: colors.textSecondary,
         }}
         itemStyle={{
@@ -1017,12 +1021,12 @@ export function SettingsScreen({
             subtitle={section.subtitle}
             titleStyle={{
               fontWeight: '600',
-              fontSize: theme.fontSizes.md,
+              fontSize: fontSizes.lg,
               color: theme.colors.primary,
             }}
             subtitleStyle={{
               color: colors.textSecondary,
-              fontSize: theme.fontSizes.xs,
+              fontSize: fontSizes.sm,
             }}
           >
             {section.items.map((item) => (
@@ -1057,8 +1061,6 @@ export function SettingsScreen({
       <Animated.ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
-          paddingHorizontal: theme.sizes.lg,
-          paddingTop: theme.sizes.lg,
           paddingBottom: 90, // Extra padding to prevent overlay with bottom tabs
         }}
         showsVerticalScrollIndicator={false}

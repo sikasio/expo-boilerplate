@@ -13,6 +13,7 @@ import {
   Animated,
 } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
 import { Button } from './Button';
@@ -121,6 +122,7 @@ export function HeroSection({
   ...props
 }: HeroSectionProps) {
   const { theme } = useTheme();
+  const { isRTL } = useRTL();
 
   // Scroll animation - only when hideOnScroll=true, scrollable=false (fixed hero) and scrollY is provided
   const heroElementsOpacity = React.useMemo(() => {
@@ -241,7 +243,7 @@ export function HeroSection({
       return StatusBar.currentHeight || 0;
     }
     // iOS status bar height varies by device, but we'll use a standard approach
-    return 44; // Standard iOS status bar height
+    return 50; // Standard iOS status bar height
   };
 
   const getContainerStyle = (): ViewStyle => {
@@ -266,7 +268,7 @@ export function HeroSection({
     if (fullScreen) {
       return {
         ...baseStyle,
-        paddingTop: getStatusBarHeight() + dimensions.paddingVertical + theme.sizes.md,
+        paddingTop: getStatusBarHeight() + dimensions.paddingVertical + theme.sizes.lg,
         paddingBottom: theme.sizes.lg,
         marginTop: -getStatusBarHeight(),
       };
@@ -296,7 +298,7 @@ export function HeroSection({
             paddingHorizontal: theme.sizes.sm,
             paddingVertical: 4,
             borderRadius: theme.borderRadius.md,
-            alignSelf: contentAlign === 'center' ? 'center' : contentAlign === 'right' ? 'flex-end' : 'flex-start',
+            alignSelf: isRTL ? 'flex-end' : (contentAlign === 'center' ? 'center' : contentAlign === 'right' ? 'flex-end' : 'flex-start'),
             marginBottom: heroElementsMargin,
             opacity: heroElementsOpacity,
             maxHeight: badgeHeight,
@@ -318,12 +320,12 @@ export function HeroSection({
 
       {title && (
         <Text
+          variant='title'
           style={{
             color: colors.text,
             fontWeight: 'bold',
-            marginBottom: subtitle || description ? getSpacing(titleSpacing, 'xs') : theme.sizes.md,
             fontSize: dimensions.titleSize,
-            textAlign: contentAlign,
+            textAlign: isRTL ? 'right' : contentAlign,
           }}
         >
           {title}
@@ -331,12 +333,13 @@ export function HeroSection({
       )}
 
       {subtitle && (
-        <Animated.View style={{ marginBottom: description ? getSpacing(descriptionSpacing, 'sm') : getSpacing(subtitleSpacing, 'md') }}>
+        <Animated.View>
           <Text
+            variant='subtitle'
             style={{
               color: colors.text,
               fontSize: dimensions.subtitleSize,
-              textAlign: contentAlign,
+              textAlign: isRTL ? 'right' : contentAlign,
             }}
           >
             {subtitle}
@@ -353,12 +356,12 @@ export function HeroSection({
           }}
         >
           <Text
+            variant='body'
             style={{
               color: colors.text,
               opacity: 0.9,
               fontSize: dimensions.descriptionSize,
-              textAlign: contentAlign,
-              marginBottom: getSpacing(descriptionBottomSpacing, 'md'),
+              textAlign: isRTL ? 'right' : contentAlign,
             }}
           >
             {description}
@@ -397,12 +400,12 @@ export function HeroSection({
       {/* Content takes full width */}
       {customContent ? customContent : renderDefaultContent()}
 
-      {/* Right actions floated absolutely */}
+      {/* Right actions floated absolutely - positioned based on RTL */}
       {(rightAction || rightActions.length > 0) && (
         <View style={{
           position: 'absolute',
           top: 0,
-          right: 0,
+          [isRTL ? 'left' : 'right']: 0,
           zIndex: 10,
           flexDirection: 'row',
           gap: theme.sizes.xs,
@@ -459,7 +462,8 @@ export function HeroSection({
         flexDirection: 'row',
         gap: theme.sizes.sm,
         marginTop: theme.sizes.sm,
-        justifyContent: contentAlign === 'center' ? 'center' : contentAlign === 'right' ? 'flex-end' : 'flex-start',
+        justifyContent: isRTL ? 'flex-end' : (contentAlign === 'center' ? 'center' : contentAlign === 'right' ? 'flex-end' : 'flex-start'),
+        alignItems: 'center',
       }}>
         {allActions.map((action, index) => (
           <Button

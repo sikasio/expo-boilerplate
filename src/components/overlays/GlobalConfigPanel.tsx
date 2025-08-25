@@ -369,7 +369,7 @@ export function GlobalConfigPanel({
                   const rightContent = (
                     <Switch
                       value={option.value as boolean}
-                      onValueChange={option.onToggle || (() => {})}
+                      onValueChange={(value) => option.onToggle?.(value)}
                       size="small"
                       activeColor={theme.colors.primary}
                       inactiveColor={theme.colors.border}

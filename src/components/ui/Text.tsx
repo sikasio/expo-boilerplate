@@ -112,15 +112,24 @@ export function Text({
   };
 
   const getVariantStyle = () => {
-    // Use font context line height multiplier
+    // Use font context line height multiplier (unchanged)
     const getLineHeight = (fontSize: number) => {
       return fontSize * lineHeightMultiplier;
+    };
+
+    // iOS-specific padding to prevent text clipping at the top
+    const getIOSPaddingTop = (fontSize: number) => {
+      return Platform.OS === 'ios' ? Math.max(0.2, fontSize * 0.05) : 0;
     };
 
     const baseStyle = {
       fontSize: fontSizes.md,
       lineHeight: getLineHeight(fontSizes.md),
       color: color || theme.colors.text,
+      ...(Platform.OS === 'ios' && {
+        paddingTop: getIOSPaddingTop(fontSizes.md),
+        includeFontPadding: false, // iOS-specific fix for text clipping
+      }),
     };
 
     switch (variant) {
@@ -130,8 +139,12 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(titleWeight, isItalic),
           fontSize: fontSizes.xxxl,
-          lineHeight: getLineHeight(fontSizes.lg),
+          lineHeight: getLineHeight(fontSizes.lg), // Keep original lineHeight logic
           color: color || theme.colors.text,
+          ...(Platform.OS === 'ios' && {
+            paddingTop: getIOSPaddingTop(fontSizes.xxxl),
+            includeFontPadding: false,
+          }),
         };
       case 'subtitle':
         const subtitleWeight = getAvailableFontWeight('medium', requestedFontWeight);
@@ -139,8 +152,12 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(subtitleWeight, isItalic),
           fontSize: fontSizes.xl,
-          lineHeight: getLineHeight(fontSizes.lg),
+          lineHeight: getLineHeight(fontSizes.lg), // Keep original lineHeight logic
           color: color || theme.colors.text,
+          ...(Platform.OS === 'ios' && {
+            paddingTop: getIOSPaddingTop(fontSizes.xl),
+            includeFontPadding: false,
+          }),
         };
       case 'body':
         const bodyWeight = getAvailableFontWeight('regular', requestedFontWeight);
@@ -148,8 +165,12 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(bodyWeight, isItalic),
           fontSize: fontSizes.md,
-          lineHeight: getLineHeight(fontSizes.sm),
+          lineHeight: getLineHeight(fontSizes.sm), // Keep original lineHeight logic
           color: color || theme.colors.text,
+          ...(Platform.OS === 'ios' && {
+            paddingTop: getIOSPaddingTop(fontSizes.md),
+            includeFontPadding: false,
+          }),
         };
       case 'caption':
         const captionWeight = getAvailableFontWeight('regular', requestedFontWeight);
@@ -157,8 +178,12 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(captionWeight, isItalic),
           fontSize: fontSizes.sm,
-          lineHeight: getLineHeight(fontSizes.xs),
+          lineHeight: getLineHeight(fontSizes.xs), // Keep original lineHeight logic
           color: color || theme.colors.textSecondary,
+          ...(Platform.OS === 'ios' && {
+            paddingTop: getIOSPaddingTop(fontSizes.sm),
+            includeFontPadding: false,
+          }),
         };
       case 'label':
         const labelWeight = getAvailableFontWeight('medium', requestedFontWeight);
@@ -166,8 +191,12 @@ export function Text({
           ...baseStyle,
           ...getFontStyle(labelWeight, isItalic),
           fontSize: fontSizes.sm,
-          lineHeight: getLineHeight(fontSizes.sm),
+          lineHeight: getLineHeight(fontSizes.sm), // Keep original lineHeight logic
           color: color || theme.colors.text,
+          ...(Platform.OS === 'ios' && {
+            paddingTop: getIOSPaddingTop(fontSizes.sm),
+            includeFontPadding: false,
+          }),
         };
       default:
         const defaultWeight = getAvailableFontWeight('regular', requestedFontWeight);

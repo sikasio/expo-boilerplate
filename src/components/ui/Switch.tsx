@@ -53,10 +53,14 @@ export function Switch({
   const config = sizeConfig[size];
   const thumbPosition = config.width - config.thumbSize - config.padding * 2;
 
-  // Colors
+  // Colors - optimized for better contrast and visual hierarchy
   const defaultActiveColor = activeColor || theme.colors.primary;
-  const defaultInactiveColor = inactiveColor || theme.colors.border;
-  const defaultThumbColor = thumbColor || '#FFFFFF';
+  const defaultInactiveColor = inactiveColor || (theme.isDark ? theme.colors.textSecondary + '40' : theme.colors.border);
+  const defaultThumbColor = thumbColor || (theme.isDark ? theme.colors.surface : '#FFFFFF');
+  
+  // Disabled state colors
+  const disabledTrackColor = theme.isDark ? theme.colors.textSecondary + '30' : theme.colors.border + '80';
+  const disabledThumbColor = theme.isDark ? theme.colors.textSecondary + '60' : theme.colors.textSecondary;
 
   useEffect(() => {
     Animated.timing(animatedValue, {
@@ -72,10 +76,12 @@ export function Switch({
     }
   };
 
-  const trackColor = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [defaultInactiveColor, defaultActiveColor],
-  });
+  const trackColor = disabled 
+    ? disabledTrackColor
+    : animatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: [defaultInactiveColor, defaultActiveColor],
+      });
 
   const thumbTranslateX = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -99,7 +105,6 @@ export function Switch({
           borderRadius: config.height / 2,
           padding: config.padding,
           justifyContent: 'center',
-          opacity: disabled ? 0.5 : 1,
         },
         style,
       ]}
@@ -112,6 +117,10 @@ export function Switch({
           borderRadius: config.height / 2,
           backgroundColor: trackColor,
           justifyContent: 'center',
+          borderWidth: theme.isDark ? 0 : 0.5,
+          borderColor: disabled 
+            ? (theme.isDark ? 'transparent' : theme.colors.textSecondary + '40')
+            : (theme.isDark ? 'transparent' : theme.colors.border + '60'),
         }}
       >
         <Animated.View
@@ -119,18 +128,18 @@ export function Switch({
             width: config.thumbSize,
             height: config.thumbSize,
             borderRadius: config.thumbSize / 2,
-            backgroundColor: defaultThumbColor,
-            shadowColor: '#000',
+            backgroundColor: disabled ? disabledThumbColor : defaultThumbColor,
+            shadowColor: disabled ? 'transparent' : (theme.isDark ? '#000000' : '#000000'),
             shadowOffset: {
               width: 0,
-              height: 2,
+              height: disabled ? 0 : 2,
             },
-            shadowOpacity: 0.2,
-            shadowRadius: 3,
-            elevation: 3,
+            shadowOpacity: disabled ? 0 : (theme.isDark ? 0.3 : 0.2),
+            shadowRadius: disabled ? 0 : 3,
+            elevation: disabled ? 0 : (theme.isDark ? 4 : 3),
             transform: [
               { translateX: thumbTranslateX },
-              { scale: thumbScale },
+              { scale: disabled ? 1 : thumbScale },
             ],
           }}
         />
