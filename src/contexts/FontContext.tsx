@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { 
-  FONT_FAMILIES, 
-  DEFAULT_APP_FONT_CONFIGS, 
+import {
+  FONT_FAMILIES,
+  DEFAULT_APP_FONT_CONFIGS,
   calculateFontSizes,
   getFontStyle,
   type FontFamily,
-  type AppFontConfig 
+  type AppFontConfig
 } from '@/config/fonts';
 import { getCurrentApp } from '@/utils/getCurrentApp';
 
@@ -23,19 +24,19 @@ interface FontContextType {
   fontSize: number;
   fontSizes: Record<string, number>;
   lineHeightMultiplier: number;
-  
+
   // Available fonts
   availableFonts: FontFamily[];
-  
+
   // Font management
   setFontFamily: (fontId: string) => Promise<void>;
   setFontSize: (size: number) => Promise<void>;
   setLineHeightMultiplier: (multiplier: number) => Promise<void>;
-  
+
   // App-specific settings
   getAppFontConfig: (appId: string) => AppFontConfig;
   setAppFontConfig: (appId: string, config: Partial<AppFontConfig>) => Promise<void>;
-  
+
   // Utility functions
   getFontStyle: (weight?: 'thin' | 'extraLight' | 'light' | 'regular' | 'medium' | 'semiBold' | 'bold' | 'extraBold' | 'black', italic?: boolean) => any;
   resetToDefaults: () => Promise<void>;
@@ -49,12 +50,19 @@ interface FontProviderProps {
 
 export function FontProvider({ children }: FontProviderProps) {
   const currentApp = getCurrentApp();
+
+  // Apply platform-specific line height multipliers
+  const getPlatformLineHeightMultiplier = (baseMultiplier: number): number => {
+    return Platform.OS === 'ios' ? baseMultiplier * 1.15 : baseMultiplier;
+  };
+
   const defaultConfig = DEFAULT_APP_FONT_CONFIGS[currentApp] || DEFAULT_APP_FONT_CONFIGS._default;
-  
+  const platformAdjustedLineHeight = getPlatformLineHeightMultiplier(defaultConfig.lineHeightMultiplier);
+
   // State
   const [fontFamily, setFontFamilyState] = useState<FontFamily>(FONT_FAMILIES[defaultConfig.fontFamily]);
   const [fontSize, setFontSizeState] = useState<number>(defaultConfig.baseSize);
-  const [lineHeightMultiplier, setLineHeightMultiplierState] = useState<number>(defaultConfig.lineHeightMultiplier);
+  const [lineHeightMultiplier, setLineHeightMultiplierState] = useState<number>(platformAdjustedLineHeight);
   const [appFontConfigs, setAppFontConfigs] = useState<Record<string, AppFontConfig>>(DEFAULT_APP_FONT_CONFIGS);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -81,20 +89,20 @@ export function FontProvider({ children }: FontProviderProps) {
       if (savedConfigs) {
         const configs = JSON.parse(savedConfigs);
         setAppFontConfigs({ ...DEFAULT_APP_FONT_CONFIGS, ...configs });
-        
+
         // Apply current app's config
         const currentConfig = configs[currentApp] || DEFAULT_APP_FONT_CONFIGS[currentApp] || DEFAULT_APP_FONT_CONFIGS._default;
         setFontFamilyState(FONT_FAMILIES[currentConfig.fontFamily] || FONT_FAMILIES.system);
         setFontSizeState(currentConfig.baseSize);
-        setLineHeightMultiplierState(currentConfig.lineHeightMultiplier);
+        setLineHeightMultiplierState(getPlatformLineHeightMultiplier(currentConfig.lineHeightMultiplier));
       } else {
         // First time - apply default config for current app
         const currentConfig = DEFAULT_APP_FONT_CONFIGS[currentApp] || DEFAULT_APP_FONT_CONFIGS._default;
         setFontFamilyState(FONT_FAMILIES[currentConfig.fontFamily]);
         setFontSizeState(currentConfig.baseSize);
-        setLineHeightMultiplierState(currentConfig.lineHeightMultiplier);
+        setLineHeightMultiplierState(getPlatformLineHeightMultiplier(currentConfig.lineHeightMultiplier));
       }
-      
+
       setIsLoaded(true);
     } catch (error) {
       console.error('Error loading font settings:', error);
@@ -115,7 +123,7 @@ export function FontProvider({ children }: FontProviderProps) {
     if (!newFontFamily) return;
 
     setFontFamilyState(newFontFamily);
-    
+
     // Update current app's config
     const updatedConfigs = {
       ...appFontConfigs,
@@ -130,7 +138,7 @@ export function FontProvider({ children }: FontProviderProps) {
   const setFontSize = async (size: number) => {
     const clampedSize = Math.max(12, Math.min(24, size)); // Clamp between 12-24px
     setFontSizeState(clampedSize);
-    
+
     // Update current app's config
     const updatedConfigs = {
       ...appFontConfigs,
@@ -145,7 +153,7 @@ export function FontProvider({ children }: FontProviderProps) {
   const setLineHeightMultiplier = async (multiplier: number) => {
     const clampedMultiplier = Math.max(1.0, Math.min(2.0, multiplier)); // Clamp between 1.0-2.0
     setLineHeightMultiplierState(clampedMultiplier);
-    
+
     // Update current app's config
     const updatedConfigs = {
       ...appFontConfigs,
@@ -170,7 +178,7 @@ export function FontProvider({ children }: FontProviderProps) {
       },
     };
     setAppFontConfigs(updatedConfigs);
-    
+
     // If updating current app, apply changes immediately
     if (appId === currentApp) {
       if (config.fontFamily) {
@@ -198,11 +206,11 @@ export function FontProvider({ children }: FontProviderProps) {
 
   const resetToDefaults = async () => {
     const defaultConfig = DEFAULT_APP_FONT_CONFIGS[currentApp] || DEFAULT_APP_FONT_CONFIGS._default;
-    
+
     setFontFamilyState(FONT_FAMILIES[defaultConfig.fontFamily]);
     setFontSizeState(defaultConfig.baseSize);
-    setLineHeightMultiplierState(defaultConfig.lineHeightMultiplier);
-    
+    setLineHeightMultiplierState(getPlatformLineHeightMultiplier(defaultConfig.lineHeightMultiplier));
+
     // Reset current app's config
     const updatedConfigs = {
       ...appFontConfigs,
@@ -217,19 +225,19 @@ export function FontProvider({ children }: FontProviderProps) {
     fontSize,
     fontSizes,
     lineHeightMultiplier,
-    
+
     // Available fonts
     availableFonts,
-    
+
     // Font management
     setFontFamily,
     setFontSize,
     setLineHeightMultiplier,
-    
+
     // App-specific settings
     getAppFontConfig,
     setAppFontConfig,
-    
+
     // Utility functions
     getFontStyle: getFontStyleFunction,
     resetToDefaults,
