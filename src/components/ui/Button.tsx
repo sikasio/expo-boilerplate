@@ -14,7 +14,7 @@ import { Text } from './Text';
 import { Icon, IconName } from './Icon';
 import { getFlexDirection, getRTLMargin, createRTLStyle, getRTLIconName } from '@/utils';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'outline-white' | 'ghost' | 'success' | 'warning' | 'error';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'outline-white' | 'ghost' | 'success' | 'warning' | 'error' | 'outline-error' | 'outline-warning';
 export type ButtonSize = 'xs' | 'small' | 'medium' | 'large' | 'xl';
 
 interface ButtonProps extends TouchableOpacityProps {
@@ -115,6 +115,14 @@ export function Button({
         backgroundColor: 'transparent',
         borderColor: '#FFFFFF',
       },
+      'outline-error': {
+        backgroundColor: 'transparent',
+        borderColor: theme.colors.error,
+      },
+      'outline-warning': {
+        backgroundColor: 'transparent',
+        borderColor: theme.colors.warning,
+      },
       ghost: {
         backgroundColor: 'transparent',
         borderColor: 'transparent',
@@ -147,6 +155,10 @@ export function Button({
         return theme.colors.primary;
       case 'outline-white':
         return '#FFFFFF';
+      case 'outline-error':
+        return theme.colors.error;
+      case 'outline-warning':
+        return theme.colors.warning;
       case 'ghost':
         return theme.colors.text;
       default:

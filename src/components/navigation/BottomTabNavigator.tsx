@@ -14,6 +14,8 @@ export interface TabConfig {
   title: string;
   icon: IconName;
   iconFocused: IconName;
+  badge?: boolean;
+  badgeCount?: number;
 }
 
 interface BottomTabNavigatorProps {
@@ -179,6 +181,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
                           translateY: isFocused ? -2 : 0,
                         },
                       ],
+                      position: 'relative',
                     }}
                   >
                     <TabBarIcon
@@ -186,6 +189,37 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
                       color={isFocused ? theme.colors.primary : theme.colors.textSecondary}
                       size={isFocused ? 24 : 28}
                     />
+                    {/* Badge/Notification Dot */}
+                    {tab.badge && !isFocused && (
+                      <View
+                        style={{
+                          position: 'absolute',
+                          top: -7,
+                          right: -7,
+                          backgroundColor: theme.colors.error,
+                          borderRadius: 8,
+                          minWidth: 14,
+                          height: 14,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderWidth: 2,
+                          borderColor: theme.colors.surface,
+                        }}
+                      >
+                        {tab.badgeCount && tab.badgeCount > 0 && (
+                          <Text
+                            style={{
+                              color: 'white',
+                              fontSize: 10,
+                              fontWeight: '700',
+                              lineHeight: 12,
+                            }}
+                          >
+                            {tab.badgeCount > 9 ? '9+' : tab.badgeCount}
+                          </Text>
+                        )}
+                      </View>
+                    )}
                   </Animated.View>
                   {isFocused && (
                     <Animated.View

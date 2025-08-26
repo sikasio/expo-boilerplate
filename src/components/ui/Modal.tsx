@@ -31,7 +31,7 @@ export type ModalAnimation = 'slide' | 'fade' | 'scale' | 'none';
 export interface ModalAction {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success' | 'warning' | 'outline-primary' | 'outline-secondary' | 'outline-danger' | 'outline-warning' | 'outline-success';
   disabled?: boolean;
   loading?: boolean;
   icon?: string;
