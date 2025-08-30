@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Platform, View, Animated, TouchableOpacity } from 'react-native';
+import { Platform, View, Animated, TouchableOpacity, Dimensions } from 'react-native';
+import { use3ButtonNavigationDetector } from '@/hooks/use3ButtonNavigationDetector';
 
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSplash } from '@/contexts/SplashContext';
@@ -26,12 +27,14 @@ interface BottomTabNavigatorProps {
 export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNavigatorProps) {
   const { theme } = useTheme();
   const { isSplashActive } = useSplash();
+  const { androidBottomOffset } = use3ButtonNavigationDetector();
 
   const getTabBarStyle = () => {
     const dimensions = getTabBarDimensions(design);
+
     // Android-only: Add small extra padding
     const androidExtraTopPadding = Platform.OS === 'android' ? 8 : 0;
-    const androidExtraBottomPadding = Platform.OS === 'android' ? 8 : 0;
+    const androidExtraBottomPadding = Platform.OS === 'android' ? 8 + androidBottomOffset : 0;
 
     const baseStyle = {
       backgroundColor: theme.colors.surface,
@@ -42,7 +45,7 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
       case 'floating':
         return {
           position: 'absolute' as const,
-          bottom: dimensions.bottomOffset,
+          bottom: dimensions.bottomOffset + androidBottomOffset,
           marginHorizontal: 16,
           backgroundColor: theme.colors.surface,
           borderRadius: theme.borderRadius.xxl,
@@ -94,13 +97,13 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
 
       const dimensions = getTabBarDimensions(design);
       // Android-only: Add small extra padding for bubble design
-      const androidExtraBottomPadding = Platform.OS === 'android' ? 8 : 0;
+      const androidExtraBottomPadding = Platform.OS === 'android' ? 8 + androidBottomOffset : 0;
       const androidExtraTopPadding = Platform.OS === 'android' ? 8 : 0;
 
       return (
         <View style={{
           position: 'absolute',
-          bottom: dimensions.bottomOffset,
+          bottom: dimensions.bottomOffset + androidBottomOffset,
           left: 16,
           right: 16,
           flexDirection: 'row',
