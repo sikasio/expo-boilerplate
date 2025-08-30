@@ -5,6 +5,7 @@ import { ThemeMode } from '@/types';
 import { StorageService } from '@/services/storage';
 import { STORAGE_KEYS } from '@/constants';
 import { logger } from '@/utils/logger';
+import { getCurrentAppDefaults } from '@/config/appDefaults';
 
 interface ThemeContextType {
   theme: Theme;
@@ -19,6 +20,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
+  
+  // Start with fallback defaults initially, will be set properly after loading
   const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
   const [colorScheme, setColorSchemeState] = useState<string>('blue');
 
@@ -32,12 +35,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const savedMode = await StorageService.getItem(STORAGE_KEYS.THEME);
       if (savedMode && (savedMode === 'light' || savedMode === 'dark' || savedMode === 'system')) {
         setThemeModeState(savedMode as ThemeMode);
+      } else {
+        // No saved preference, use app-specific default
+        const appDefaults = getCurrentAppDefaults();
+        setThemeModeState(appDefaults.theme.mode);
+        // Save the default for this app
+        await StorageService.setItem(STORAGE_KEYS.THEME, appDefaults.theme.mode);
+        
+        logger.debug('No saved theme mode, using app default', {
+          function: 'loadThemeMode',
+          component: 'ThemeContext',
+          defaultMode: appDefaults.theme.mode
+        });
       }
     } catch (error) {
       logger.error('Failed to load theme mode', error, {
         function: 'loadThemeMode',
         component: 'ThemeContext'
       });
+      // Fallback to system on error
+      setThemeModeState('system');
     }
   };
 
@@ -46,12 +63,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const savedScheme = await StorageService.getItem(STORAGE_KEYS.COLOR_SCHEME);
       if (savedScheme) {
         setColorSchemeState(savedScheme);
+      } else {
+        // No saved preference, use app-specific default
+        const appDefaults = getCurrentAppDefaults();
+        setColorSchemeState(appDefaults.theme.colorScheme);
+        // Save the default for this app
+        await StorageService.setItem(STORAGE_KEYS.COLOR_SCHEME, appDefaults.theme.colorScheme);
+        
+        logger.debug('No saved color scheme, using app default', {
+          function: 'loadColorScheme',
+          component: 'ThemeContext',
+          defaultColorScheme: appDefaults.theme.colorScheme
+        });
       }
     } catch (error) {
       logger.error('Failed to load color scheme', error, {
         function: 'loadColorScheme',
         component: 'ThemeContext'
       });
+      // Fallback to blue on error
+      setColorSchemeState('blue');
     }
   };
 

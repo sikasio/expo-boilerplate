@@ -13,6 +13,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRTL } from '@/contexts/RTLContext';
 import { useFont } from '@/contexts/FontContext';
+import { getCurrentAppDefaults, logCurrentAppDefaults } from '@/config/appDefaults';
+import { getCurrentApp } from '@/utils/getCurrentApp';
 import { Icon } from '../ui/Icon';
 import { Text } from '../ui/Text';
 import { List, ListItem } from '../ui/List';
@@ -48,7 +50,7 @@ export function GlobalConfigPanel({
     return null;
   }
 
-  const { theme, toggleTheme, colorScheme, setColorScheme } = useTheme();
+  const { theme, toggleTheme, colorScheme, setColorScheme, setThemeMode } = useTheme();
   const { isRTL, toggleRTL } = useRTL();
   const { fontFamily, fontSize, availableFonts, setFontFamily, setFontSize } = useFont();
   const insets = useSafeAreaInsets();
@@ -88,6 +90,42 @@ export function GlobalConfigPanel({
 
   const handleFontSizeChange = (size: number) => {
     setFontSize(size);
+  };
+
+  const handleResetToDefaults = () => {
+    Alert.alert(
+      'Reset to App Defaults',
+      'This will reset theme and RTL settings to the default values for this app. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            const appDefaults = getCurrentAppDefaults();
+            console.log('Resetting to app defaults:', appDefaults);
+            
+            // Reset color scheme
+            setColorScheme(appDefaults.theme.colorScheme);
+            
+            // Reset theme mode - use setThemeMode directly instead of toggle
+            setThemeMode(appDefaults.theme.mode);
+            
+            // Reset RTL setting
+            if (appDefaults.rtl.enabled !== isRTL) {
+              await toggleRTL();
+            }
+            
+            setIsMenuOpen(false);
+            setTimeout(() => slideOut(), 300);
+            
+            // Show confirmation with current app name
+            const currentApp = getCurrentApp();
+            Alert.alert('Reset Complete', `Settings have been reset to defaults for ${currentApp}:\n• Theme: ${appDefaults.theme.mode}\n• Colors: ${appDefaults.theme.colorScheme}\n• RTL: ${appDefaults.rtl.enabled ? 'Enabled' : 'Disabled'}`);
+          }
+        }
+      ]
+    );
   };
 
   // Prepare font family options
@@ -159,6 +197,20 @@ export function GlobalConfigPanel({
       max: 24,
       step: 1,
       onValueChange: handleFontSizeChange,
+    },
+  ];
+
+  // Add reset button option (development only)
+  const devConfigOptions: ConfigOption[] = [
+    ...configOptions,
+    {
+      id: 'reset-defaults',
+      label: 'Reset to App Defaults',
+      icon: 'refresh-outline',
+      description: 'Reset all settings to current app defaults',
+      type: 'toggle',
+      value: false,
+      onPress: handleResetToDefaults,
     },
   ];
 
@@ -292,6 +344,13 @@ export function GlobalConfigPanel({
     };
   }, [isMenuOpen, isHidden]);
 
+  // Log app defaults on first render (development only)
+  useEffect(() => {
+    if (process.env.EXPO_PUBLIC_APP_ENV !== 'production') {
+      logCurrentAppDefaults();
+    }
+  }, []);
+
 
   return (
     <>
@@ -364,9 +423,25 @@ export function GlobalConfigPanel({
             ]}
           >
             <List variant="default" showDividers={true}>
-              {configOptions.map((option) => {
+              {(process.env.EXPO_PUBLIC_APP_ENV !== 'production' ? devConfigOptions : configOptions).map((option) => {
                 if (option.type === 'toggle') {
-                  const rightContent = (
+                  const rightContent = option.id === 'reset-defaults' ? (
+                    <TouchableOpacity
+                      onPress={option.onPress}
+                      style={{
+                        backgroundColor: theme.colors.primary + '15',
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 6,
+                        borderWidth: 1,
+                        borderColor: theme.colors.primary
+                      }}
+                    >
+                      <Text style={{ color: theme.colors.primary, fontSize: 12, fontWeight: '600' }}>
+                        Reset
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
                     <Switch
                       value={option.value as boolean}
                       onValueChange={(value) => option.onToggle?.(value)}

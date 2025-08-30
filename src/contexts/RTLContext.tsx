@@ -4,6 +4,7 @@ import { StorageService } from '@/services/storage';
 import { STORAGE_KEYS } from '@/constants';
 import { logger } from '@/utils/logger';
 import { getCurrentApp } from '@/utils/getCurrentApp';
+import { getCurrentAppDefaults } from '@/config/appDefaults';
 
 interface RTLContextType {
   isRTL: boolean;
@@ -14,12 +15,8 @@ interface RTLContextType {
 const RTLContext = createContext<RTLContextType | undefined>(undefined);
 
 export function RTLProvider({ children }: { children: React.ReactNode }) {
-  // For audiobook app, default to RTL (true), otherwise LTR (false)
-  const getDefaultRTL = () => {
-    return getCurrentApp() === 'audiobooks';
-  };
-
-  const [isRTL, setIsRTLState] = useState<boolean>(getDefaultRTL());
+  // Start with false initially, will be set properly after loading defaults
+  const [isRTL, setIsRTLState] = useState<boolean>(false);
 
   useEffect(() => {
     loadRTLSetting();
@@ -34,16 +31,10 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
       if (savedRTL !== null) {
         const rtlEnabled = savedRTL === 'true';
         setIsRTLState(rtlEnabled);
-
-        // logger.debug('RTL setting loaded', {
-        //   component: 'RTLContext',
-        //   function: 'loadRTLSetting',
-        //   direction: rtlEnabled ? 'RTL' : 'LTR',
-        //   manualControl: true
-        // });
       } else {
         // No saved preference, use app-specific default
-        const defaultRTL = getDefaultRTL();
+        const appDefaults = getCurrentAppDefaults();
+        const defaultRTL = appDefaults.rtl.enabled;
         setIsRTLState(defaultRTL);
         // Save the default for this app
         await StorageService.setItem(STORAGE_KEYS.RTL_DIRECTION, defaultRTL.toString());
@@ -52,7 +43,8 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
           component: 'RTLContext',
           function: 'loadRTLSetting',
           app: getCurrentApp(),
-          direction: defaultRTL ? 'RTL' : 'LTR'
+          direction: defaultRTL ? 'RTL' : 'LTR',
+          source: 'app_defaults'
         });
       }
     } catch (error) {
@@ -60,8 +52,8 @@ export function RTLProvider({ children }: { children: React.ReactNode }) {
         component: 'RTLContext',
         function: 'loadRTLSetting'
       });
-      // Fallback to app default on error
-      setIsRTLState(getDefaultRTL());
+      // Fallback to LTR on error
+      setIsRTLState(false);
     }
   };
 
