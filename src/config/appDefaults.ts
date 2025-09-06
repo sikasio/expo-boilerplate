@@ -11,6 +11,7 @@ import { APP_DEFAULTS as DEFAULT_CONFIG } from '../../apps/_default/_config/appC
 import { APP_DEFAULTS as TILAWAH_CONFIG } from '../../apps/TilawahConnect/_config/appConfig';
 import { APP_DEFAULTS as AUDIOBOOKS_CONFIG } from '../../apps/audiobooks/_config/appConfig';
 import { APP_DEFAULTS as ECOMMERCE_CONFIG } from '../../apps/eCommerce-v1/_config/appConfig';
+import { APP_DEFAULTS as CASHFLOW_CONFIG } from '../../apps/CashFlow/_config/appConfig';
 
 export interface AppDefaults {
   theme: {
@@ -30,6 +31,7 @@ const APP_CONFIG_MAP: Record<string, AppDefaults> = {
   'TilawahConnect': TILAWAH_CONFIG,
   'audiobooks': AUDIOBOOKS_CONFIG,
   'eCommerce-v1': ECOMMERCE_CONFIG,
+  'CashFlow': CASHFLOW_CONFIG,
 };
 
 /**

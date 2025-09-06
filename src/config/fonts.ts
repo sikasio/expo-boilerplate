@@ -92,11 +92,11 @@ export const getFontWeight = (
 ): string => {
   // Handle italic variants first
   if (italic && fontFamily.italics) {
-    const italicVariant = 
+    const italicVariant =
       weight === 'light' ? fontFamily.italics.light :
       weight === 'bold' ? fontFamily.italics.bold :
       fontFamily.italics.regular;
-    
+
     if (italicVariant) return italicVariant;
   }
 
@@ -160,6 +160,12 @@ export const DEFAULT_APP_FONT_CONFIGS: Record<string, AppFontConfig> = {
   },
   'eCommerce-v1': {
     appId: 'eCommerce-v1',
+    fontFamily: 'system',
+    baseSize: 16,
+    lineHeightMultiplier: 1.4,
+  },
+  CashFlow: {
+    appId: 'CashFlow',
     fontFamily: 'system',
     baseSize: 16,
     lineHeightMultiplier: 1.4,
