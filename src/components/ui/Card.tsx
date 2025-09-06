@@ -16,7 +16,7 @@ import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
 
 export type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled';
 export type CardSize = 'small' | 'medium' | 'large';
-export type CardColorScheme = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost';
+export type CardColorScheme = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost' | 'white';
 
 interface CardAction {
   label: string;
@@ -107,7 +107,7 @@ export function Card({
           minHeight: 120,
           titleSize: theme.fontSizes.lg,
           subtitleSize: theme.fontSizes.md,
-          iconSize: theme.fontSizes.lg,
+          iconSize: theme.fontSizes.xl,
         };
     }
   };
@@ -156,6 +156,13 @@ export function Card({
           borderColor: 'transparent',
           titleColor: theme.colors.text,
           badgeColor: theme.colors.primary,
+        };
+      case 'white':
+        return {
+          backgroundColor: theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.15)',
+          borderColor: theme.isDark ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.3)',
+          titleColor: '#FFFFFF',
+          badgeColor: '#FFFFFF',
         };
       default:
         return {
@@ -293,8 +300,8 @@ export function Card({
         flex: 1,
       }, {}, isRTL),
       headerIcon: {
-        ...margin.marginEnd(8),
-        marginTop: 2,
+        ...margin.marginEnd(6),
+        marginTop: 7,
       },
       headerRight: {
         ...createRTLStyle({
@@ -335,7 +342,7 @@ export function Card({
             <Icon
               name={headerIcon}
               size={sizeDimensions.iconSize}
-              color={schemeColors.titleColor}
+              color={colorScheme === 'white' ? '#FFFFFF' : schemeColors.titleColor}
               style={dynamicStyles.headerIcon}
             />
           )}
@@ -356,7 +363,7 @@ export function Card({
               <Text
                 variant="body"
                 style={[
-                  { fontSize: sizeDimensions.subtitleSize, color: theme.colors.textSecondary },
+                  { fontSize: sizeDimensions.subtitleSize, color: colorScheme === 'white' ? '#FFFFFF' : theme.colors.textSecondary },
                   styles.subtitle
                 ]}
                 numberOfLines={3}

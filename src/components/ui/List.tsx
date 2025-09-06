@@ -47,6 +47,7 @@ interface ListItemProps extends TouchableOpacityProps {
   rightIcon?: IconName;
   iconSize?: number;
   iconBackground?: string;
+  leftIconPadding?: number;
   leftAvatar?: {
     source?: any;
     title?: string;
@@ -170,6 +171,7 @@ export function ListItem({
   rightIcon,
   iconSize = 20,
   iconBackground,
+  leftIconPadding,
   leftAvatar,
   rightContent,
   badge,
@@ -311,9 +313,10 @@ export function ListItem({
 
     if (leftIcon) {
       const margin = getRTLMargin(isRTL);
+      const iconPadding = leftIconPadding !== undefined ? leftIconPadding : theme.sizes.sm;
       return (
         <View style={[
-          margin.marginEnd(theme.sizes.md),
+          margin.marginEnd(iconPadding),
           {
             justifyContent: 'center',
             alignItems: 'center',
