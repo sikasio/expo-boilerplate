@@ -67,7 +67,7 @@ export function Card({
   subtitle,
   headerIcon,
   headerActions,
-  headerSpacing = 'medium',
+  headerSpacing = 'small',
   headerBorder = false,
   footer,
   actions,
