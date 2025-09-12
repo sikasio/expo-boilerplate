@@ -8,17 +8,15 @@ import {
   Animated,
   ImageSourcePropType,
   ImageBackground,
+  Image,
   StatusBar,
-  Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Text } from '@/components/ui/Text';
 import { Button } from '@/components/ui/Button';
 import { Icon, IconName } from '@/components/ui/Icon';
-import { Avatar } from '@/components/ui/Avatar';
-import { Card } from '@/components/ui/Card';
-import { AppConfig } from '@/config/app';
+import { MiniView } from '@/components/ui';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -79,7 +77,7 @@ export function OnboardingScreen({
 }: OnboardingScreenProps) {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  
+
   // Early return if no slides provided
   if (!slides || slides.length === 0) {
     return (
@@ -253,7 +251,7 @@ export function OnboardingScreen({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: theme.sizes.lg,
+        paddingBottom: theme.sizes.xxl,
       }}>
         {slides.map((_, index) => (
           <TouchableOpacity
@@ -286,7 +284,7 @@ export function OnboardingScreen({
           width: screenWidth,
           flex: 1,
           paddingHorizontal: theme.sizes.lg,
-          paddingVertical: theme.sizes.xl,
+          paddingTop: theme.sizes.xl,
           justifyContent: 'center',
           alignItems: 'center',
         }}
@@ -317,7 +315,22 @@ export function OnboardingScreen({
           ]}
         >
           {/* Icon/Image */}
-          {slide.icon && (
+          {slide.image ? (
+            <View style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: theme.sizes.xl,
+            }}>
+              <Image
+                source={slide.image}
+                style={{
+                  width: 120,
+                  height: 120,
+                }}
+                resizeMode="contain"
+              />
+            </View>
+          ) : slide.icon ? (
             <View style={{
               width: 120,
               height: 120,
@@ -338,18 +351,14 @@ export function OnboardingScreen({
                 color={theme.colors.primary}
               />
             </View>
-          )}
+          ) : null}
 
           {/* Title */}
           <Text
             variant="title"
             style={{
-              fontSize: theme.fontSizes.xxl + 4,
-              fontWeight: '700',
-              color: slide.textColor || theme.colors.text,
-              textAlign: 'center',
+              fontSize: theme.fontSizes.xxl + 2,
               marginBottom: theme.sizes.sm,
-              letterSpacing: -0.5,
             }}
           >
             {slide.title}
@@ -360,11 +369,8 @@ export function OnboardingScreen({
             <Text
               variant="subtitle"
               style={{
-                fontSize: theme.fontSizes.lg,
                 color: theme.colors.primary,
-                textAlign: 'center',
                 marginBottom: theme.sizes.md,
-                fontWeight: '600',
               }}
             >
               {slide.subtitle}
@@ -375,10 +381,9 @@ export function OnboardingScreen({
           <Text
             variant="body"
             style={{
-              fontSize: theme.fontSizes.md,
               color: slide.textColor || theme.colors.textSecondary,
               textAlign: 'center',
-              lineHeight: theme.fontSizes.md * 1.6,
+              lineHeight: theme.fontSizes.md * 1.5,
               marginBottom: theme.sizes.xl,
               paddingHorizontal: theme.sizes.sm,
             }}
@@ -390,15 +395,15 @@ export function OnboardingScreen({
           {slide.features && slide.features.length > 0 && (
             <View style={{
               width: '100%',
-              marginBottom: theme.sizes.xl,
+              marginBottom: theme.sizes.md,
             }}>
               {slide.features.map((feature, featureIndex) => (
-                <View
+                <MiniView enableRTL
                   key={featureIndex}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    paddingVertical: theme.sizes.sm,
+                    paddingVertical: theme.sizes.xs,
                     paddingHorizontal: theme.sizes.md,
                   }}
                 >
@@ -406,7 +411,7 @@ export function OnboardingScreen({
                     name="checkmark-circle"
                     size={20}
                     color={theme.colors.success}
-                    style={{ marginRight: theme.sizes.sm }}
+                    style={{ marginHorizontal: theme.sizes.sm }}
                   />
                   <Text
                     style={{
@@ -416,7 +421,7 @@ export function OnboardingScreen({
                   >
                     {feature}
                   </Text>
-                </View>
+                </MiniView>
               ))}
             </View>
           )}
@@ -434,61 +439,65 @@ export function OnboardingScreen({
         paddingBottom: Math.max(insets.bottom, theme.sizes.md),
         paddingTop: theme.sizes.md,
       }}>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-          {/* Skip Button */}
-          {showSkipButton && !isLastSlide && (
+        {/* Conditional Layout: Centered for Last Slide, Row Layout for Others */}
+        {isLastSlide ? (
+          // Last slide: Centered button layout (no skip button)
+          <View style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
             <Button
-              title={skipButtonText}
-              variant="ghost"
-              size="medium"
-              onPress={handleSkip}
-              textStyle={{
-                color: theme.colors.textSecondary,
-                fontWeight: '500',
-              }}
-            />
-          )}
-
-          {/* Spacer when skip is hidden */}
-          {(!showSkipButton || isLastSlide) && <View style={{ flex: 1 }} />}
-
-          {/* Navigation Buttons */}
-          <View style={{ flexDirection: 'row', gap: theme.sizes.sm }}>
-            {/* Previous Button */}
-            {currentIndex > 0 && (
-              <Button
-                variant="outline"
-                size="medium"
-                leftIcon="chevron-back-outline"
-                onPress={goToPrevious}
-                style={{
-                  minWidth: 60,
-                }}
-              />
-            )}
-
-            {/* Next/Done Button */}
-            <Button
-              title={isLastSlide ? doneButtonText : nextButtonText}
+              title={doneButtonText}
               variant="primary"
               size="medium"
-              rightIcon={isLastSlide ? 'checkmark-outline' : 'chevron-forward-outline'}
-              onPress={isLastSlide ? handleComplete : goToNext}
+              rightIcon="checkmark-outline"
+              onPress={handleComplete}
               style={{
-                minWidth: 120,
-                ...(isLastSlide && {
-                  backgroundColor: theme.colors.success,
-                  borderColor: theme.colors.success,
-                }),
+                minWidth: 160,
+                backgroundColor: theme.colors.success,
+                borderColor: theme.colors.success,
               }}
               disabled={isAnimating}
             />
           </View>
-        </View>
+        ) : (
+          // Other slides: Original row layout
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+            {/* Skip Button */}
+            {showSkipButton && (
+              <Button
+                title={skipButtonText}
+                variant="ghost"
+                size="medium"
+                onPress={handleSkip}
+                textStyle={{
+                  color: theme.colors.textSecondary,
+                  fontWeight: '500',
+                }}
+              />
+            )}
+
+            {/* Spacer when skip is hidden */}
+            {!showSkipButton && <View style={{ flex: 1 }} />}
+
+            {/* Next Button */}
+            <Button
+              title={nextButtonText}
+              variant="primary"
+              size="medium"
+              rightIcon="chevron-forward-outline"
+              onPress={goToNext}
+              style={{
+                minWidth: 120,
+              }}
+              disabled={isAnimating}
+            />
+          </View>
+        )}
       </View>
     );
   };
@@ -539,6 +548,41 @@ export function OnboardingScreen({
 
       <View style={{ flex: 1 }}>
         {renderProgressBar()}
+
+        {/* Top Back Button */}
+        {currentIndex > 0 && (
+          <View style={{
+            position: 'absolute',
+            top: insets.top + theme.sizes.sm,
+            left: theme.sizes.md,
+            zIndex: 100,
+          }}>
+            <TouchableOpacity
+              onPress={goToPrevious}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: theme.colors.surface + 'CC',
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: theme.colors.text,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 4,
+                elevation: 4,
+              }}
+              disabled={isAnimating}
+              activeOpacity={0.7}
+            >
+              <Icon
+                name="chevron-back-outline"
+                size={24}
+                color={theme.colors.text}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
 
         <ScrollView
           ref={scrollViewRef}

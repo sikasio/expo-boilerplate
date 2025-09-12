@@ -183,8 +183,8 @@ export function HorizontalCardScroll({
     return variant === 'hero' ? 20 : 16;
   };
 
-  const finalCardWidth = getDefaultCardWidth();
-  const finalCardHeight = getDefaultCardHeight();
+  const finalCardWidth = cardWidth || getDefaultCardWidth();
+  const finalCardHeight = cardHeight || getDefaultCardHeight();
   const finalSpacing = getDefaultSpacing();
   const finalContentPadding = getDefaultContentPadding();
 
