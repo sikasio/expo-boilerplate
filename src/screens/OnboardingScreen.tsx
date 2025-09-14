@@ -489,7 +489,7 @@ export function OnboardingScreen({
               title={nextButtonText}
               variant="primary"
               size="medium"
-              rightIcon="chevron-forward-outline"
+              leftIcon="chevron-back-outline"
               onPress={goToNext}
               style={{
                 minWidth: 120,
@@ -562,15 +562,12 @@ export function OnboardingScreen({
               style={{
                 width: 44,
                 height: 44,
-                borderRadius: 22,
+                borderRadius: theme.borderRadius.sm,
                 backgroundColor: theme.colors.surface + 'CC',
                 justifyContent: 'center',
                 alignItems: 'center',
-                shadowColor: theme.colors.text,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 4,
-                elevation: 4,
+                borderWidth: 1,
+                borderColor: theme.colors.border,
               }}
               disabled={isAnimating}
               activeOpacity={0.7}

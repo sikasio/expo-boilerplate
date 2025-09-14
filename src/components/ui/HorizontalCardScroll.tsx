@@ -579,7 +579,7 @@ export function HorizontalCardScroll({
           <View style={{ flex: 1 }}>
             {title && (
               <Text variant="subtitle" style={{
-                fontWeight: '600',
+                fontSize: theme.fontSizes.lg,
                 marginBottom: subtitle ? theme.sizes.xs : 0,
               }}>
                 {title}

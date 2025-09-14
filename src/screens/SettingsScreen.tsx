@@ -248,7 +248,7 @@ export function SettingsScreen({
 }: SettingsScreenProps) {
   const { theme, toggleTheme } = useTheme();
   const { logout } = useAuth();
-  const { fontSize, setFontSize, fontSizes } = useFont();
+  const { fontSize, setFontSize } = useFont();
   const insets = useSafeAreaInsets();
 
   // Merge default content with provided content
@@ -826,7 +826,7 @@ export function SettingsScreen({
                 }}>
                   <Text style={{
                     color: theme.colors.warning,
-                    fontSize: fontSizes.xs,
+                    fontSize: theme.fontSizes.xs,
                     fontWeight: '600',
                   }}>
                     PRO
@@ -840,7 +840,7 @@ export function SettingsScreen({
             </Text>
 
             {user.memberSince && (
-              <Text variant="caption" style={{ color: colors.textSecondary, fontSize: fontSizes.xs }}>
+              <Text variant="caption" style={{ color: colors.textSecondary, fontSize: theme.fontSizes.xs }}>
                 {mergedContent.memberSince} {user.memberSince.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' })}
               </Text>
             )}
@@ -920,7 +920,7 @@ export function SettingsScreen({
               </View>
               <Text variant="caption" style={{
                 color: colors.text,
-                fontSize: fontSizes.xs,
+                fontSize: theme.fontSizes.xs,
                 textAlign: 'center',
               }}>
                 {action.title}
@@ -953,7 +953,7 @@ export function SettingsScreen({
           return (
             <Text style={{
               color: colors.textSecondary,
-              fontSize: fontSizes.xs,
+              fontSize: theme.fontSizes.xs,
             }}>
               {selectedOption?.label || String(item.value)}
             </Text>
@@ -962,7 +962,7 @@ export function SettingsScreen({
           return (
             <Text style={{
               color: colors.textSecondary,
-              fontSize: fontSizes.xs,
+              fontSize: theme.fontSizes.xs,
             }}>
               {String(item.value)}
             </Text>
@@ -971,7 +971,7 @@ export function SettingsScreen({
           return item.value ? (
             <Text style={{
               color: colors.textSecondary,
-              fontSize: fontSizes.xs,
+              fontSize: theme.fontSizes.xs,
             }}>
               {String(item.value)}
             </Text>
@@ -993,12 +993,12 @@ export function SettingsScreen({
         onPress={!isDisabled ? item.onPress : undefined}
         disabled={isDisabled}
         titleStyle={{
-          fontSize: fontSizes.sm,
+          fontSize: theme.fontSizes.sm,
           color: item.destructive ? theme.colors.error : (item.color || colors.text),
           fontWeight: '500',
         }}
         subtitleStyle={{
-          fontSize: fontSizes.xs,
+          fontSize: theme.fontSizes.xs,
           color: colors.textSecondary,
         }}
         itemStyle={{
@@ -1021,12 +1021,12 @@ export function SettingsScreen({
             subtitle={section.subtitle}
             titleStyle={{
               fontWeight: '600',
-              fontSize: fontSizes.lg,
+              fontSize: theme.fontSizes.lg,
               color: theme.colors.primary,
             }}
             subtitleStyle={{
               color: colors.textSecondary,
-              fontSize: fontSizes.sm,
+              fontSize: theme.fontSizes.sm,
             }}
           >
             {section.items.map((item) => (
