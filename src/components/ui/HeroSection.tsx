@@ -222,22 +222,6 @@ export function HeroSection({
   const dimensions = getSizeDimensions();
   const colors = getColorScheme();
 
-  // General spacing helper function
-  const getSpacing = (spacingValue: 'none' | 'xs' | 'sm' | 'md' | 'lg' | number | undefined, defaultValue: 'xs' | 'sm' | 'md' | 'lg' = 'xs') => {
-    if (spacingValue === 'none') return 0;
-    if (typeof spacingValue === 'number') return spacingValue;
-
-    const value = spacingValue || defaultValue;
-
-    switch (value) {
-      case 'xs': return theme.sizes.xs;
-      case 'sm': return theme.sizes.sm;
-      case 'md': return theme.sizes.md;
-      case 'lg': return theme.sizes.lg;
-      default: return theme.sizes.xs;
-    }
-  };
-
   const getStatusBarHeight = () => {
     if (Platform.OS === 'android') {
       return StatusBar.currentHeight || 0;
