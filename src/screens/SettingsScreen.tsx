@@ -8,6 +8,7 @@ import {
   RefreshControl,
   StatusBar,
   ViewStyle,
+  Image,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -131,6 +132,15 @@ interface SettingsScreenContent {
   memberSince?: string;
 }
 
+interface FooterConfig {
+  show?: boolean;
+  logo?: any; // Image source
+  companyName?: string;
+  description?: string;
+  websiteUrl?: string;
+  copyrightYear?: number;
+}
+
 export interface SettingsScreenProps {
   layout?: SettingsScreenLayout;
   theme?: SettingsScreenTheme;
@@ -138,11 +148,16 @@ export interface SettingsScreenProps {
   showUserSection?: boolean;
   showQuickActions?: boolean;
   showSearchBar?: boolean;
+  showAnimatedHeader?: boolean; // Option to show/hide animated header
   enableRefresh?: boolean;
+  useSafeArea?: boolean; // Control whether to use SafeAreaView
+  contentBottomPadding?: number; // Control bottom padding of scroll content
   customSections?: SettingSection[];
   visibleSections?: string[]; // Filter which sections to show by their IDs
   hiddenItems?: string[]; // Hide specific items by their IDs across all sections
   content?: SettingsScreenContent;
+  customItemStyle?: ViewStyle; // Custom style for list items
+  footer?: FooterConfig; // Footer configuration
   onUserPress?: () => void;
   onSearchPress?: () => void;
   onLogout?: () => void;
@@ -234,11 +249,16 @@ export function SettingsScreen({
   showUserSection = true,
   showQuickActions = true,
   showSearchBar = false,
+  showAnimatedHeader = true,
   enableRefresh = true,
+  useSafeArea = true,
+  contentBottomPadding = 90,
   customSections,
   visibleSections,
   hiddenItems,
   content,
+  customItemStyle,
+  footer,
   onUserPress,
   onSearchPress,
   onLogout,
@@ -1004,7 +1024,63 @@ export function SettingsScreen({
         itemStyle={{
           paddingVertical: theme.sizes.md,
           opacity: isDisabled ? 0.5 : 1,
+          ...customItemStyle,
         }}
+      />
+    );
+  };
+
+  // Render footer
+  const renderFooter = () => {
+    if (!footer?.show) return null;
+
+    return (
+      <Card
+        colorScheme="ghost"
+        padding="none"
+        style={{
+          alignItems: 'center',
+          marginTop: theme.sizes.sm,
+        }}
+        footer={
+          <View style={{
+            alignItems: 'center',
+            width: '100%',
+          }}>
+            {footer.logo && (
+              <Image
+                source={footer.logo}
+                style={{
+                  width: 50,
+                  height: 50,
+                  marginBottom: theme.sizes.sm,
+                  opacity: 0.8,
+                }}
+                resizeMode="contain"
+              />
+            )}
+            {footer.companyName && (
+              <Text variant="caption" style={{
+                marginBottom: theme.sizes.xs,
+              }}>
+                مطور بواسطة {footer.websiteUrl || footer.companyName}
+              </Text>
+            )}
+            {footer.description && (
+              <Text variant="caption" style={{
+                opacity: 0.7,
+                marginBottom: theme.sizes.xs,
+              }}>
+                {footer.description}
+              </Text>
+            )}
+            <Text variant="caption" style={{
+              opacity: 0.6,
+            }}>
+              © {footer.copyrightYear || new Date().getFullYear()} جميع الحقوق محفوظة
+            </Text>
+          </View>
+        }
       />
     );
   };
@@ -1014,7 +1090,7 @@ export function SettingsScreen({
     <View>
       {sections.map((section, sectionIndex) => (
         <List key={section.id} variant="default" showDividers={true} dividerVariant="full"
-          style={{ marginBottom: theme.sizes.lg, backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md }}
+          style={{ marginBottom: theme.sizes.md, backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, paddingBottom: theme.sizes.md }}
         >
           <ListSection
             title={section.title}
@@ -1028,6 +1104,9 @@ export function SettingsScreen({
               color: colors.textSecondary,
               fontSize: theme.fontSizes.sm,
             }}
+            headerStyle={{
+              paddingBottom: theme.sizes.md,
+            }}
           >
             {section.items.map((item) => (
               <React.Fragment key={item.id}>
@@ -1040,12 +1119,19 @@ export function SettingsScreen({
     </View>
   );
 
+  const Container = useSafeArea ? SafeAreaView : View;
+
   return (
-    <SafeAreaView
+    <Container
       style={[
         {
           flex: 1,
           backgroundColor: colors.background,
+          // Always add margins when not using SafeAreaView
+          ...(!useSafeArea ? {
+            marginTop: theme.sizes.md,
+            marginBottom: 0,
+          } : {}),
         },
         style
       ]}
@@ -1056,12 +1142,12 @@ export function SettingsScreen({
         backgroundColor={colors.background}
       />
 
-      {renderAnimatedHeader()}
+      {showAnimatedHeader && renderAnimatedHeader()}
 
       <Animated.ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
-          paddingBottom: 90, // Extra padding to prevent overlay with bottom tabs
+          paddingBottom: contentBottomPadding, // Configurable bottom padding
         }}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -1083,7 +1169,8 @@ export function SettingsScreen({
         {renderUserSection()}
         {renderQuickActions()}
         {renderSettingsSections()}
+        {renderFooter()}
       </Animated.ScrollView>
-    </SafeAreaView>
+    </Container>
   );
 }
