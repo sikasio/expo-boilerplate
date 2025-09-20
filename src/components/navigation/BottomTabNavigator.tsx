@@ -122,7 +122,10 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
               paddingHorizontal: 6,
               paddingVertical: dimensions.paddingTop,
               justifyContent: 'center',
-              ...(theme.isDark ? {} : {
+              ...(theme.isDark ? {
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+              } : {
                 shadowColor: theme.colors.text,
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.2,

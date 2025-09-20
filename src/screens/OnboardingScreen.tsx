@@ -43,6 +43,8 @@ export interface OnboardingScreenProps {
   autoPlayInterval?: number;
   backgroundImage?: ImageSourcePropType;
   overlayOpacity?: number;
+  imageWidth?: number;
+  imageHeight?: number;
   onComplete?: () => void;
   onSkip?: () => void;
   onSlideChange?: (index: number) => void;
@@ -65,6 +67,8 @@ export function OnboardingScreen({
   autoPlayInterval = 5000,
   backgroundImage,
   overlayOpacity = 0.3,
+  imageWidth = 140,
+  imageHeight = 140,
   onComplete,
   onSkip,
   onSlideChange,
@@ -324,8 +328,8 @@ export function OnboardingScreen({
               <Image
                 source={slide.image}
                 style={{
-                  width: 120,
-                  height: 120,
+                  width: slide.id === 'welcome' ? 140 : imageWidth,
+                  height: slide.id === 'welcome' ? 140 : imageHeight,
                 }}
                 resizeMode="contain"
               />
