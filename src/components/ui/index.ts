@@ -38,6 +38,7 @@ export { LazyImage } from './LazyImage';
 export { GallerySlider } from './GallerySlider';
 export { StarRating } from './StarRating';
 export { Switch } from './Switch';
+export { NetworkConnectivityBar } from './NetworkConnectivityBar';
 export { CountdownTimer } from './CountdownTimer';
 export type { CountdownTimerVariant, CountdownTimerSize, CountdownTimerColorScheme } from './CountdownTimer';
 export { 
