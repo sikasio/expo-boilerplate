@@ -166,9 +166,9 @@ export const DEFAULT_APP_FONT_CONFIGS: Record<string, AppFontConfig> = {
   },
   CashFlow: {
     appId: 'CashFlow',
-    fontFamily: 'system',
+    fontFamily: 'zain',
     baseSize: 16,
-    lineHeightMultiplier: 1.4,
+    lineHeightMultiplier: 1.6, // Better for Arabic text
   },
 };
 
