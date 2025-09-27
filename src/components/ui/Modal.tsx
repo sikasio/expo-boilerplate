@@ -328,7 +328,7 @@ export const Modal: React.FC<ModalProps> = ({
           {headerIcon && (
             <View style={[
               styles.headerIcon,
-              { 
+              {
                 backgroundColor: theme.colors.primary + '20',
                 ...getRTLMargin(isRTL).marginEnd(12),
               }
@@ -373,7 +373,7 @@ export const Modal: React.FC<ModalProps> = ({
                 onPress={handleClose}
                 style={[
                   styles.closeButton,
-                  { 
+                  {
                     backgroundColor: theme.colors.background,
                     ...getRTLMargin(isRTL).marginStart(8),
                   }
@@ -503,10 +503,12 @@ export const Modal: React.FC<ModalProps> = ({
               width: dimensions.width,
               height: size === 'fullscreen' ? dimensions.height : undefined,
               maxHeight: size === 'fullscreen' ? undefined : dimensions.maxHeight,
-              shadowColor: theme.colors.text,
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.25,
-              shadowRadius: 20,
+              // shadowColor: theme.colors.text,
+              // shadowOffset: { width: 0, height: 10 },
+              // shadowOpacity: 0.25,
+              // shadowRadius: 20,
+              borderColor: theme.colors.border,
+              borderWidth: 1,
               elevation: 10,
             },
             getVariantStyles(),
