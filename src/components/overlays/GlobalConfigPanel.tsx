@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from 'react-native';
+import { StorageClearingService } from '@/services/storageClearingService';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRTL } from '@/contexts/RTLContext';
@@ -104,21 +105,21 @@ export function GlobalConfigPanel({
           onPress: async () => {
             const appDefaults = getCurrentAppDefaults();
             console.log('Resetting to app defaults:', appDefaults);
-            
+
             // Reset color scheme
             setColorScheme(appDefaults.theme.colorScheme);
-            
+
             // Reset theme mode - use setThemeMode directly instead of toggle
             setThemeMode(appDefaults.theme.mode);
-            
+
             // Reset RTL setting
             if (appDefaults.rtl.enabled !== isRTL) {
               await toggleRTL();
             }
-            
+
             setIsMenuOpen(false);
             setTimeout(() => slideOut(), 300);
-            
+
             // Show confirmation with current app name
             const currentApp = getCurrentApp();
             Alert.alert('Reset Complete', `Settings have been reset to defaults for ${currentApp}:\n• Theme: ${appDefaults.theme.mode}\n• Colors: ${appDefaults.theme.colorScheme}\n• RTL: ${appDefaults.rtl.enabled ? 'Enabled' : 'Disabled'}`);
@@ -126,6 +127,25 @@ export function GlobalConfigPanel({
         }
       ]
     );
+  };
+
+
+  const handleClearAllAppData = () => {
+    StorageClearingService.showClearingDialog({
+      onComplete: (result, method) => {
+        // Close menu after clearing
+        setIsMenuOpen(false);
+        setTimeout(() => slideOut(), 300);
+
+        // Log the result for debugging
+        console.log(`${method} clear completed:`, result);
+      },
+      onCancel: () => {
+        // Just close the menu if user cancels
+        setIsMenuOpen(false);
+        setTimeout(() => slideOut(), 300);
+      }
+    });
   };
 
   // Prepare font family options
@@ -211,6 +231,15 @@ export function GlobalConfigPanel({
       type: 'toggle',
       value: false,
       onPress: handleResetToDefaults,
+    },
+    {
+      id: 'clear-app-data',
+      label: 'Clear All App Data & Cache',
+      icon: 'trash-outline',
+      description: 'Smart or nuclear clear of all app storage and cache',
+      type: 'toggle',
+      value: false,
+      onPress: handleClearAllAppData,
     },
   ];
 
@@ -439,6 +468,22 @@ export function GlobalConfigPanel({
                     >
                       <Text style={{ color: theme.colors.primary, fontSize: 12, fontWeight: '600' }}>
                         Reset
+                      </Text>
+                    </TouchableOpacity>
+                  ) : option.id === 'clear-app-data' ? (
+                    <TouchableOpacity
+                      onPress={option.onPress}
+                      style={{
+                        backgroundColor: '#FF453A15',
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 6,
+                        borderWidth: 1,
+                        borderColor: '#FF453A'
+                      }}
+                    >
+                      <Text style={{ color: '#FF453A', fontSize: 12, fontWeight: '600' }}>
+                        Clear Data
                       </Text>
                     </TouchableOpacity>
                   ) : (

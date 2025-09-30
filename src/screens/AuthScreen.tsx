@@ -567,7 +567,7 @@ export function AuthScreen({
         // Check if email should be required for registration
         const isEmailRequiredForReg = registrationFieldRequirements?.emailRequired !== false; // Default: true
         const isEmailOptional = variant === 'register' && !isEmailRequiredForReg;
-        
+
         if (!isEmailOptional) {
           rules.required = 'Email is required';
         }
@@ -606,7 +606,7 @@ export function AuthScreen({
       case 'phone':
         // Check if phone should be required for registration
         const isPhoneRequiredForReg = registrationFieldRequirements?.phoneRequired === true; // Default: false
-        
+
         // Phone is required based on variant and specific configuration
         if (variant === 'forgot-password-whatsapp') {
           rules.required = 'WhatsApp number is required';
@@ -896,6 +896,7 @@ export function AuthScreen({
               fontWeight: '700',
               color: variant === 'account-created-successfully' ? '#22C55E' : colors.text,
               textAlign: layout === 'centered' ? 'center' : 'left',
+              lineHeight : theme.fontSizes.xxl * 1.4,
               marginBottom: theme.sizes.sm,
               ...(variant === 'account-created-successfully' && {
                 fontSize: theme.fontSizes.xxl + 4,
