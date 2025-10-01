@@ -11,6 +11,7 @@ import {
   ScrollView,
   Platform,
   Easing,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -405,6 +406,7 @@ export const Modal: React.FC<ModalProps> = ({
           style={[styles.scrollContent, { maxHeight: dimensions.maxHeight - 200 }]}
           contentContainerStyle={contentStyle}
           showsVerticalScrollIndicator={true}
+          keyboardShouldPersistTaps="handled"
           {...scrollViewProps}
         >
           {children}
@@ -493,7 +495,11 @@ export const Modal: React.FC<ModalProps> = ({
       </TouchableWithoutFeedback>
 
       {/* Modal Container */}
-      <View style={[styles.container, getPositionStyle()]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={[styles.container, getPositionStyle()]}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
         <Animated.View
           style={[
             styles.modal,
@@ -519,7 +525,7 @@ export const Modal: React.FC<ModalProps> = ({
           {renderContent()}
           {renderFooter()}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </RNModal>
   );
 };

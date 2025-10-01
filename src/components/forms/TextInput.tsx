@@ -92,7 +92,7 @@ export function TextInput({
       borderRadius: theme.borderRadius.sm,
       backgroundColor: theme.colors.surface,
       flexDirection: getFlexDirection(isRTL),
-      alignItems: 'center' as const,
+      alignItems: props.multiline ? ('flex-start' as const) : ('center' as const),
       minHeight: theme.sizes.xxl, // Use theme size instead of hardcoded 48
     };
 
