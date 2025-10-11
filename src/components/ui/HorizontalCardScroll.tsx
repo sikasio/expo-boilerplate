@@ -588,6 +588,7 @@ export function HorizontalCardScroll({
             {subtitle && (
               <Text variant="body" style={{
                 color: theme.colors.textSecondary,
+                marginBottom: -theme.sizes.sm - 2
               }}>
                 {subtitle}
               </Text>
