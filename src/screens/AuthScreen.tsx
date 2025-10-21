@@ -12,10 +12,13 @@ import {
   Animated,
   Easing,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRTL } from '@/contexts/RTLContext';
+import { getFlexDirection, getTextAlign } from '@/utils';
 import { Text } from '@/components/ui/Text';
 import { Button } from '@/components/ui/Button';
 import { TextInput } from '@/components/forms/TextInput';
@@ -145,6 +148,10 @@ export interface AuthScreenProps {
   showRememberMe?: boolean;
   showForgotPassword?: boolean;
   showTermsCheckbox?: boolean;
+  termsUrl?: string; // URL to open when terms text is clicked
+  onTermsPress?: () => void; // Custom handler for terms press (overrides default URL opening)
+  termsLinkText?: string; // The clickable part of the terms text (defaults to last part of termsLabel)
+  termsPrefix?: string; // Text before the link (defaults to first part of termsLabel)
   enableBiometric?: boolean;
 
   // Conditional Input Visibility
@@ -199,6 +206,9 @@ export interface AuthScreenProps {
   testID?: string;
   accessible?: boolean;
 
+  // Custom Fields
+  customFields?: React.ReactNode; // Additional custom form fields to insert after standard fields
+
   // Style overrides
   style?: ViewStyle;
   contentStyle?: ViewStyle;
@@ -226,6 +236,10 @@ export function AuthScreen({
   showRememberMe = true,
   showForgotPassword = true,
   showTermsCheckbox = false,
+  termsUrl,
+  onTermsPress,
+  termsLinkText,
+  termsPrefix,
   enableBiometric = false,
   conditionalInputs,
   verificationContact,
@@ -249,11 +263,13 @@ export function AuthScreen({
   animationDuration = 600,
   testID,
   accessible = true,
+  customFields,
   style,
   contentStyle,
   formStyle,
 }: AuthScreenProps) {
   const { theme } = useTheme();
+  const { isRTL } = useRTL();
   const insets = useSafeAreaInsets();
 
   // Animation values
@@ -1132,7 +1148,7 @@ export function AuthScreen({
     if (variant === 'forgot-password' || variant === 'verification' || variant === 'account-review' || variant === 'account-suspended' || variant === 'account-created-successfully') return null;
 
     return (
-      <View style={{ marginBottom: theme.sizes.lg }}>
+      <View style={{ marginBottom: theme.sizes.lg, marginTop: theme.sizes.md }}>
         {showRememberMe && ['login-email', 'login-phone'].includes(variant) && (
           <Checkbox
             label={inputLabels.rememberMeLabel || "Remember me"}
@@ -1144,14 +1160,48 @@ export function AuthScreen({
 
         {showTermsCheckbox && variant === 'register' && (
           <Checkbox
-            label={inputLabels.termsLabel || "I agree to the Terms of Service and Privacy Policy"}
+            label={
+              (termsUrl || onTermsPress) ? (
+                <View style={{ flexDirection: getFlexDirection(isRTL), alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.sm,
+                      color: theme.colors.text,
+                      fontWeight: '500',
+                      textAlign: getTextAlign(isRTL),
+                    }}
+                  >
+                    {termsPrefix || (inputLabels.termsLabel?.split(' ').slice(0, 2).join(' ')) || 'I agree to'}{' '}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (onTermsPress) {
+                        onTermsPress();
+                      } else if (termsUrl) {
+                        Linking.openURL(termsUrl);
+                      }
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: theme.fontSizes.sm,
+                        color: theme.colors.primary,
+                        textDecorationLine: 'underline',
+                        fontWeight: '500',
+                        textAlign: getTextAlign(isRTL),
+                      }}
+                    >
+                      {termsLinkText || (inputLabels.termsLabel?.split(' ').slice(2).join(' ')) || 'Terms of Service and Privacy Policy'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                inputLabels.termsLabel || "I agree to the Terms of Service and Privacy Policy"
+              )
+            }
             checked={agreeToTerms}
             onPress={() => setAgreeToTerms(!agreeToTerms)}
             style={{ marginBottom: theme.sizes.sm }}
-            labelStyle={{
-              fontSize: theme.fontSizes.sm,
-              lineHeight: theme.fontSizes.sm * 1.4,
-            }}
           />
         )}
 
@@ -1490,6 +1540,7 @@ export function AuthScreen({
 
         <View>
           {renderFormFields()}
+          {customFields}
           {renderFormOptions()}
 
           <Button

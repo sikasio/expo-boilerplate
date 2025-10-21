@@ -19,7 +19,7 @@ export type CheckboxSize = 'small' | 'medium' | 'large';
 interface CheckboxProps extends Omit<TouchableOpacityProps, 'onPress'> {
   checked?: boolean;
   indeterminate?: boolean;
-  label?: string;
+  label?: string | React.ReactNode;
   description?: string;
   variant?: CheckboxVariant;
   size?: CheckboxSize;
@@ -242,16 +242,22 @@ export function Checkbox({
 
   const renderContent = () => {
     if (!label && !description) return null;
-    
+
     const margin = getRTLMargin(isRTL);
 
     return (
       <View style={[{ flex: 1 }, margin.marginStart(sizeConfig.spacing)]}>
         {label && (
           <View style={{ flexDirection: getFlexDirection(isRTL), alignItems: 'center' }}>
-            <Text style={getLabelStyle()}>
-              {label}
-            </Text>
+            {typeof label === 'string' ? (
+              <Text style={getLabelStyle()}>
+                {label}
+              </Text>
+            ) : (
+              <View style={{ flex: 1 }}>
+                {label}
+              </View>
+            )}
             {required && (
               <Text style={[{ color: theme.colors.error }, margin.marginStart(2)]}>
                 *
