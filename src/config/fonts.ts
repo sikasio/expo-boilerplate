@@ -170,6 +170,12 @@ export const DEFAULT_APP_FONT_CONFIGS: Record<string, AppFontConfig> = {
     baseSize: 16,
     lineHeightMultiplier: 1.6, // Better for Arabic text
   },
+  EchoNote: {
+    appId: 'EchoNote',
+    fontFamily: 'system',
+    baseSize: 16,
+    lineHeightMultiplier: 1.4, // Standard line height for system font
+  },
 };
 
 // Utility to get font style object

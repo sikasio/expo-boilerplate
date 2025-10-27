@@ -12,6 +12,7 @@ import { APP_DEFAULTS as TILAWAH_CONFIG } from '../../apps/TilawahConnect/_confi
 import { APP_DEFAULTS as AUDIOBOOKS_CONFIG } from '../../apps/audiobooks/_config/appConfig';
 import { APP_DEFAULTS as ECOMMERCE_CONFIG } from '../../apps/eCommerce-v1/_config/appConfig';
 import { APP_DEFAULTS as CASHFLOW_CONFIG } from '../../apps/CashFlow/_config/appConfig';
+import { APP_DEFAULTS as ECHONOTE_CONFIG } from '../../apps/EchoNote/_config/appConfig';
 
 export interface AppDefaults {
   theme: {
@@ -32,6 +33,7 @@ const APP_CONFIG_MAP: Record<string, AppDefaults> = {
   'audiobooks': AUDIOBOOKS_CONFIG,
   'eCommerce-v1': ECOMMERCE_CONFIG,
   'CashFlow': CASHFLOW_CONFIG,
+  'EchoNote': ECHONOTE_CONFIG,
 };
 
 /**
