@@ -12,6 +12,7 @@ export function ThemeToast() {
         style={{
           borderLeftColor: theme.colors.success,
           backgroundColor: theme.colors.surface,
+          borderLeftWidth: 5,
         }}
         contentContainerStyle={{ paddingHorizontal: 15 }}
         text1Style={{
@@ -31,6 +32,7 @@ export function ThemeToast() {
         style={{
           borderLeftColor: theme.colors.error,
           backgroundColor: theme.colors.surface,
+          borderLeftWidth: 5,
         }}
         text1Style={{
           fontSize: theme.fontSizes.md,
@@ -49,6 +51,7 @@ export function ThemeToast() {
         style={{
           borderLeftColor: theme.colors.primary,
           backgroundColor: theme.colors.surface,
+          borderLeftWidth: 5,
         }}
         contentContainerStyle={{ paddingHorizontal: 15 }}
         text1Style={{
@@ -64,5 +67,11 @@ export function ThemeToast() {
     ),
   };
 
-  return <Toast config={toastConfig} />;
+  return (
+    <Toast
+      config={toastConfig}
+      position="bottom"
+      bottomOffset={100}
+    />
+  );
 }

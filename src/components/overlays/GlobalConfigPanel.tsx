@@ -501,7 +501,6 @@ export function GlobalConfigPanel({
                     <ListItem
                       key={option.id}
                       title={option.label}
-                      subtitle={option.description}
                       leftIcon={option.icon}
                       rightContent={rightContent}
                       variant="compact"
@@ -512,7 +511,6 @@ export function GlobalConfigPanel({
                     <React.Fragment key={option.id}>
                       <ListItem
                         title={option.label}
-                        subtitle={option.description}
                         leftIcon={option.icon}
                         variant="compact"
                       />
@@ -574,7 +572,6 @@ export function GlobalConfigPanel({
                     <React.Fragment key={option.id}>
                       <ListItem
                         title={option.label}
-                        subtitle={option.description}
                         leftIcon={option.icon}
                         variant="compact"
                       />
@@ -618,7 +615,6 @@ export function GlobalConfigPanel({
                     <React.Fragment key={option.id}>
                       <ListItem
                         title={option.label}
-                        subtitle={`${option.description} (Current: ${option.value}px)`}
                         leftIcon={option.icon}
                         variant="compact"
                         rightContent={
