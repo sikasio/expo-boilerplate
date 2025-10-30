@@ -1062,6 +1062,8 @@ export function SettingsScreen({
             {footer.companyName && (
               <Text variant="caption" style={{
                 marginBottom: theme.sizes.xs,
+                textAlign: 'right',
+                writingDirection: 'rtl',
               }}>
                 مطور بواسطة {footer.websiteUrl || footer.companyName}
               </Text>
