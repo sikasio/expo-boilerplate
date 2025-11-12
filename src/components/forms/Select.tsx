@@ -65,7 +65,7 @@ export function Select({
   leftIcon,
   variant = 'primary',
   size = 'medium',
-  maxHeight = 500,
+  maxHeight = 600,
   adaptiveHeight = true,
   containerStyle,
   dropdownStyle,
@@ -104,22 +104,22 @@ export function Select({
   // Calculate optimal height for dropdown using theme sizes
   const getOptimalHeight = () => {
     if (!adaptiveHeight) return maxHeight;
-    
+
     const headerHeight = theme.sizes.xxl + theme.sizes.md; // Header with proper spacing
     const searchHeight = searchable ? theme.sizes.xxl + theme.sizes.lg : 0; // Search input with margins
     const footerHeight = multiple ? theme.sizes.xxl + theme.sizes.sm : 0; // Footer for multi-select
     const fixedHeight = headerHeight + searchHeight + footerHeight;
-    
+
     // Calculate item height using theme sizes (padding + content + border)
-    const estimatedItemHeight = theme.sizes.xxl + theme.sizes.md; // Base item height from theme
-    const availableHeight = screenHeight * 0.8 - fixedHeight; // 80% of screen minus fixed elements
+    const estimatedItemHeight = theme.sizes.xxl + theme.sizes.lg; // Increased item height estimate
+    const availableHeight = screenHeight * 0.85 - fixedHeight; // Increased from 80% to 85%
     const calculatedHeight = Math.min(
-      filteredOptions.length * estimatedItemHeight,
+      filteredOptions.length * estimatedItemHeight + theme.sizes.xl, // Added extra padding
       availableHeight,
       maxHeight
     );
-    
-    return Math.max(calculatedHeight, theme.sizes.xxl * 4); // Minimum height using theme
+
+    return Math.max(calculatedHeight, theme.sizes.xxl * 5); // Increased minimum height
   };
 
   const optimalHeight = getOptimalHeight();
@@ -455,13 +455,15 @@ export function Select({
             )}
 
             {/* Options List */}
-            <ScrollView 
-              style={{ 
+            <ScrollView
+              style={{
                 flex: 1,
-                maxHeight: optimalHeight - (searchable ? theme.sizes.xxl * 3 : theme.sizes.xxl + theme.sizes.md) - (multiple ? theme.sizes.xxl + theme.sizes.sm : 0)
               }}
               showsVerticalScrollIndicator={true}
-              contentContainerStyle={{ paddingBottom: theme.sizes.sm }}
+              contentContainerStyle={{
+                paddingBottom: theme.sizes.xl,
+              }}
+              nestedScrollEnabled={true}
             >
               {filteredOptions.length === 0 ? (
                 <View
