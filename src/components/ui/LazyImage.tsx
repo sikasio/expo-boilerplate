@@ -1,15 +1,12 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
-  Image,
   ImageStyle,
   ViewStyle,
   StyleProp,
-  ImageLoadEventData,
-  NativeSyntheticEvent,
-  ImageErrorEventData,
-  Animated
+  Platform
 } from 'react-native';
+import { Image, ImageLoadEventData, ImageErrorEventData } from 'expo-image';
 import { useTheme } from '@/contexts/ThemeContext';
 import { LoadingSpinner, LoadingSpinnerSize, LoadingSpinnerVariant } from './LoadingSpinner';
 import { Icon } from './Icon';
@@ -26,14 +23,15 @@ export interface LazyImageProps {
   showLoadingSpinner?: boolean;
   showErrorIcon?: boolean;
   resizeMode?: 'cover' | 'contain' | 'stretch' | 'repeat' | 'center';
-  onLoad?: (event: NativeSyntheticEvent<ImageLoadEventData>) => void;
-  onError?: (error: NativeSyntheticEvent<ImageErrorEventData>) => void;
+  onLoad?: (event: ImageLoadEventData) => void;
+  onError?: (error: ImageErrorEventData) => void;
   onLoadStart?: () => void;
   onLoadEnd?: () => void;
   testID?: string;
   loadingTimeout?: number; // Simulate loading - show spinner for this duration before displaying image
   spinnerSize?: LoadingSpinnerSize; // Size of loading spinner ('xs' | 'small' | 'medium' | 'large' | 'xl')
   spinnerVariant?: LoadingSpinnerVariant; // Variant of loading spinner ('default' | 'dots' | 'pulse' | 'bars' | 'circle' | 'custom')
+  cachePolicy?: 'none' | 'disk' | 'memory' | 'memory-disk'; // expo-image cache policy
 }
 
 export function LazyImage({
@@ -54,24 +52,23 @@ export function LazyImage({
   testID,
   loadingTimeout,
   spinnerSize,
-  spinnerVariant
+  spinnerVariant,
+  cachePolicy = 'memory-disk'
 }: LazyImageProps) {
   const { theme } = useTheme();
-  
+
   // Use theme defaults if props not provided
   const finalSpinnerSize = spinnerSize || theme.lazyImage.spinnerSize;
   const finalSpinnerVariant = spinnerVariant || theme.lazyImage.spinnerVariant;
   const finalLoadingTimeout = loadingTimeout || theme.lazyImage.defaultTimeout;
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [opacity] = useState(new Animated.Value(0));
-  const [imageSource, setImageSource] = useState<{ uri: string } | number | null>(null);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false); // Track if image has been loaded before
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSourceRef = useRef<string | number | null>(null); // Track the last source to detect changes
 
-  const handleLoadStart = useCallback(() => {
+  const internalHandleLoadStart = useCallback(() => {
     const currentSource = typeof source === 'object' && source.uri ? source.uri : source;
     const sourceChanged = lastSourceRef.current !== currentSource;
 
@@ -81,69 +78,31 @@ export function LazyImage({
       lastSourceRef.current = currentSource;
     }
 
-    // If image has already been loaded once and source hasn't changed, skip loading simulation
+    // If image has already been loaded once and source hasn't changed, skip loading state
     if (hasLoadedOnce && !sourceChanged) {
-      setImageSource(source);
       setLoading(false);
-      onLoadEnd?.();
       return;
     }
 
     setLoading(true);
     setError(false);
     onLoadStart?.();
+  }, [source, hasLoadedOnce, onLoadStart]);
 
-    // Clear any existing timeout
-    if (loadTimeoutRef.current) {
-      clearTimeout(loadTimeoutRef.current);
-    }
-
-    // If loadingTimeout is provided, simulate loading state
-    if (finalLoadingTimeout && finalLoadingTimeout > 0) {
-      // Show loading spinner for the specified duration, then show image
-      loadTimeoutRef.current = setTimeout(() => {
-        setImageSource(source);
-        setLoading(false); // Hide loading spinner after timeout
-        setHasLoadedOnce(true); // Mark as loaded
-        onLoadEnd?.();
-      }, finalLoadingTimeout);
-    } else {
-      // No timeout - show image immediately
-      setImageSource(source);
-      setLoading(false);
-      setHasLoadedOnce(true); // Mark as loaded
-      onLoadEnd?.();
-    }
-  }, [source, finalLoadingTimeout, hasLoadedOnce, onLoadStart, onLoadEnd]);
-
-  const handleLoad = useCallback((event: NativeSyntheticEvent<ImageLoadEventData>) => {
-    // Fade in animation
-    Animated.timing(opacity, {
-      toValue: 1,
-      duration: fadeDuration,
-      useNativeDriver: true,
-    }).start();
-
+  const handleLoad = useCallback((event: ImageLoadEventData) => {
+    // Hide loading spinner when image is loaded
+    setLoading(false);
+    setHasLoadedOnce(true);
+    onLoadEnd?.();
     onLoad?.(event);
-  }, [opacity, fadeDuration, onLoad]);
+  }, [onLoad, onLoadEnd]);
 
-  const handleError = useCallback((errorEvent: NativeSyntheticEvent<ImageErrorEventData>) => {
+  const handleError = useCallback((error: ImageErrorEventData) => {
     setLoading(false);
     setError(true);
-    onError?.(errorEvent);
+    onError?.(error);
     onLoadEnd?.();
   }, [onError, onLoadEnd]);
-
-  // Initialize image loading
-  useEffect(() => {
-    handleLoadStart();
-
-    return () => {
-      if (loadTimeoutRef.current) {
-        clearTimeout(loadTimeoutRef.current);
-      }
-    };
-  }, [source]);
 
   const defaultStyle: ImageStyle = {
     width: '100%',
@@ -240,23 +199,20 @@ export function LazyImage({
 
   return (
     <View style={[containerDefaultStyle, containerStyle, style]} testID={testID}>
-      {/* Main Image */}
-      {imageSource && (
-        <Animated.Image
-          source={imageSource}
-          style={[
-            defaultStyle,
-            {
-              opacity: opacity,
-            }
-          ]}
-          resizeMode={resizeMode}
-          onLoad={handleLoad}
-          onError={handleError}
-        />
-      )}
+      {/* Main Image using expo-image */}
+      <Image
+        source={source}
+        style={defaultStyle}
+        contentFit={resizeMode}
+        transition={fadeDuration}
+        cachePolicy={cachePolicy}
+        onLoadStart={internalHandleLoadStart}
+        onLoad={handleLoad}
+        onError={handleError}
+        priority="high"
+      />
 
-      {/* Loading Overlay - show during timeout */}
+      {/* Loading Overlay */}
       {loading && renderLoadingComponent()}
 
       {/* Error Overlay */}
@@ -264,3 +220,6 @@ export function LazyImage({
     </View>
   );
 }
+
+// Re-export types for convenience
+export type { LoadingSpinnerSize, LoadingSpinnerVariant };

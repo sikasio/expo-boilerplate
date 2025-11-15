@@ -921,7 +921,7 @@ These are in package.json but removed during build for certain apps:
    - AsyncStorage for non-sensitive data
 
 2. **Firebase Security**
-   - Firestore security rules (found in scripts/audiobooks/config/)
+   - Firestore security rules (found in scripts/Yarwy/config/)
    - Authentication required for write operations
 
 3. **API Keys**

@@ -9,7 +9,7 @@ import { getCurrentApp } from '@/utils/getCurrentApp';
 // Static imports for React Native/Metro bundler compatibility
 import { APP_DEFAULTS as DEFAULT_CONFIG } from '../../apps/_default/_config/appConfig';
 import { APP_DEFAULTS as TILAWAH_CONFIG } from '../../apps/TilawahConnect/_config/appConfig';
-import { APP_DEFAULTS as AUDIOBOOKS_CONFIG } from '../../apps/audiobooks/_config/appConfig';
+import { APP_DEFAULTS as AUDIOBOOKS_CONFIG } from '../../apps/Yarwy/_config/appConfig';
 import { APP_DEFAULTS as ECOMMERCE_CONFIG } from '../../apps/eCommerce-v1/_config/appConfig';
 import { APP_DEFAULTS as CASHFLOW_CONFIG } from '../../apps/CashFlow/_config/appConfig';
 import { APP_DEFAULTS as ECHONOTE_CONFIG } from '../../apps/EchoNote/_config/appConfig';
@@ -30,7 +30,7 @@ export interface AppDefaults {
 const APP_CONFIG_MAP: Record<string, AppDefaults> = {
   '_default': DEFAULT_CONFIG,
   'TilawahConnect': TILAWAH_CONFIG,
-  'audiobooks': AUDIOBOOKS_CONFIG,
+  'Yarwy': AUDIOBOOKS_CONFIG,
   'eCommerce-v1': ECOMMERCE_CONFIG,
   'CashFlow': CASHFLOW_CONFIG,
   'EchoNote': ECHONOTE_CONFIG,

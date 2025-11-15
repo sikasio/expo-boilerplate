@@ -30,9 +30,9 @@ export class StorageClearingService {
    */
   private static readonly APP_PATTERNS = [
     // App-specific initialization keys
-    /^app_first_launch_completed_(audiobooks|TilawahConnect|CashFlow|eCommerce|_default)$/,
+    /^app_first_launch_completed_(Yarwy|TilawahConnect|CashFlow|eCommerce|_default)$/,
     // App prefixed keys (from StorageService.getAppKey)
-    /^(audiobooks|TilawahConnect|CashFlow|eCommerce|default)_/,
+    /^(Yarwy|TilawahConnect|CashFlow|eCommerce|default)_/,
     // Global app settings that affect all apps
     /^app_(theme|color_scheme|rtl_direction|language|user_token|user_data|onboarding_completed)$/,
     // Firebase/Auth related keys
