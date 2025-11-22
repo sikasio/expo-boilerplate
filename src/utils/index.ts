@@ -31,3 +31,9 @@ export {
   getRTLIconName,
   type RTLProps,
 } from './rtl';
+export {
+  extractCrashLocation,
+  formatCrashLocation,
+  extractStackLines,
+  type CrashLocation,
+} from './crashLocation';
