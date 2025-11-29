@@ -5,15 +5,3 @@ export {
   FirstTimeService,
   createFirstTimeTracker
 } from './firstTime.service';
-export {
-  logError as logErrorToStorage,
-  getErrorLogs,
-  clearErrorLogs,
-  getErrorLogsText,
-  exportLogsAsText,
-  saveInitStatus,
-  getInitStatus,
-  sendTestError,
-  getErrorLogStats,
-} from './errorLogger.service';
-export type { ErrorLog, InitStatus } from './errorLogger.service';

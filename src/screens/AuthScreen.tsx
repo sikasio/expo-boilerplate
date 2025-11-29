@@ -143,8 +143,10 @@ export interface AuthScreenProps {
   socialProviders?: SocialProvider[];
   showSocialLogin?: boolean;
   socialLoginTitle?: string;
+  socialLoginPosition?: 'top' | 'bottom'; // Position of social login buttons (default: 'bottom')
 
   // Form Configuration
+  primaryButtonVariant?: 'primary' | 'secondary' | 'outline' | 'ghost'; // Variant for primary button (default: 'primary')
   showRememberMe?: boolean;
   showForgotPassword?: boolean;
   showTermsCheckbox?: boolean;
@@ -233,6 +235,8 @@ export function AuthScreen({
   socialProviders = [],
   showSocialLogin = false,
   socialLoginTitle = 'Or continue with',
+  socialLoginPosition = 'bottom',
+  primaryButtonVariant = 'primary',
   showRememberMe = true,
   showForgotPassword = true,
   showTermsCheckbox = false,
@@ -1145,7 +1149,7 @@ export function AuthScreen({
 
   // Render form options (remember me, terms)
   const renderFormOptions = () => {
-    if (variant === 'forgot-password' || variant === 'verification' || variant === 'account-review' || variant === 'account-suspended' || variant === 'account-created-successfully') return null;
+    if (variant === 'forgot-password' || variant === 'verification' || variant === 'account-review' || variant === 'account-suspended' || variant === 'account-created-successfully' || variant === 'social-login') return null;
 
     return (
       <View style={{ marginBottom: theme.sizes.lg, marginTop: theme.sizes.md }}>
@@ -1223,29 +1227,31 @@ export function AuthScreen({
   const renderSocialLogin = () => {
     if (!showSocialLogin || socialProviders.length === 0) return null;
 
-    return (
-      <View style={{ marginBottom: theme.sizes.lg }}>
-        <View
+    const renderSeparator = () => (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: socialLoginPosition === 'top' ? 0 : theme.sizes.md,
+          marginTop: socialLoginPosition === 'top' ? theme.sizes.md : 0,
+        }}
+      >
+        <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+        <Text
+          variant="caption"
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginBottom: theme.sizes.md,
+            color: colors.textSecondary,
+            marginHorizontal: theme.sizes.md,
           }}
         >
-          <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
-          <Text
-            variant="caption"
-            style={{
-              color: colors.textSecondary,
-              marginHorizontal: theme.sizes.md,
-            }}
-          >
-            {socialLoginTitle}
-          </Text>
-          <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
-        </View>
+          {socialLoginTitle}
+        </Text>
+        <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+      </View>
+    );
 
-        <View
+    const renderSocialButtons = () => (
+      <View
           style={{
             flexDirection: 'column',
             gap: theme.sizes.sm,
@@ -1256,7 +1262,7 @@ export function AuthScreen({
             const getTextColor = (providerName: string) => {
               switch (providerName.toLowerCase()) {
                 case 'google':
-                  return theme.isDark ? '#FFFFFF' : '#1F1F1F'; // White on dark theme, dark gray on light
+                  return '#FFFFFF'; // White text on Google Red
                 case 'apple':
                   return theme.isDark ? '#000000' : '#FFFFFF'; // Black text on white bg (dark theme), white text on black bg (light)
                 case 'facebook':
@@ -1269,7 +1275,7 @@ export function AuthScreen({
             const getBackgroundColor = (providerName: string) => {
               switch (providerName.toLowerCase()) {
                 case 'google':
-                  return theme.isDark ? colors.surface : '#FFFFFF'; // Use theme surface on dark, white on light
+                  return '#EA4335'; // Google Red
                 case 'apple':
                   return theme.isDark ? '#FFFFFF' : '#000000'; // White on dark theme, black on light
                 case 'facebook':
@@ -1282,7 +1288,7 @@ export function AuthScreen({
             const getBorderColor = (providerName: string) => {
               switch (providerName.toLowerCase()) {
                 case 'google':
-                  return theme.isDark ? colors.border : '#DADCE0'; // Use theme border on dark
+                  return '#EA4335'; // Google Red border
                 case 'apple':
                   return theme.isDark ? '#FFFFFF' : '#000000'; // White border on dark, black on light
                 case 'facebook':
@@ -1354,7 +1360,6 @@ export function AuthScreen({
                 key={index}
                 title={inputLabels?.continueWithLabel ? `${inputLabels.continueWithLabel} ${provider.name}` : `Continue with ${provider.name}`}
                 variant={provider.name.toLowerCase() === 'google' ? 'outline' : 'primary'}
-                leftIcon={provider.icon}
                 onPress={provider.onPress}
                 style={getButtonStyle(provider.name)}
                 textStyle={{
@@ -1366,6 +1371,23 @@ export function AuthScreen({
             );
           })}
         </View>
+    );
+
+    return (
+      <View style={{ marginBottom: theme.sizes.lg }}>
+        {/* When position is 'top': buttons first, then separator */}
+        {/* When position is 'bottom': separator first, then buttons */}
+        {socialLoginPosition === 'top' ? (
+          <>
+            {renderSocialButtons()}
+            {renderSeparator()}
+          </>
+        ) : (
+          <>
+            {renderSeparator()}
+            {renderSocialButtons()}
+          </>
+        )}
       </View>
     );
   };
@@ -1538,6 +1560,9 @@ export function AuthScreen({
       >
         {renderHeader()}
 
+        {/* Social login at top if socialLoginPosition is 'top' */}
+        {socialLoginPosition === 'top' && renderSocialLogin()}
+
         <View>
           {renderFormFields()}
           {customFields}
@@ -1545,7 +1570,7 @@ export function AuthScreen({
 
           <Button
             title={finalContent.primaryButtonText || 'Submit'}
-            variant="primary"
+            variant={primaryButtonVariant}
             size="medium"
             onPress={handleSubmit(handleFormSubmit)}
             loading={isLoading}
@@ -1568,7 +1593,8 @@ export function AuthScreen({
         </View>
 
         {renderBiometricLogin()}
-        {renderSocialLogin()}
+        {/* Social login at bottom if socialLoginPosition is 'bottom' (default) */}
+        {socialLoginPosition === 'bottom' && renderSocialLogin()}
         {renderFooter()}
       </Animated.View>
     );

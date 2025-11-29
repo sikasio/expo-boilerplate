@@ -49,8 +49,6 @@ export {
   ListItemSkeleton 
 } from './SkeletonCard';
 export { GlobalConfigPanel } from '../overlays/GlobalConfigPanel';
-export { ErrorFallback, ErrorFallbackArabic } from '../error/ErrorFallback';
-export type { ErrorFallbackProps } from '../error/ErrorFallback';
 export type { IconName } from './Icon';
 export type { IconFamily, IconName as EnhancedIconName } from './EnhancedIcon';
 export { getAvailableIconFamilies } from './EnhancedIcon';

@@ -64,6 +64,10 @@ export const COLOR_SCHEMES = {
     light: { primary: '#317775', secondary: '#BAD398' },
     dark: { primary: '#317775', secondary: '#BAD398' }
   },
+  yarwy: {
+    light: { primary: '#d4700c', secondary: '#e8923a' },
+    dark: { primary: '#d4700c', secondary: '#e8923a' }
+  },
 } as const;
 
 export const SIZES = {
