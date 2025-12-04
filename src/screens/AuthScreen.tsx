@@ -182,6 +182,7 @@ export interface AuthScreenProps {
   // Loading States
   isLoading?: boolean;
   loadingText?: string;
+  fullScreenLoading?: boolean; // Show full-screen overlay during loading (e.g., social login)
 
   // Form Data
   initialValues?: Partial<AuthFormData>;
@@ -253,6 +254,7 @@ export function AuthScreen({
   initialValues = {},
   isLoading = false,
   loadingText = 'Please wait...',
+  fullScreenLoading = false,
   onSubmit,
   onSocialLogin,
   onForgotPassword,
@@ -1360,7 +1362,15 @@ export function AuthScreen({
                 key={index}
                 title={inputLabels?.continueWithLabel ? `${inputLabels.continueWithLabel} ${provider.name}` : `Continue with ${provider.name}`}
                 variant={provider.name.toLowerCase() === 'google' ? 'outline' : 'primary'}
-                onPress={provider.onPress}
+                onPress={() => {
+                  if (provider.onPress) {
+                    provider.onPress();
+                  } else {
+                    onSocialLogin?.(provider.name.toLowerCase());
+                  }
+                }}
+                loading={isLoading}
+                disabled={isLoading}
                 style={getButtonStyle(provider.name)}
                 textStyle={{
                   color: getTextColor(provider.name),
@@ -1450,6 +1460,88 @@ export function AuthScreen({
             }}
           />
         )}
+      </View>
+    );
+  };
+
+  // Render full-screen loading overlay
+  const spinAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isLoading && fullScreenLoading) {
+      const spinAnimation = Animated.loop(
+        Animated.timing(spinAnim, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      );
+      spinAnimation.start();
+      return () => spinAnimation.stop();
+    }
+  }, [isLoading, fullScreenLoading]);
+
+  const renderFullScreenLoading = () => {
+    if (!isLoading || !fullScreenLoading) return null;
+
+    const spin = spinAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '360deg'],
+    });
+
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: theme.isDark ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 999,
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: theme.isDark ? theme.colors.surface : '#FFFFFF',
+            borderRadius: theme.borderRadius.xl,
+            padding: theme.sizes.xl,
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+            elevation: 8,
+            minWidth: 200,
+          }}
+        >
+          <Animated.View
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 24,
+              borderWidth: 3,
+              borderColor: theme.colors.primary,
+              borderTopColor: 'transparent',
+              marginBottom: theme.sizes.md,
+              transform: [{ rotate: spin }],
+            }}
+          />
+          <Text
+            variant="body"
+            style={{
+              color: theme.colors.text,
+              fontSize: theme.fontSizes.md,
+              fontWeight: '500',
+              textAlign: 'center',
+            }}
+          >
+            {loadingText}
+          </Text>
+        </View>
       </View>
     );
   };
@@ -1658,6 +1750,8 @@ export function AuthScreen({
           {renderFormContent()}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {renderFullScreenLoading()}
     </SafeAreaView>
   );
 }
