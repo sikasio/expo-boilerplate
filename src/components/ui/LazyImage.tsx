@@ -32,6 +32,7 @@ export interface LazyImageProps {
   spinnerSize?: LoadingSpinnerSize; // Size of loading spinner ('xs' | 'small' | 'medium' | 'large' | 'xl')
   spinnerVariant?: LoadingSpinnerVariant; // Variant of loading spinner ('default' | 'dots' | 'pulse' | 'bars' | 'circle' | 'custom')
   cachePolicy?: 'none' | 'disk' | 'memory' | 'memory-disk'; // expo-image cache policy
+  priority?: 'low' | 'normal' | 'high'; // Image loading priority
 }
 
 export function LazyImage({
@@ -53,7 +54,8 @@ export function LazyImage({
   loadingTimeout,
   spinnerSize,
   spinnerVariant,
-  cachePolicy = 'memory-disk'
+  cachePolicy = 'memory-disk',
+  priority = 'normal' // Changed from 'high' to prevent network congestion
 }: LazyImageProps) {
   const { theme } = useTheme();
 
@@ -209,7 +211,7 @@ export function LazyImage({
         onLoadStart={internalHandleLoadStart}
         onLoad={handleLoad}
         onError={handleError}
-        priority="high"
+        priority={priority}
       />
 
       {/* Loading Overlay */}
