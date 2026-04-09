@@ -16,20 +16,26 @@ export interface LogContext {
 }
 
 class Logger {
-  private isDev: boolean;
   private appName: string;
 
   constructor() {
-    // Always allow console logging, but track production mode for UI elements
-    this.isDev = true; // Always log to console
     this.appName = 'BP';
   }
 
   /**
-   * Check if we're in production environment (for UI elements, not console logging)
+   * Check if we're in production environment
+   * In production, all console logs are suppressed for security and performance
    */
   private get isProduction(): boolean {
-    return process.env.EXPO_PUBLIC_APP_ENV === 'production';
+    return process.env.EXPO_PUBLIC_APP_ENV === 'production' ||
+           process.env.NODE_ENV === 'production';
+  }
+
+  /**
+   * Check if logging is enabled (disabled in production)
+   */
+  private get isLoggingEnabled(): boolean {
+    return !this.isProduction;
   }
 
   /**
@@ -77,9 +83,10 @@ class Logger {
 
   /**
    * Debug level logging - for detailed debugging info
+   * Disabled in production
    */
   debug(message: string, context?: LogContext) {
-    if (!this.isDev) return;
+    if (!this.isLoggingEnabled) return;
 
     const formattedMessage = this.formatMessage('debug', message, context);
     const contextData = this.formatContext(context);
@@ -93,9 +100,10 @@ class Logger {
 
   /**
    * Info level logging - for general information
+   * Disabled in production
    */
   info(message: string, context?: LogContext) {
-    if (!this.isDev) return;
+    if (!this.isLoggingEnabled) return;
 
     const formattedMessage = this.formatMessage('info', message, context);
     const contextData = this.formatContext(context);
@@ -109,9 +117,10 @@ class Logger {
 
   /**
    * Warning level logging - for warnings
+   * Disabled in production
    */
   warn(message: string, context?: LogContext) {
-    if (!this.isDev) return;
+    if (!this.isLoggingEnabled) return;
 
     const formattedMessage = this.formatMessage('warn', message, context);
     const contextData = this.formatContext(context);
@@ -125,9 +134,10 @@ class Logger {
 
   /**
    * Error level logging - for errors and exceptions
+   * Disabled in production for security (errors should be sent to monitoring service instead)
    */
   error(message: string, error?: Error | any, context?: LogContext) {
-    if (!this.isDev) return;
+    if (!this.isLoggingEnabled) return;
 
     const formattedMessage = this.formatMessage('error', message, context);
     const contextData = this.formatContext(context);
