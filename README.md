@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sikasio/.github/main/profile/logo.png" alt="@sikasio/expo-boilerplate" width="96" height="96" onerror="this.style.display='none'" />
+  <img src="https://raw.githubusercontent.com/sikasio/expo-boilerplate/main/examples/_default/assets/logo.png" alt="@sikasio/expo-boilerplate" width="128" height="128" />
 </p>
 
 <h1 align="center">@sikasio/expo-boilerplate — The RTL-First Expo Boilerplate</h1>
