@@ -74,8 +74,6 @@ export function GlobalConfigPanel({
     { label: 'Orange', value: 'orange', primary: '#FF9500', secondary: '#FF3B30' },
     { label: 'Red', value: 'red', primary: '#FF3B30', secondary: '#FF9500' },
     { label: 'Teal', value: 'teal', primary: '#5AC8FA', secondary: '#34C759' },
-    { label: 'Tilawah', value: 'tilawah', primary: '#317775', secondary: '#BAD398' },
-    { label: 'Yarwy', value: 'yarwy', primary: '#d4700c', secondary: '#e8923a' },
   ];
 
   const handleColorSchemeChange = (newColorScheme: string) => {

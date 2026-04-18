@@ -7,7 +7,7 @@
 <p align="center">
   <strong>The Expo / React Native boilerplate you stop writing from scratch.</strong><br/>
   26 themed UI components · 5 form components · 4 reusable screens · 7 contexts · 8 services · 6 hooks · 9 utility modules · <strong>111 unit tests</strong> — all TypeScript, all tree-shakable via subpath exports, RTL-ready from day one.<br/>
-  Battle-tested in 4 production apps, including <a href="https://play.google.com/store/apps/details?id=com.upsmart.yarwy">Yarwy يَروي</a> on Google Play.
+  Battle-tested in multiple shipped Expo/React Native apps.
 </p>
 
 <p align="center">

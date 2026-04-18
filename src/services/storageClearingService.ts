@@ -26,23 +26,23 @@ export interface StorageClearingOptions {
 export class StorageClearingService {
 
   /**
-   * App-related key patterns for smart clearing
+   * App-related key patterns for smart clearing. These are intentionally
+   * generic so the service works for any app ID passed to `setCurrentApp()`
+   * rather than a hardcoded allow-list.
    */
   private static readonly APP_PATTERNS = [
-    // App-specific initialization keys
-    /^app_first_launch_completed_(Yarwy|TilawahConnect|CashFlow|eCommerce|_default)$/,
-    // App prefixed keys (from StorageService.getAppKey)
-    /^(Yarwy|TilawahConnect|CashFlow|eCommerce|default)_/,
-    // Global app settings that affect all apps
+    // App-specific initialization keys — any `app_first_launch_completed_<AppId>`
+    /^app_first_launch_completed_[A-Za-z0-9_-]+$/,
+    // App-prefixed keys produced by StorageService.getAppKey(): `<AppId>_<rest>`
+    /^[A-Z_][A-Za-z0-9_-]*_/,
+    // Global app settings
     /^app_(theme|color_scheme|rtl_direction|language|user_token|user_data|onboarding_completed)$/,
-    // Firebase/Auth related keys
+    // Firebase / Auth related keys
     /^firebase_/,
     /^auth_/,
     // User preferences and cache
     /^user_/,
     /^cache_/,
-    // App-specific storage patterns
-    /^(audiobook|tilawah|cashflow|ecommerce)_/i,
   ];
 
   /**

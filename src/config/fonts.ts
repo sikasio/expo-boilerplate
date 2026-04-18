@@ -138,43 +138,16 @@ export interface AppFontConfig {
   lineHeightMultiplier: number;
 }
 
-// Default font configurations for different apps
+// Default font configuration for the `_default` app.
+// Consumers can add their own app configs by extending this record or by
+// passing a custom `AppFontConfig` to `FontProvider`. Suggested pattern for
+// Arabic-heavy apps: `{ fontFamily: 'zain', baseSize: 16, lineHeightMultiplier: 1.6 }`.
 export const DEFAULT_APP_FONT_CONFIGS: Record<string, AppFontConfig> = {
   _default: {
     appId: '_default',
     fontFamily: 'system',
     baseSize: 16,
     lineHeightMultiplier: 1.4,
-  },
-  TilawahConnect: {
-    appId: 'TilawahConnect',
-    fontFamily: 'zain',
-    baseSize: 16,
-    lineHeightMultiplier: 1.6, // Better for Arabic text
-  },
-  Yarwy: {
-    appId: 'Yarwy',
-    fontFamily: 'system',
-    baseSize: 16,
-    lineHeightMultiplier: 1.4,
-  },
-  'eCommerce-v1': {
-    appId: 'eCommerce-v1',
-    fontFamily: 'system',
-    baseSize: 16,
-    lineHeightMultiplier: 1.4,
-  },
-  CashFlow: {
-    appId: 'CashFlow',
-    fontFamily: 'zain',
-    baseSize: 16,
-    lineHeightMultiplier: 1.6, // Better for Arabic text
-  },
-  EchoNote: {
-    appId: 'EchoNote',
-    fontFamily: 'system',
-    baseSize: 16,
-    lineHeightMultiplier: 1.4, // Standard line height for system font
   },
 };
 

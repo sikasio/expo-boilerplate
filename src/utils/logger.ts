@@ -1,8 +1,8 @@
 /**
- * Centralized Logger Utility for UpSmart Boilerplate
+ * Centralized Logger Utility for @sikasio/expo-boilerplate
  *
- * Provides consistent logging across all apps with development/production control
- * Always logs to console for debugging, but respects production environment for UI elements
+ * Provides consistent logging across all apps with development/production control.
+ * Always logs to console for debugging, but respects production environment for UI elements.
  */
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
