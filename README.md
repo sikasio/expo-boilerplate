@@ -1,5 +1,9 @@
 # @sikasio/expo-boilerplate
 
+![test](https://github.com/sikasio/expo-boilerplate/actions/workflows/test.yml/badge.svg)
+![npm](https://img.shields.io/npm/v/@sikasio/expo-boilerplate)
+![license](https://img.shields.io/npm/l/@sikasio/expo-boilerplate)
+
 Sikasio's shared Expo / React Native component & utilities package.
 Published from [github.com/sikasio/expo-boilerplate](https://github.com/sikasio/expo-boilerplate).
 
@@ -29,6 +33,18 @@ useFonts({
   // …
 });
 ```
+
+## Development
+
+```bash
+npm install          # install deps
+npm test             # run 111 unit tests (utils: rtl, validation, format, helpers, async, formatters)
+npm run test:coverage  # with coverage report
+```
+
+Tests use `jest` + `ts-jest` with a minimal React Native mock (see
+`__tests__/__mocks__/react-native.ts`). CI runs the suite on every push and PR
+via `.github/workflows/test.yml`.
 
 ## Examples
 
