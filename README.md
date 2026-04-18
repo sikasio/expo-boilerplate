@@ -5,9 +5,9 @@
 <h1 align="center">Production-Ready Expo / React Native Boilerplate</h1>
 
 <p align="center">
-  <strong>Production-ready shared UI, contexts, services, hooks, and utilities for Expo / React Native apps — with first-class Arabic/RTL support.</strong><br/>
-  Stop copy-pasting Button, Card, useTheme, AsyncStorage wrappers, and RTL helpers into every new app. Install one package, import from subpaths, and start shipping features on day one.<br/>
-  A battle-tested foundation extracted from 4 production apps — including <a href="https://play.google.com/store/apps/details?id=com.upsmart.yarwy">Yarwy يَروي</a>.
+  <strong>The Expo / React Native boilerplate you stop writing from scratch.</strong><br/>
+  26 themed UI components · 5 form components · 4 reusable screens · 7 contexts · 8 services · 6 hooks · 9 utility modules · <strong>111 unit tests</strong> — all TypeScript, all tree-shakable via subpath exports, RTL-ready from day one.<br/>
+  Battle-tested in 4 production apps, including <a href="https://play.google.com/store/apps/details?id=com.upsmart.yarwy">Yarwy يَروي</a> on Google Play.
 </p>
 
 <p align="center">
@@ -22,14 +22,41 @@
 </p>
 
 <p align="center">
-  <a href="#-installation">Install</a> &bull;
-  <a href="#-features">Features</a> &bull;
-  <a href="#-usage">Usage</a> &bull;
-  <a href="#-api-surface">API</a> &bull;
+  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#why-sikasioexpo-boilerplate">Why?</a> &bull;
+  <a href="#features">Features</a> &bull;
+  <a href="#installation">Install</a> &bull;
+  <a href="#usage">Usage</a> &bull;
+  <a href="#api-surface">API</a> &bull;
   <a href="./examples/_default">Example</a> &bull;
-  <a href="#-testing">Testing</a> &bull;
-  <a href="#-contributing">Contributing</a>
+  <a href="#testing">Testing</a> &bull;
+  <a href="#contributing">Contributing</a>
 </p>
+
+---
+
+## Quick Start
+
+```bash
+npm install @sikasio/expo-boilerplate
+```
+
+```tsx
+// Drop a production-grade auth screen into your app
+import { AuthScreen } from '@sikasio/expo-boilerplate/screens';
+
+export default function LoginRoute() {
+  return (
+    <AuthScreen
+      variant="login-email"
+      layout="centered"
+      onSubmit={async ({ email, password }) => { /* your auth logic */ }}
+    />
+  );
+}
+```
+
+**Full setup with peers →** [Installation](#installation)  ·  **Runnable example app →** [`examples/_default`](./examples/_default)  ·  **See every export →** [API Surface](#api-surface)
 
 ---
 
@@ -434,7 +461,7 @@ CI runs the full suite on every push and pull request via [`.github/workflows/te
 
 ## Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](docs/CONTRIBUTING.md) before submitting a PR.
+Contributions are welcome. See below for the dev setup, areas where help is most needed, and the security disclosure policy.
 
 ```bash
 git clone https://github.com/sikasio/expo-boilerplate.git
@@ -454,7 +481,7 @@ cd examples/_default && npm install && npx expo start
 
 ### Security
 
-Found a vulnerability? See our [Security Policy](docs/SECURITY.md) for responsible disclosure.
+Found a vulnerability? Please use GitHub's [private vulnerability reporting](https://github.com/sikasio/expo-boilerplate/security/advisories/new) instead of a public issue. We aim to acknowledge reports within 72 hours and ship a fix or mitigation before any public disclosure.
 
 ---
 
@@ -476,7 +503,7 @@ Released under the [Apache 2.0 License](LICENSE). Free for commercial and non-co
 
 ## Keywords
 
-`expo` · `react-native` · `boilerplate` · `rtl` · `arabic` · `sikasio` · `ui-components` · `theme` · `dark-mode` · `auth-screen` · `storage` · `async-storage` · `i18n` · `zain-font` · `expo-router` · `typescript` · `react-hook-form` · `form-components` · `mobile-starter` · `expo-template` · `react-native-starter` · `multi-app` · `tdd` · `unit-tests` · `raw-source-package` · `subpath-exports`
+`expo` · `expo-boilerplate` · `expo-template` · `expo-starter` · `expo-router` · `react-native` · `react-native-boilerplate` · `react-native-template` · `react-native-starter` · `react-native-ui` · `ui-components` · `ui-kit` · `component-library` · `theme` · `dark-mode` · `rtl` · `arabic` · `i18n` · `auth-screen` · `form-components` · `react-hook-form` · `async-storage` · `typescript` · `hooks` · `boilerplate` · `template` · `starter` · `mobile` · `zain-font` · `subpath-exports`
 
 ---
 
