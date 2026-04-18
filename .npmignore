@@ -1,0 +1,10 @@
+src/
+test/
+__tests__/
+*.test.ts
+*.test.tsx
+tsconfig.json
+tsconfig.build.json
+.github/
+.gitignore
+node_modules/
