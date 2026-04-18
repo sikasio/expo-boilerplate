@@ -7,7 +7,7 @@ import {
   ImageStyle,
   TouchableOpacityProps,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
 

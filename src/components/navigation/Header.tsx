@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, ViewStyle, ViewProps, StatusBar, Platform } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
-import { Text } from '@/components/ui/Text';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
+import { Text } from '../ui/Text';
 import { BackButton, BackButtonProps } from './BackButton';
-import { IconName } from '@/components/ui/Icon';
-import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
+import { IconName } from '../ui/Icon';
+import { getFlexDirection, getRTLMargin, createRTLStyle } from '../../utils';
 
 export type HeaderMarginBottom = 'none' | 'small' | 'medium' | 'large';
 

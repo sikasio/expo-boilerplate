@@ -12,11 +12,11 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/contexts/ThemeContext';
-import { Text } from '@/components/ui/Text';
-import { Button } from '@/components/ui/Button';
-import { Icon, IconName } from '@/components/ui/Icon';
-import { MiniView } from '@/components/ui';
+import { useTheme } from '../contexts/ThemeContext';
+import { Text } from '../components/ui/Text';
+import { Button } from '../components/ui/Button';
+import { Icon, IconName } from '../components/ui/Icon';
+import { MiniView } from '../components/ui';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 

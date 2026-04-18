@@ -9,13 +9,13 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from 'react-native';
-import { StorageClearingService } from '@/services/storageClearingService';
+import { StorageClearingService } from '../../services/storageClearingService';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
-import { useFont } from '@/contexts/FontContext';
-import { getCurrentAppDefaults, logCurrentAppDefaults } from '@/config/appDefaults';
-import { getCurrentApp } from '@/utils/getCurrentApp';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
+import { useFont } from '../../contexts/FontContext';
+import { getCurrentAppDefaults, logCurrentAppDefaults } from '../../config/appDefaults';
+import { getCurrentApp } from '../../utils/getCurrentApp';
 import { Icon } from '../ui/Icon';
 import { Text } from '../ui/Text';
 import { List, ListItem } from '../ui/List';

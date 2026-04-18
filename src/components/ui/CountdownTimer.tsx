@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, ViewStyle, Platform } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
-import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
+import { getFlexDirection, getRTLMargin, createRTLStyle } from '../../utils';
 
 export type CountdownTimerVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error';
 export type CountdownTimerSize = 'xs' | 'small' | 'medium' | 'large' | 'xl';

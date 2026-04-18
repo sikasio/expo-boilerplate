@@ -1,5 +1,5 @@
 import { TextStyle } from 'react-native';
-import { FONT_FAMILIES, getFontStyle, type FontFamily } from '@/config/fonts';
+import { FONT_FAMILIES, getFontStyle, type FontFamily } from '../config/fonts';
 
 // Utility to create text styles with font support
 export const createTextStyle = (

@@ -18,9 +18,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from './Text';
 import { Button } from './Button';
 import { Icon } from './Icon';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
-import { getFlexDirection, getRTLMargin, getRTLPadding } from '@/utils';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
+import { getFlexDirection, getRTLMargin, getRTLPadding } from '../../utils';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 

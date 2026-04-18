@@ -3,8 +3,8 @@
  * Uses static imports with mapping for React Native compatibility
  */
 
-import { ThemeMode } from '@/types';
-import { getCurrentApp } from '@/utils/getCurrentApp';
+import { ThemeMode } from '../types';
+import { getCurrentApp } from '../utils/getCurrentApp';
 
 // Static imports for React Native/Metro bundler compatibility
 import { APP_DEFAULTS as DEFAULT_CONFIG } from '../../apps/_default/_config/appConfig';

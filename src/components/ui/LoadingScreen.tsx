@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, StatusBar, ViewStyle, ActivityIndicator, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { SplashScreen, SplashScreenProps } from '@/screens/SplashScreen';
-import { useTheme } from '@/contexts/ThemeContext';
+import { SplashScreen, SplashScreenProps } from '../../screens/SplashScreen';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Icon, IconName } from './Icon';
 import { Text } from './Text';
 

@@ -16,17 +16,17 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
-import { getFlexDirection, getTextAlign } from '@/utils';
-import { Text } from '@/components/ui/Text';
-import { Button } from '@/components/ui/Button';
-import { TextInput } from '@/components/forms/TextInput';
-import { OTPInput } from '@/components/forms/OTPInput';
-import { Card } from '@/components/ui/Card';
-import { Icon, IconName } from '@/components/ui/Icon';
-import { Avatar } from '@/components/ui/Avatar';
-import { Checkbox } from '@/components/ui/Checkbox';
+import { useTheme } from '../contexts/ThemeContext';
+import { useRTL } from '../contexts/RTLContext';
+import { getFlexDirection, getTextAlign } from '../utils';
+import { Text } from '../components/ui/Text';
+import { Button } from '../components/ui/Button';
+import { TextInput } from '../components/forms/TextInput';
+import { OTPInput } from '../components/forms/OTPInput';
+import { Card } from '../components/ui/Card';
+import { Icon, IconName } from '../components/ui/Icon';
+import { Avatar } from '../components/ui/Avatar';
+import { Checkbox } from '../components/ui/Checkbox';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -726,9 +726,9 @@ export function AuthScreen({
 
       // Smart selection based on theme for center logo
       if (theme.isDark) {
-        return require('@/assets/logo-white.png');
+        return require('../assets/logo-white.png');
       } else {
-        return require('@/assets/logo.png');
+        return require('../assets/logo.png');
       }
     };
 
@@ -855,9 +855,9 @@ export function AuthScreen({
 
       // Smart selection based on theme
       if (theme.isDark) {
-        return require('@/assets/logo-white.png');
+        return require('../assets/logo-white.png');
       } else {
-        return require('@/assets/logo.png');
+        return require('../assets/logo.png');
       }
     };
 

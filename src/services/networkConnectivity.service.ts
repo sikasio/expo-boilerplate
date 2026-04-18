@@ -7,7 +7,7 @@
  * Uses simplified approach without external dependencies.
  */
 
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 export interface NetworkState {
   isConnected: boolean;

@@ -7,7 +7,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 export interface StorageClearingResult {
   success: boolean;

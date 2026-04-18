@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
-import { Theme, getTheme } from '@/config/theme';
-import { ThemeMode } from '@/types';
-import { StorageService } from '@/services/storage';
-import { STORAGE_KEYS } from '@/constants';
-import { logger } from '@/utils/logger';
-import { getCurrentAppDefaults } from '@/config/appDefaults';
+import { Theme, getTheme } from '../config/theme';
+import { ThemeMode } from '../types';
+import { StorageService } from '../services/storage';
+import { STORAGE_KEYS } from '../constants';
+import { logger } from '../utils/logger';
+import { getCurrentAppDefaults } from '../config/appDefaults';
 
 interface ThemeContextType {
   theme: Theme;

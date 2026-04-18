@@ -6,10 +6,10 @@ import {
 } from 'react-native';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePathname } from 'expo-router';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
-import { use3ButtonNavigationDetector } from '@/hooks/use3ButtonNavigationDetector';
-import { createRTLStyle } from '@/utils';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
+import { use3ButtonNavigationDetector } from '../../hooks/use3ButtonNavigationDetector';
+import { createRTLStyle } from '../../utils';
 
 interface ContainerProps extends ViewProps {
   children: React.ReactNode;

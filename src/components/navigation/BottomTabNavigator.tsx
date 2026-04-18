@@ -1,14 +1,14 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Platform, View, Animated, TouchableOpacity, Dimensions } from 'react-native';
-import { use3ButtonNavigationDetector } from '@/hooks/use3ButtonNavigationDetector';
+import { use3ButtonNavigationDetector } from '../../hooks/use3ButtonNavigationDetector';
 
-import { useTheme } from '@/contexts/ThemeContext';
-import { useSplash } from '@/contexts/SplashContext';
-import { TabBarIcon } from '@/components/ui/TabBarIcon';
-import { IconName } from '@/components/ui/Icon';
-import { Text } from '@/components/ui/Text';
-import { getTabBarDimensions, NAVIGATION_CONSTANTS, TabNavigatorDesign } from '@/config/navigation';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useSplash } from '../../contexts/SplashContext';
+import { TabBarIcon } from '../ui/TabBarIcon';
+import { IconName } from '../ui/Icon';
+import { Text } from '../ui/Text';
+import { getTabBarDimensions, NAVIGATION_CONSTANTS, TabNavigatorDesign } from '../../config/navigation';
 
 export interface TabConfig {
   name: string;

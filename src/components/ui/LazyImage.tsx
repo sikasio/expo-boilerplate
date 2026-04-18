@@ -7,7 +7,7 @@ import {
   Platform
 } from 'react-native';
 import { Image, ImageLoadEventData, ImageErrorEventData } from 'expo-image';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { LoadingSpinner, LoadingSpinnerSize, LoadingSpinnerVariant } from './LoadingSpinner';
 import { Icon } from './Icon';
 import { Text } from './Text';

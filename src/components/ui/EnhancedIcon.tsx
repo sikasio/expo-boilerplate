@@ -1,6 +1,6 @@
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { logger } from '@/utils/logger';
+import { logger } from '../../utils/logger';
 
 // Try to import other icon families, but handle if they're not available
 let MaterialIcons: any, MaterialCommunityIcons: any, FontAwesome: any;
@@ -26,7 +26,7 @@ try {
 } catch (error) {
   logger.warn('Some icon families are not available:', error, { function: 'iconFamilyLoad', component: 'EnhancedIcon' });
 }
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export type IconFamily = 
   | 'Ionicons'

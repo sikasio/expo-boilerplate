@@ -9,7 +9,7 @@ import {
   Animated,
 } from 'react-native';
 import { PanGestureHandler, PanGestureHandlerGestureEvent, State } from 'react-native-gesture-handler';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Text } from './Text';
 import { Icon } from './Icon';
 import { LazyImage } from './LazyImage';

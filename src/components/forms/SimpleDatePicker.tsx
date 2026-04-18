@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Modal, Pressable, ViewStyle } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
-import { Text } from '@/components/ui/Text';
-import { Icon, IconName } from '@/components/ui/Icon';
-import { Button } from '@/components/ui/Button';
-import { getFlexDirection, getRTLPadding } from '@/utils';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
+import { Text } from '../ui/Text';
+import { Icon, IconName } from '../ui/Icon';
+import { Button } from '../ui/Button';
+import { getFlexDirection, getRTLPadding } from '../../utils';
 
 interface SimpleDatePickerProps {
   label?: string;

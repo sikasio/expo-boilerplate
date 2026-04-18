@@ -6,11 +6,11 @@ import {
   ViewStyle,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
-import { Text } from '@/components/ui/Text';
-import { Icon, IconName } from '@/components/ui/Icon';
-import { getFlexDirection, getRTLMargin, getRTLPadding, getTextAlign, createRTLStyle, getRTLIconName } from '@/utils';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
+import { Text } from '../ui/Text';
+import { Icon, IconName } from '../ui/Icon';
+import { getFlexDirection, getRTLMargin, getRTLPadding, getTextAlign, createRTLStyle, getRTLIconName } from '../../utils';
 
 interface TextInputProps extends RNTextInputProps {
   label?: string;

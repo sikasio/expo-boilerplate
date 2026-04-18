@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { CartItem, BaseProduct, CartSummary, CartConfiguration } from '../types/cart';
 import { CartService } from '../services/cart';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 interface CartContextType<T extends BaseProduct = BaseProduct> {
   cartItems: CartItem<T>[];

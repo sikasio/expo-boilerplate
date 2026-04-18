@@ -1,7 +1,7 @@
 import React from 'react';
 import { View as RNView, ViewProps as RNViewProps, ViewStyle } from 'react-native';
-import { useRTL } from '@/contexts/RTLContext';
-import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
+import { useRTL } from '../../contexts/RTLContext';
+import { getFlexDirection, getRTLMargin, createRTLStyle } from '../../utils';
 
 /**
  * RTL-Aware MiniView Component

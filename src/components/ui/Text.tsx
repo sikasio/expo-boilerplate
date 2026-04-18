@@ -1,9 +1,9 @@
 import React from 'react';
 import { Text as RNText, TextProps as RNTextProps, StyleSheet, Platform } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
-import { useFont } from '@/contexts/FontContext';
-import { getTextAlign, createRTLStyle } from '@/utils';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
+import { useFont } from '../../contexts/FontContext';
+import { getTextAlign, createRTLStyle } from '../../utils';
 
 type TextVariant = 'title' | 'subtitle' | 'body' | 'caption' | 'label';
 

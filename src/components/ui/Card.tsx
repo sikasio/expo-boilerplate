@@ -7,12 +7,12 @@ import {
   TouchableOpacityProps,
   ViewStyle,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
 import { Button } from './Button';
-import { getFlexDirection, getRTLMargin, createRTLStyle } from '@/utils';
+import { getFlexDirection, getRTLMargin, createRTLStyle } from '../../utils';
 
 export type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled';
 export type CardSize = 'small' | 'medium' | 'large';

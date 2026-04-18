@@ -8,11 +8,11 @@ import {
   TextStyle,
   View,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
-import { getFlexDirection, getRTLMargin, createRTLStyle, getRTLIconName } from '@/utils';
+import { getFlexDirection, getRTLMargin, createRTLStyle, getRTLIconName } from '../../utils';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'outline-white' | 'ghost' | 'success' | 'warning' | 'error' | 'outline-error' | 'outline-warning';
 export type ButtonSize = 'xs' | 'small' | 'medium' | 'large' | 'xl';

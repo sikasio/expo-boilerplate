@@ -11,18 +11,18 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useFont } from '@/contexts/FontContext';
-import { Text } from '@/components/ui/Text';
-import { Card } from '@/components/ui/Card';
-import { Avatar } from '@/components/ui/Avatar';
-import { Icon, IconName } from '@/components/ui/Icon';
-import { List, ListItem, ListSection, ListDivider } from '@/components/ui/List';
-import { Switch } from '@/components/ui/Switch';
-import { AppConfig, LanguageOptions } from '@/config/app';
+import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useFont } from '../contexts/FontContext';
+import { Text } from '../components/ui/Text';
+import { Card } from '../components/ui/Card';
+import { Avatar } from '../components/ui/Avatar';
+import { Icon, IconName } from '../components/ui/Icon';
+import { List, ListItem, ListSection, ListDivider } from '../components/ui/List';
+import { Switch } from '../components/ui/Switch';
+import { AppConfig, LanguageOptions } from '../config/app';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MiniView } from '@/components';
+import { MiniView } from '../components';
 
 export type SettingsScreenLayout = 'default' | 'grouped' | 'minimal' | 'detailed';
 export type SettingsScreenTheme = 'auto' | 'light' | 'dark' | 'gradient';

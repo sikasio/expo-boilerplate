@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { StorageService } from '@/services/storage';
-import { logger } from '@/utils/logger';
+import { StorageService } from '../services/storage';
+import { logger } from '../utils/logger';
 
 export function useStorage<T>(
   key: string,

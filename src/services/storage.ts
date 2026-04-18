@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { getAppPrefix } from '../utils/getCurrentApp';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 export class StorageService {
   /**

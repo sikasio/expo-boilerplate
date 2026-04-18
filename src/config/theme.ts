@@ -1,6 +1,6 @@
-import { COLORS, DARK_COLORS, COLOR_SCHEMES, SIZES, FONT_SIZES, BORDER_RADIUS } from '@/constants';
-import type { LoadingSpinnerSize, LoadingSpinnerVariant } from '@/components/ui/LoadingSpinner';
-import type { FontFamily } from '@/config/fonts';
+import { COLORS, DARK_COLORS, COLOR_SCHEMES, SIZES, FONT_SIZES, BORDER_RADIUS } from '../constants';
+import type { LoadingSpinnerSize, LoadingSpinnerVariant } from '../components/ui/LoadingSpinner';
+import type { FontFamily } from './fonts';
 
 export interface LazyImageTheme {
   spinnerSize: LoadingSpinnerSize;

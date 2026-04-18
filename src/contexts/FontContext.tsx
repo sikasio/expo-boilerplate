@@ -8,8 +8,8 @@ import {
   getFontStyle,
   type FontFamily,
   type AppFontConfig
-} from '@/config/fonts';
-import { getCurrentApp } from '@/utils/getCurrentApp';
+} from '../config/fonts';
+import { getCurrentApp } from '../utils/getCurrentApp';
 
 // Storage keys
 const STORAGE_KEYS = {

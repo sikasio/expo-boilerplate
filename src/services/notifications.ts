@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 export class NotificationService {
   static async initialize(): Promise<void> {

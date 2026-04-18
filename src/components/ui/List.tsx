@@ -19,11 +19,11 @@ if (
 ) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
-import { getRTLMargin, getRTLIconName, getFlexDirection } from '@/utils';
+import { getRTLMargin, getRTLIconName, getFlexDirection } from '../../utils';
 import { Avatar, AvatarSize } from './Avatar';
 
 export type ListVariant = 'default' | 'inset' | 'sidebar' | 'card';

@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { I18nManager, Platform } from 'react-native';
-import { StorageService } from '@/services/storage';
-import { STORAGE_KEYS } from '@/constants';
-import { logger } from '@/utils/logger';
-import { getCurrentApp } from '@/utils/getCurrentApp';
-import { getCurrentAppDefaults } from '@/config/appDefaults';
+import { StorageService } from '../services/storage';
+import { STORAGE_KEYS } from '../constants';
+import { logger } from '../utils/logger';
+import { getCurrentApp } from '../utils/getCurrentApp';
+import { getCurrentAppDefaults } from '../config/appDefaults';
 
 interface RTLContextType {
   isRTL: boolean;

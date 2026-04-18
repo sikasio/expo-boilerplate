@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { AppState } from '@/types';
-import { logger } from '@/utils/logger';
+import { AppState } from '../types';
+import { logger } from '../utils/logger';
 
 interface AppContextType {
   state: AppState;

@@ -1,6 +1,6 @@
 import { StorageService } from './storage';
 import { CartItem, BaseProduct, CartSummary, CartConfiguration, DEFAULT_CART_CONFIG } from '../types/cart';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 const CART_STORAGE_KEY = 'cart_items';
 

@@ -6,7 +6,7 @@ import {
   ViewStyle,
   StyleSheet,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export type SkeletonCardVariant = 'default' | 'elevated' | 'outlined';
 export type SkeletonCardSize = 'small' | 'medium' | 'large';

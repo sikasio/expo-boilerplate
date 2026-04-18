@@ -3,11 +3,11 @@
  * Ensures proper default settings are applied for new installations
  */
 
-import { StorageService } from '@/services/storage';
-import { STORAGE_KEYS } from '@/constants';
-import { getCurrentAppDefaults } from '@/config/appDefaults';
-import { getCurrentApp } from '@/utils/getCurrentApp';
-import { logger } from '@/utils/logger';
+import { StorageService } from './storage';
+import { STORAGE_KEYS } from '../constants';
+import { getCurrentAppDefaults } from '../config/appDefaults';
+import { getCurrentApp } from '../utils/getCurrentApp';
+import { logger } from '../utils/logger';
 
 const FIRST_LAUNCH_KEY = 'app_first_launch_completed';
 

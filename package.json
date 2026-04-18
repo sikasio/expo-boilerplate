@@ -13,83 +13,41 @@
     "url": "https://github.com/sikasio/expo-boilerplate/issues"
   },
   "sideEffects": false,
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "react-native": "./src/index.ts",
+  "source": "./src/index.ts",
   "files": [
-    "dist",
+    "src",
     "assets/fonts",
     "README.md",
     "LICENSE"
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "react-native": "./src/index.ts",
+      "source": "./src/index.ts",
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     },
-    "./components": {
-      "import": "./dist/components/index.js",
-      "types": "./dist/components/index.d.ts"
-    },
-    "./components/ui": {
-      "import": "./dist/components/ui/index.js",
-      "types": "./dist/components/ui/index.d.ts"
-    },
-    "./components/forms": {
-      "import": "./dist/components/forms/index.js",
-      "types": "./dist/components/forms/index.d.ts"
-    },
-    "./components/layout": {
-      "import": "./dist/components/layout/index.js",
-      "types": "./dist/components/layout/index.d.ts"
-    },
-    "./components/navigation": {
-      "import": "./dist/components/navigation/index.js",
-      "types": "./dist/components/navigation/index.d.ts"
-    },
-    "./components/overlays": {
-      "import": "./dist/components/overlays/index.js",
-      "types": "./dist/components/overlays/index.d.ts"
-    },
-    "./contexts": {
-      "import": "./dist/contexts/index.js",
-      "types": "./dist/contexts/index.d.ts"
-    },
-    "./services": {
-      "import": "./dist/services/index.js",
-      "types": "./dist/services/index.d.ts"
-    },
-    "./hooks": {
-      "import": "./dist/hooks/index.js",
-      "types": "./dist/hooks/index.d.ts"
-    },
-    "./utils": {
-      "import": "./dist/utils/index.js",
-      "types": "./dist/utils/index.d.ts"
-    },
-    "./screens": {
-      "import": "./dist/screens/index.js",
-      "types": "./dist/screens/index.d.ts"
-    },
-    "./config": {
-      "import": "./dist/config/index.js",
-      "types": "./dist/config/index.d.ts"
-    },
-    "./constants": {
-      "import": "./dist/constants/index.js",
-      "types": "./dist/constants/index.d.ts"
-    },
-    "./types": {
-      "import": "./dist/types/index.js",
-      "types": "./dist/types/index.d.ts"
-    },
+    "./components": "./src/components/index.ts",
+    "./components/ui": "./src/components/ui/index.ts",
+    "./components/forms": "./src/components/forms/index.ts",
+    "./components/layout": "./src/components/layout/index.ts",
+    "./components/navigation": "./src/components/navigation/index.ts",
+    "./components/overlays": "./src/components/overlays/index.ts",
+    "./contexts": "./src/contexts/index.ts",
+    "./services": "./src/services/index.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./screens": "./src/screens/index.ts",
+    "./config": "./src/config/index.ts",
+    "./constants": "./src/constants/index.ts",
+    "./types": "./src/types/index.ts",
     "./fonts/*": "./assets/fonts/*"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build"
+    "typecheck": "echo 'typecheck is a no-op for raw-source packages; consumers typecheck.'"
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -114,11 +72,6 @@
     "date-fns": "^4.1.0",
     "react-native-toast-message": "^2.3.3",
     "react-native-url-polyfill": "^3.0.0"
-  },
-  "devDependencies": {
-    "typescript": "~5.9.2",
-    "@types/react": "~19.1.0",
-    "@types/react-native": "^0.73.0"
   },
   "publishConfig": {
     "access": "public"

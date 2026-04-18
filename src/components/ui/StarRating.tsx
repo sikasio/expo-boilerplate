@@ -3,7 +3,7 @@ import { TouchableOpacity, ViewStyle, View } from 'react-native';
 import { Icon } from './Icon';
 import { Text } from './Text';
 import { MiniView } from './MiniView';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export interface StarRatingProps {
   rating?: number;

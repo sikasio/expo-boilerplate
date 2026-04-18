@@ -11,15 +11,15 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
 import { Card, CardProps } from './Card';
 import { Text } from './Text';
 import { Button } from './Button';
 import { Icon, IconName } from './Icon';
 import { LoadingSpinner } from './LoadingSpinner';
 import { LazyImage, LoadingSpinnerSize, LoadingSpinnerVariant } from './LazyImage';
-import { getFlexDirection, getRTLMargin } from '@/utils';
+import { getFlexDirection, getRTLMargin } from '../../utils';
 
 const { width: screenWidth } = Dimensions.get('window');
 

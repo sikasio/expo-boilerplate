@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Animated, Dimensions, Platform } from 'react-native';
-import { Text } from '@/components/ui';
-import { useTheme } from '@/contexts/ThemeContext';
-import { networkConnectivityService, NetworkState } from '@/services/networkConnectivity.service';
+import { Text } from './';
+import { useTheme } from '../../contexts/ThemeContext';
+import { networkConnectivityService, NetworkState } from '../../services/networkConnectivity.service';
 import { usePathname } from 'expo-router';
 
 interface NetworkConnectivityBarProps {

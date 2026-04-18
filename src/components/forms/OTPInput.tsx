@@ -5,8 +5,8 @@ import {
   ViewStyle,
   Pressable,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { Text } from '@/components/ui/Text';
+import { useTheme } from '../../contexts/ThemeContext';
+import { Text } from '../ui/Text';
 
 interface OTPInputProps {
   length?: number;

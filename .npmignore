@@ -1,10 +1,10 @@
-src/
-test/
+node_modules/
+.github/
+.gitignore
+.npmrc
+package-lock.json
 __tests__/
 *.test.ts
 *.test.tsx
-tsconfig.json
-tsconfig.build.json
-.github/
-.gitignore
-node_modules/
+.DS_Store
+dist/

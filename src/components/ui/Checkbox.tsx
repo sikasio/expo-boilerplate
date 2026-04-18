@@ -7,11 +7,11 @@ import {
   View,
   Animated,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRTL } from '@/contexts/RTLContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useRTL } from '../../contexts/RTLContext';
 import { Text } from './Text';
 import { Icon, IconName } from './Icon';
-import { getFlexDirection, getRTLMargin } from '@/utils';
+import { getFlexDirection, getRTLMargin } from '../../utils';
 
 export type CheckboxVariant = 'default' | 'success' | 'warning' | 'error';
 export type CheckboxSize = 'small' | 'medium' | 'large';

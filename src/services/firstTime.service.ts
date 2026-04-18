@@ -1,5 +1,5 @@
 import { StorageService } from './storage';
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 /**
  * Generic First-Time Service
