@@ -724,12 +724,8 @@ export function AuthScreen({
       // If a specific logoSource is provided, use it
       if (logoSource) return logoSource;
 
-      // Smart selection based on theme for center logo
-      if (theme.isDark) {
-        return require('../assets/logo-white.png');
-      } else {
-        return require('../assets/logo.png');
-      }
+      // No logoSource provided and no default bundled — consumer app should pass logoSource
+      return null;
     };
 
     if (!logo && !logoSource) {
@@ -853,12 +849,8 @@ export function AuthScreen({
       // If logoSource is provided, use it
       if (logoSource) return logoSource;
 
-      // Smart selection based on theme
-      if (theme.isDark) {
-        return require('../assets/logo-white.png');
-      } else {
-        return require('../assets/logo.png');
-      }
+      // No source provided and no default bundled — consumer app should pass a logo
+      return null;
     };
 
     const logoSrc = getSmartLogoSource();
