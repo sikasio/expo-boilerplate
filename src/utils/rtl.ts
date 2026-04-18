@@ -130,6 +130,14 @@ export const getRTLPadding = (rtl?: boolean) => {
     paddingEnd: (value: number) => ({
       [isRTLActive ? 'paddingLeft' : 'paddingRight']: value,
     }),
+
+    /**
+     * Padding horizontal (both left and right — direction-agnostic)
+     */
+    paddingHorizontal: (value: number) => ({
+      paddingLeft: value,
+      paddingRight: value,
+    }),
   };
 };
 
