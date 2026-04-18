@@ -30,6 +30,19 @@ useFonts({
 });
 ```
 
+## Examples
+
+The [`examples/`](./examples) directory contains a runnable Expo app that
+imports from this package via `file:..`, so local changes to `src/` reload
+into the example immediately. Great starting point for a new Sikasio app
+or a playground for testing changes to the boilerplate.
+
+- [`examples/_default`](./examples/_default) — minimal starter demoing every
+  component, context, hook, util, and screen exposed by the package.
+  `cd examples/_default && npm install && npx expo start`.
+
+Examples are not shipped in the npm tarball (see `.npmignore`).
+
 ## License
 
 Apache-2.0 © Sikasio

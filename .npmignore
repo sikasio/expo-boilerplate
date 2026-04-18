@@ -8,3 +8,4 @@ __tests__/
 *.test.tsx
 .DS_Store
 dist/
+examples/
