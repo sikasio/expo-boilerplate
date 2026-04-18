@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sikasio/expo-boilerplate/main/examples/_default/assets/logo.png" alt="@sikasio/expo-boilerplate" width="128" height="128" />
+  <img src="https://raw.githubusercontent.com/sikasio/expo-boilerplate/main/examples/_default/assets/logo.png" alt="@sikasio/expo-boilerplate" width="160" />
 </p>
 
-<h1 align="center">@sikasio/expo-boilerplate — The RTL-First Expo Boilerplate</h1>
+<h1 align="center">@sikasio/expo-boilerplate — Production-Ready Expo / React Native Boilerplate</h1>
 
 <p align="center">
   <strong>Production-ready shared UI, contexts, services, hooks, and utilities for Expo / React Native apps — with first-class Arabic/RTL support.</strong><br/>
