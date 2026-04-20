@@ -24,7 +24,7 @@ try {
   SimpleLineIcons = VectorIcons.SimpleLineIcons;
   Zocial = VectorIcons.Zocial;
 } catch (error) {
-  logger.warn('Some icon families are not available:', error, { function: 'iconFamilyLoad', component: 'EnhancedIcon' });
+  logger.warn('Some icon families are not available', { function: 'iconFamilyLoad', component: 'EnhancedIcon', error });
 }
 import { useTheme } from '../../contexts/ThemeContext';
 

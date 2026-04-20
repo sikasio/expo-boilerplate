@@ -67,11 +67,13 @@ export function LazyImage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false); // Track if image has been loaded before
-  const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSourceRef = useRef<string | number | null>(null); // Track the last source to detect changes
 
   const internalHandleLoadStart = useCallback(() => {
-    const currentSource = typeof source === 'object' && source.uri ? source.uri : source;
+    const currentSource: string | number = typeof source === 'object' && source.uri
+      ? source.uri
+      : (source as string | number);
     const sourceChanged = lastSourceRef.current !== currentSource;
 
     // If source changed, reset the loaded state
@@ -155,7 +157,7 @@ export function LazyImage({
 
     if (showErrorIcon) {
       return (
-        <View style={[overlayStyle, { backgroundColor: theme.colors.backgroundSecondary }]}>
+        <View style={[overlayStyle, { backgroundColor: (theme.colors as any).backgroundSecondary ?? theme.colors.surface }]}>
           <Icon
             name="image-outline"
             size={32}
@@ -189,7 +191,7 @@ export function LazyImage({
     }
 
     return (
-      <View style={[overlayStyle, { backgroundColor: theme.colors.backgroundSecondary }]}>
+      <View style={[overlayStyle, { backgroundColor: (theme.colors as any).backgroundSecondary ?? theme.colors.surface }]}>
         <Icon
           name="image-outline"
           size={24}
@@ -205,7 +207,7 @@ export function LazyImage({
       <Image
         source={source}
         style={defaultStyle}
-        contentFit={resizeMode}
+        contentFit={resizeMode as any}
         transition={fadeDuration}
         cachePolicy={cachePolicy}
         onLoadStart={internalHandleLoadStart}

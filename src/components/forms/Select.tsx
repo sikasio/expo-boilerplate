@@ -137,7 +137,8 @@ export function Select({
         };
       case 'large':
         return {
-          minHeight: theme.sizes.xxxl || theme.sizes.xxl + theme.sizes.sm, // 56px
+          // theme.sizes tops out at xxl (48); bump by sm for a 56px cell.
+          minHeight: theme.sizes.xxl + theme.sizes.sm,
           paddingHorizontal: theme.sizes.lg,
           paddingVertical: theme.sizes.md,
           fontSize: theme.fontSizes.lg,

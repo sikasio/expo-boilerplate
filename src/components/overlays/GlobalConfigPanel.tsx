@@ -26,10 +26,14 @@ interface GlobalConfigPanelProps {
   testID?: string;
 }
 
+// Internal to GlobalConfigPanel. The icon is forwarded to the typed Icon
+// component via leftIcon; casting there is cheaper than propagating IconName
+// through every caller.
 interface ConfigOption {
   id: string;
   label: string;
   icon: string;
+  /** When forwarded to <Icon />, cast to IconName at the call site. */
   description: string;
   type: 'toggle' | 'colorScheme' | 'fontFamily' | 'fontSize';
   value?: boolean | string | number;
@@ -344,7 +348,7 @@ export function GlobalConfigPanel({
 
   // Auto-close menu when user stops interacting
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
     if (isMenuOpen) {
       timeout = setTimeout(() => {
         setIsMenuOpen(false);
@@ -361,7 +365,7 @@ export function GlobalConfigPanel({
 
   // Auto slide-out when not interacting
   useEffect(() => {
-    let slideTimeout: NodeJS.Timeout;
+    let slideTimeout: ReturnType<typeof setTimeout> | undefined;
     if (!isMenuOpen && !isHidden) {
       slideTimeout = setTimeout(() => {
         slideOut();
@@ -500,7 +504,7 @@ export function GlobalConfigPanel({
                     <ListItem
                       key={option.id}
                       title={option.label}
-                      leftIcon={option.icon}
+                      leftIcon={option.icon as any}
                       rightContent={rightContent}
                       variant="compact"
                     />
@@ -510,7 +514,7 @@ export function GlobalConfigPanel({
                     <React.Fragment key={option.id}>
                       <ListItem
                         title={option.label}
-                        leftIcon={option.icon}
+                        leftIcon={option.icon as any}
                         variant="compact"
                       />
                       {/* Color Options Row */}
@@ -571,7 +575,7 @@ export function GlobalConfigPanel({
                     <React.Fragment key={option.id}>
                       <ListItem
                         title={option.label}
-                        leftIcon={option.icon}
+                        leftIcon={option.icon as any}
                         variant="compact"
                       />
                       {/* Font Family Options */}
@@ -614,7 +618,7 @@ export function GlobalConfigPanel({
                     <React.Fragment key={option.id}>
                       <ListItem
                         title={option.label}
-                        leftIcon={option.icon}
+                        leftIcon={option.icon as any}
                         variant="compact"
                         rightContent={
                           <View style={styles.fontSizeContainer}>

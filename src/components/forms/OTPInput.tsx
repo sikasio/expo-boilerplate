@@ -106,8 +106,9 @@ export function OTPInput({
       textAlignVertical: 'center' as const,
     };
 
-    let borderColor = theme.colors.border;
-    
+    // Declare as string so TS widens past the first assignment's literal type.
+    let borderColor: string = theme.colors.border;
+
     if (error) {
       borderColor = theme.colors.error;
     } else if (focusedIndex === index) {
@@ -164,8 +165,11 @@ export function OTPInput({
             style={{ flex: 1, alignItems: 'center' }}
           >
             <RNTextInput
-              ref={(ref) => (inputRefs.current[index] = ref)}
-              style={getCellStyle(index)}
+              ref={(ref) => {
+                // Ref callbacks must return void, not the assigned value.
+                inputRefs.current[index] = ref;
+              }}
+              style={getCellStyle(index) as any}
               value={secureTextEntry ? (digit ? '•' : '') : digit}
               onChangeText={(text) => handleTextChange(text, index)}
               onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}

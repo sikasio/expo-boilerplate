@@ -307,7 +307,7 @@ export function LoadingScreen({
     accessible: !!accessibilityLabel,
     style: [
       {
-        position: 'absolute',
+        position: 'absolute' as const,
         top: 0,
         left: 0,
         right: 0,
@@ -318,7 +318,7 @@ export function LoadingScreen({
         transform: [{ translateY: 0 }],
       },
       style,
-    ],
+    ] as any,
     contentStyle: contentStyle,
   };
 

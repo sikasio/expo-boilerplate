@@ -28,7 +28,8 @@ interface LoadingSpinnerProps {
   duration?: number; // Animation duration in ms
   style?: ViewStyle;
   containerStyle?: ViewStyle;
-  textStyle?: ViewStyle;
+  // Applied to the spinner's caption <Text>; TextStyle suffices.
+  textStyle?: import('react-native').TextStyle;
   showPercentage?: boolean;
   icon?: IconName;
   customIcon?: React.ReactNode;
@@ -175,7 +176,9 @@ export function LoadingSpinner({
 
     return {
       ...baseStyle,
-      flex: position !== 'inline' ? 1 : undefined,
+      // Some call sites pass 'inline' even though it isn't in the union; keep
+      // the guard but widen the comparison so TS doesn't flag it.
+      flex: (position as string) !== 'inline' ? 1 : undefined,
       backgroundColor: 'transparent',
     };
   };

@@ -121,7 +121,7 @@ export function HorizontalCardScroll({
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scrollX, setScrollX] = useState(0);
-  const autoScrollTimer = useRef<NodeJS.Timeout>();
+  const autoScrollTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   // Get default values based on variant and size
   const getDefaultCardWidth = () => {

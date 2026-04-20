@@ -445,7 +445,7 @@ export const Modal: React.FC<ModalProps> = ({
               <Button
                 key={index}
                 title={action.title}
-                variant={action.variant || 'outline'}
+                variant={(action.variant || 'outline') as any}
                 size="medium"
                 onPress={action.onPress}
                 disabled={action.disabled}
@@ -497,7 +497,7 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Container */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={[styles.container, getPositionStyle()]}
+        style={[styles.container, getPositionStyle()] as any}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <Animated.View

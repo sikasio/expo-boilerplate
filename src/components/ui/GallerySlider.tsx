@@ -71,7 +71,7 @@ export const GallerySlider: React.FC<GallerySliderProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: height });
   const scrollViewRef = useRef<ScrollView>(null);
-  const autoPlayRef = useRef<NodeJS.Timeout>();
+  const autoPlayRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const zoomScale = useRef(new Animated.Value(1)).current;
   const panX = useRef(new Animated.Value(0)).current;
   const panY = useRef(new Animated.Value(0)).current;
@@ -166,7 +166,9 @@ export const GallerySlider: React.FC<GallerySliderProps> = ({
   const handlePanGesture = useCallback((event: PanGestureHandlerGestureEvent) => {
     if (!enableZoom) return;
 
-    const { translationX, translationY, scale, state } = event.nativeEvent;
+    // `scale` isn't on the pan event payload type; this component was wired
+    // against a mixed pinch/pan gesture originally. Cast to access it safely.
+    const { translationX, translationY, scale, state } = event.nativeEvent as any;
 
     if (state === State.ACTIVE) {
       zoomScale.setValue(scale);

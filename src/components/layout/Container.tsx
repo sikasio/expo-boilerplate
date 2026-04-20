@@ -42,7 +42,10 @@ export function Container({
                       false;
 
   const getContainerStyle = () => {
-    const paddingStyles = {
+    // All entries share the same shape so TS doesn't narrow 'none' to {} and
+    // then refuse the paddingBottom access below.
+    type PaddingStyle = { paddingHorizontal?: number; paddingTop?: number; paddingBottom?: number };
+    const paddingStyles: Record<NonNullable<ContainerProps['padding']>, PaddingStyle> = {
       none: {},
       // Legacy padding options
       small: {

@@ -15,7 +15,7 @@ export type SkeletonShape = 'rect' | 'circle' | 'rounded';
 
 interface SkeletonLineProps {
   width?: string | number;
-  height?: number;
+  height?: number | string;
   shape?: SkeletonShape;
   marginBottom?: number;
   animation?: SkeletonAnimation;
@@ -30,7 +30,8 @@ interface SkeletonCardProps extends ViewProps {
   // Layout options
   horizontal?: boolean;
   showImage?: boolean;
-  imageSize?: { width: number; height: number };
+  // Percentage strings are also valid (e.g. '100%').
+  imageSize?: { width: number | string; height: number | string };
   imageShape?: SkeletonShape;
   
   // Header section
@@ -135,7 +136,7 @@ const SkeletonLine: React.FC<SkeletonLineProps> = ({
             overflow: 'hidden',
           },
           getShapeStyle(),
-        ]}
+        ] as any}
       >
         <Animated.View
           style={[
@@ -161,7 +162,7 @@ const SkeletonLine: React.FC<SkeletonLineProps> = ({
         },
         getShapeStyle(),
         animatedStyle,
-      ]}
+      ] as any}
     />
   );
 };

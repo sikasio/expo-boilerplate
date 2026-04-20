@@ -8,7 +8,7 @@ import { Text } from '../ui/Text';
 export type BackButtonVariant = 'icon-only' | 'with-text' | 'text-only';
 export type BackButtonSize = 'small' | 'medium' | 'large';
 
-interface BackButtonProps extends Omit<TouchableOpacityProps, 'onPress'> {
+export interface BackButtonProps extends Omit<TouchableOpacityProps, 'onPress'> {
   onPress?: () => void;
   variant?: BackButtonVariant;
   size?: BackButtonSize;
@@ -44,7 +44,9 @@ export function BackButton({
     } else if (canNavigateBack) {
       router.back();
     } else {
-      router.replace(fallbackRoute);
+      // `fallbackRoute` is a user-provided string; expo-router's Href type is
+      // a strict literal union, so cast to satisfy the compiler at the boundary.
+      router.replace(fallbackRoute as any);
     }
   };
 

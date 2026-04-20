@@ -304,7 +304,7 @@ export function ListItem({
           <Avatar
             source={leftAvatar.source}
             title={leftAvatar.title}
-            size={leftAvatar.size || 'medium'}
+            size={leftAvatar.size || ('medium' as any)}
             variant={leftAvatar.variant}
           />
         </View>
