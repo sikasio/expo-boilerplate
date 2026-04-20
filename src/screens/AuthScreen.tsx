@@ -74,8 +74,11 @@ export type AuthScreenTheme = 'light' | 'dark' | 'gradient' | 'branded' | 'glass
 interface SocialProvider {
   name: string;
   icon: IconName;
-  color: string;
-  onPress: () => void;
+  // Optional: AuthScreen falls back to per-provider brand colors (Google red,
+  // Apple black/white, Facebook blue) when `color` is omitted.
+  color?: string;
+  // Optional: when omitted, onSocialLogin(name) is invoked instead.
+  onPress?: () => void;
 }
 
 interface AuthFormData {
@@ -219,7 +222,7 @@ export interface AuthScreenProps {
 }
 
 export function AuthScreen({
-  variant = 'login',
+  variant = 'login-email',
   layout = 'default',
   theme: authTheme,
   showBackButton = false,
@@ -1275,7 +1278,7 @@ export function AuthScreen({
                 case 'facebook':
                   return '#1877F2'; // Always Facebook blue
                 default:
-                  return provider.color;
+                  return provider.color ?? theme.colors.primary;
               }
             };
 
@@ -1288,7 +1291,7 @@ export function AuthScreen({
                 case 'facebook':
                   return '#1877F2'; // Same as background for seamless look
                 default:
-                  return provider.color;
+                  return provider.color ?? theme.colors.primary;
               }
             };
 
@@ -1363,7 +1366,7 @@ export function AuthScreen({
                 }}
                 loading={isLoading}
                 disabled={isLoading}
-                style={getButtonStyle(provider.name)}
+                style={getButtonStyle(provider.name) as any}
                 textStyle={{
                   color: getTextColor(provider.name),
                   fontWeight: '600',

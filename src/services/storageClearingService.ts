@@ -197,7 +197,7 @@ export class StorageClearingService {
       return {
         success: true,
         totalKeys: allKeys.length,
-        removedKeys: allKeys,
+        removedKeys: [...allKeys], // copy into mutable array to satisfy return type
       };
 
     } catch (error) {

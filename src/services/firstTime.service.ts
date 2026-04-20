@@ -68,7 +68,7 @@ export class FirstTimeService {
         version: config.version
       };
       await StorageService.setAppObject(storageKey, data);
-      logger.debug(`FirstTimeService: Marked ${config.key} as not first time`, null, { function: 'markAsNotFirstTime', service: 'FirstTimeService', key: config.key });
+      logger.debug(`FirstTimeService: Marked ${config.key} as not first time`, { function: 'markAsNotFirstTime', service: 'FirstTimeService', key: config.key });
     } catch (error) {
       logger.error(`FirstTimeService: Error marking first time as complete for ${config.key}:`, error, { function: 'markAsNotFirstTime', service: 'FirstTimeService', key: config.key, version: config.version });
     }
@@ -83,7 +83,7 @@ export class FirstTimeService {
     try {
       const storageKey = this.getStorageKey(config.key, config.version);
       await StorageService.removeAppItem(storageKey);
-      logger.debug(`FirstTimeService: Reset first time status for ${config.key}`, null, { function: 'resetFirstTime', service: 'FirstTimeService', key: config.key });
+      logger.debug(`FirstTimeService: Reset first time status for ${config.key}`, { function: 'resetFirstTime', service: 'FirstTimeService', key: config.key });
     } catch (error) {
       logger.error(`FirstTimeService: Error resetting first time status for ${config.key}:`, error, { function: 'resetFirstTime', service: 'FirstTimeService', key: config.key, version: config.version });
     }
@@ -127,7 +127,7 @@ export class FirstTimeService {
       }
       
       if (firstTimeKeys.length > 0) {
-        logger.debug(`FirstTimeService: Cleared ${firstTimeKeys.length} first-time records for current app`, null, { function: 'clearAllFirstTimeData', service: 'FirstTimeService', recordsCleared: firstTimeKeys.length });
+        logger.debug(`FirstTimeService: Cleared ${firstTimeKeys.length} first-time records for current app`, { function: 'clearAllFirstTimeData', service: 'FirstTimeService', recordsCleared: firstTimeKeys.length });
       }
     } catch (error) {
       logger.error('FirstTimeService: Error clearing all first time data:', error, { function: 'clearAllFirstTimeData', service: 'FirstTimeService' });

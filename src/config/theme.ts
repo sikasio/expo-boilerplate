@@ -8,20 +8,29 @@ export interface LazyImageTheme {
   defaultTimeout: number;
 }
 
+// Use the structural key shape from COLORS (so we keep the typo-check) but
+// widen each value to `string` — otherwise `DARK_COLORS` and consumer overrides
+// (which provide different hex strings) can't be assigned.
+export type ThemeColors = { [K in keyof typeof COLORS]: string };
+
 export interface Theme {
-  colors: typeof COLORS;
+  colors: ThemeColors;
   sizes: typeof SIZES;
   fontSizes: typeof FONT_SIZES;
   borderRadius: typeof BORDER_RADIUS;
-  lazyImage: LazyImageTheme;
+  lazyImage?: LazyImageTheme;
   isDark: boolean;
-  // Font-related properties (will be provided by FontContext)
   fontFamily?: FontFamily;
   lineHeightMultiplier?: number;
 }
 
+export interface ColorSchemeColors {
+  light: { primary: string; secondary: string };
+  dark: { primary: string; secondary: string };
+}
+
 export const lightTheme: Theme = {
-  colors: COLORS,
+  colors: { ...COLORS },
   sizes: SIZES,
   fontSizes: FONT_SIZES,
   borderRadius: BORDER_RADIUS,
@@ -29,16 +38,24 @@ export const lightTheme: Theme = {
 };
 
 export const darkTheme: Theme = {
-  colors: DARK_COLORS,
+  colors: { ...DARK_COLORS },
   sizes: SIZES,
   fontSizes: FONT_SIZES,
   borderRadius: BORDER_RADIUS,
   isDark: true,
 };
 
+const customColorSchemes: Record<string, ColorSchemeColors> = {};
+
+export function registerColorScheme(name: string, colors: ColorSchemeColors): void {
+  customColorSchemes[name] = colors;
+}
+
 export const getTheme = (isDark: boolean, colorScheme: string = 'blue'): Theme => {
   const baseTheme = isDark ? darkTheme : lightTheme;
-  const schemeColors = COLOR_SCHEMES[colorScheme as keyof typeof COLOR_SCHEMES];
+  const schemeColors =
+    customColorSchemes[colorScheme] ??
+    COLOR_SCHEMES[colorScheme as keyof typeof COLOR_SCHEMES];
 
   if (schemeColors) {
     const colors = isDark ? schemeColors.dark : schemeColors.light;

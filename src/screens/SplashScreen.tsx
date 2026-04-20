@@ -86,8 +86,10 @@ export interface SplashScreenProps {
   // Style overrides
   style?: ViewStyle;
   contentStyle?: ViewStyle;
-  logoStyle?: ViewStyle;
-  textStyle?: ViewStyle;
+  // Logo is rendered via Animated.Image, so ImageStyle is the right shape.
+  logoStyle?: import('react-native').ImageStyle;
+  // Text styles flow into <Text> children — TextStyle is the right shape.
+  textStyle?: import('react-native').TextStyle;
 }
 
 export function SplashScreen({

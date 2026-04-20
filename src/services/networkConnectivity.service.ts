@@ -28,7 +28,7 @@ export class NetworkConnectivityService {
     isNowOnline: false,
   };
   private initialized = false;
-  private checkInterval: NodeJS.Timeout | null = null;
+  private checkInterval: ReturnType<typeof setTimeout> | null = null;
   private connectionCheckUrl = 'https://www.google.com/favicon.ico'; // Small, fast endpoint
 
   public static getInstance(): NetworkConnectivityService {

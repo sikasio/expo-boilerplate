@@ -97,8 +97,9 @@ export const createNavigationOptions = (theme: any, animationType: NavigationAni
           animationDuration: 100,
           gestureEnabled: true,
           gestureDirection: 'horizontal' as const,
+          // React Navigation 7+ expects start/end/top/bottom, not horizontal/vertical.
           gestureResponseDistance: {
-            horizontal: 15,
+            start: 15,
           },
           gestureVelocityImpact: 0.3,
         }),
@@ -106,8 +107,9 @@ export const createNavigationOptions = (theme: any, animationType: NavigationAni
           presentation: 'card' as const,
           gestureEnabled: true,
           gestureDirection: 'horizontal' as const,
+          // React Navigation 7+ expects start/end/top/bottom, not horizontal/vertical.
           gestureResponseDistance: {
-            horizontal: 15,
+            start: 15,
           },
           gestureVelocityImpact: 0.3,
         }),
@@ -153,7 +155,7 @@ export const createNavigationOptions = (theme: any, animationType: NavigationAni
           gestureEnabled: true,
           gestureDirection: 'horizontal' as const,
           gestureResponseDistance: {
-            horizontal: 25,
+            start: 25,
           },
         }),
         ...(Platform.OS === 'ios' && {
@@ -161,7 +163,7 @@ export const createNavigationOptions = (theme: any, animationType: NavigationAni
           gestureEnabled: true,
           gestureDirection: 'horizontal' as const,
           gestureResponseDistance: {
-            horizontal: 25,
+            start: 25,
           },
         }),
       };

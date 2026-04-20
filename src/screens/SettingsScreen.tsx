@@ -27,18 +27,24 @@ import { MiniView } from '../components';
 export type SettingsScreenLayout = 'default' | 'grouped' | 'minimal' | 'detailed';
 export type SettingsScreenTheme = 'auto' | 'light' | 'dark' | 'gradient';
 
+// Icons are forwarded to <Icon name={...}>, which accepts any valid Ionicons
+// string. Consumer-declared sections rarely use the IconName literal union
+// directly (they inline string literals that widen to `string`), so we accept
+// both forms here to keep the API ergonomic.
+type SettingIcon = IconName | string;
+
 interface SettingItem {
   id: string;
   title: string;
   subtitle?: string;
-  icon: IconName;
+  icon: SettingIcon;
   value?: string | boolean | number;
   type: 'navigation' | 'toggle' | 'info' | 'action' | 'picker' | 'slider';
   onPress?: () => void;
   onToggle?: (value: boolean) => void;
   onValueChange?: (value: any) => void;
   color?: string;
-  rightIcon?: IconName;
+  rightIcon?: SettingIcon;
   badge?: string;
   disabled?: boolean;
   destructive?: boolean;
@@ -52,7 +58,7 @@ interface SettingSection {
   id: string;
   title: string;
   subtitle?: string;
-  icon?: IconName;
+  icon?: SettingIcon;
   items: SettingItem[];
 }
 
@@ -104,7 +110,7 @@ interface SettingsScreenContent {
     rate?: { title: string; subtitle?: string };
     version?: { title: string; subtitle?: string };
     terms?: { title: string; subtitle?: string };
-    privacy?: { title: string; subtitle?: string };
+    privacyPolicy?: { title: string; subtitle?: string };
     licenses?: { title: string; subtitle?: string };
     logout?: { title: string; subtitle?: string };
     deleteAccount?: { title: string; subtitle?: string };
@@ -294,7 +300,7 @@ export function SettingsScreen({
   const [autoBackup, setAutoBackup] = useState(true);
   const [offlineMode, setOfflineMode] = useState(false);
   const [dataUsage, setDataUsage] = useState('wifi-only');
-  const [language, setLanguage] = useState(AppConfig.defaults.language);
+  const [language, setLanguage] = useState<string>(AppConfig.defaults.language);
   // fontSize is now from FontContext, remove local state
 
   // Animation
@@ -342,11 +348,14 @@ export function SettingsScreen({
   };
 
   const handleUserPress = () => {
-    onUserPress?.() || Alert.alert('User Settings', 'Navigate to user settings');
+    // Prior impl used `||` which tripped TS's "void isn't truthy-testable" check.
+    if (onUserPress) onUserPress();
+    else Alert.alert('User Settings', 'Navigate to user settings');
   };
 
   const handleSearchPress = () => {
-    onSearchPress?.() || Alert.alert('Search Settings', 'Open settings search');
+    if (onSearchPress) onSearchPress();
+    else Alert.alert('Search Settings', 'Open settings search');
   };
 
   const handleLogout = () => {
@@ -529,20 +538,21 @@ export function SettingsScreen({
           icon: 'language-outline',
           type: 'picker',
           value: language,
-          options: LanguageOptions,
+          options: [...LanguageOptions], // spread readonly config into mutable array
           onPress: () => {
-            Alert.alert(
-              'Select Language',
-              'Choose your preferred language',
-              LanguageOptions.map(lang => ({
-                text: lang.label,
-                onPress: async () => {
-                  setLanguage(lang.value);
-                  await saveLanguage(lang.value);
-                  Alert.alert(mergedContent.alerts?.languageChanged?.title || 'Language Changed', `${mergedContent.alerts?.languageChanged?.message || 'Language changed to'} ${lang.label}`);
-                }
-              })).concat([{ text: 'Cancel', style: 'cancel' }])
-            );
+            const buttons: any[] = LanguageOptions.map(lang => ({
+              text: lang.label,
+              onPress: async () => {
+                setLanguage(lang.value);
+                await saveLanguage(lang.value);
+                Alert.alert(
+                  mergedContent.alerts?.languageChanged?.title || 'Language Changed',
+                  `${mergedContent.alerts?.languageChanged?.message || 'Language changed to'} ${lang.label}`
+                );
+              },
+            }));
+            buttons.push({ text: 'Cancel', style: 'cancel' });
+            Alert.alert('Select Language', 'Choose your preferred language', buttons);
           },
         },
         {
@@ -572,17 +582,18 @@ export function SettingsScreen({
               { label: '24 (XXX-Large)', value: 24 },
             ];
 
-            Alert.alert(
-              'Select Font Size',
-              'Choose your preferred base font size',
-              fontSizeOptions.map(option => ({
-                text: option.label,
-                onPress: async () => {
-                  await setFontSize(option.value);
-                  Alert.alert(mergedContent.alerts?.fontSizeChanged?.title || 'Font Size Changed', `${mergedContent.alerts?.fontSizeChanged?.message || 'Font size changed to'} ${option.label}`);
-                }
-              })).concat([{ text: 'Cancel', style: 'cancel' }])
-            );
+            const fontButtons: any[] = fontSizeOptions.map(option => ({
+              text: option.label,
+              onPress: async () => {
+                await setFontSize(option.value);
+                Alert.alert(
+                  mergedContent.alerts?.fontSizeChanged?.title || 'Font Size Changed',
+                  `${mergedContent.alerts?.fontSizeChanged?.message || 'Font size changed to'} ${option.label}`
+                );
+              },
+            }));
+            fontButtons.push({ text: 'Cancel', style: 'cancel' });
+            Alert.alert('Select Font Size', 'Choose your preferred base font size', fontButtons);
           },
         },
       ],
@@ -630,17 +641,18 @@ export function SettingsScreen({
               { label: 'Ask Every Time', value: 'ask' },
             ];
 
-            Alert.alert(
-              'Data Usage',
-              'Choose when to use mobile data',
-              dataOptions.map(option => ({
-                text: option.label,
-                onPress: () => {
-                  setDataUsage(option.value);
-                  Alert.alert(mergedContent.alerts?.dataUsageChanged?.title || 'Data Usage Changed', `${mergedContent.alerts?.dataUsageChanged?.message || 'Data usage set to'} ${option.label}`);
-                }
-              })).concat([{ text: 'Cancel', style: 'cancel' }])
-            );
+            const dataButtons: any[] = dataOptions.map(option => ({
+              text: option.label,
+              onPress: () => {
+                setDataUsage(option.value);
+                Alert.alert(
+                  mergedContent.alerts?.dataUsageChanged?.title || 'Data Usage Changed',
+                  `${mergedContent.alerts?.dataUsageChanged?.message || 'Data usage set to'} ${option.label}`
+                );
+              },
+            }));
+            dataButtons.push({ text: 'Cancel', style: 'cancel' });
+            Alert.alert('Data Usage', 'Choose when to use mobile data', dataButtons);
           },
         },
         {
@@ -720,7 +732,7 @@ export function SettingsScreen({
         },
         {
           id: 'privacy-policy',
-          title: mergedContent.items?.privacy?.title || 'Privacy Policy',
+          title: mergedContent.items?.privacyPolicy?.title || 'Privacy Policy',
           icon: 'shield-checkmark-outline',
           type: 'navigation',
           rightIcon: 'open-outline',
@@ -1006,8 +1018,8 @@ export function SettingsScreen({
         variant="compact"
         title={item.title}
         subtitle={item.subtitle}
-        leftIcon={item.icon}
-        rightIcon={item.type === 'navigation' ? item.rightIcon : undefined}
+        leftIcon={item.icon as IconName}
+        rightIcon={item.type === 'navigation' ? (item.rightIcon as IconName | undefined) : undefined}
         rightContent={getRightContent()}
         badge={item.badge ? { text: item.badge } : undefined}
         onPress={!isDisabled ? item.onPress : undefined}

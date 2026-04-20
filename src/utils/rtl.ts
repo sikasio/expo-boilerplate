@@ -233,10 +233,13 @@ export const transformRTLStyle = (style: ViewStyle | TextStyle, rtl?: boolean): 
   
   // Transform text alignment
   if ('textAlign' in style) {
-    if (style.textAlign === 'left') {
-      transformedStyle.textAlign = 'right';
-    } else if (style.textAlign === 'right') {
-      transformedStyle.textAlign = 'left';
+    // style here is a union with a ViewStyle branch that doesn't carry textAlign;
+    // cast through any for the narrow access.
+    const ta = (style as any).textAlign;
+    if (ta === 'left') {
+      (transformedStyle as any).textAlign = 'right';
+    } else if (ta === 'right') {
+      (transformedStyle as any).textAlign = 'left';
     }
   }
   
@@ -258,34 +261,38 @@ export const transformRTLStyle = (style: ViewStyle | TextStyle, rtl?: boolean): 
  * @param rtlStyle - Style overrides for RTL mode  
  * @param rtl - Optional RTL override
  */
-export const createRTLStyle = (
-  baseStyle: ViewStyle | TextStyle,
-  rtlStyle?: Partial<ViewStyle | TextStyle>,
+// Generic over the style type so callers that pass a ViewStyle get a ViewStyle
+// back (instead of a widened ViewStyle | TextStyle the View components reject).
+export const createRTLStyle = <T extends ViewStyle | TextStyle>(
+  baseStyle: T,
+  rtlStyle?: Partial<T>,
   rtl?: boolean
-): ViewStyle | TextStyle => {
+): T => {
   const isRTLActive = rtl !== undefined ? rtl : false; // Default to false - manual RTL control
-  
+
   if (!isRTLActive) {
     return baseStyle;
   }
-  
+
   // Apply RTL transformations to base style
-  const transformedBaseStyle = transformRTLStyle(baseStyle, rtl);
-  
+  const transformedBaseStyle = transformRTLStyle(baseStyle, rtl) as T;
+
   // Merge with explicit RTL overrides
   return {
     ...transformedBaseStyle,
     ...(rtlStyle || {}),
-  };
+  } as T;
 };
 
 /**
  * RTL-aware icon name converter
- * Automatically converts directional icons for RTL mode
+ * Automatically converts directional icons for RTL mode.
+ * Generic over the input type so callers that pass an `IconName` literal
+ * union get the same union back (instead of widening to `string`).
  */
-export const getRTLIconName = (iconName: string, rtl?: boolean): string => {
+export const getRTLIconName = <T extends string>(iconName: T, rtl?: boolean): T => {
   const isRTLActive = rtl !== undefined ? rtl : false; // Default to false when no context provided
-  
+
   if (!isRTLActive) {
     return iconName;
   }
@@ -325,8 +332,10 @@ export const getRTLIconName = (iconName: string, rtl?: boolean): string => {
     'trending-down': 'trending-up',
   };
   
-  // Return mapped icon or original if no mapping exists
-  return arrowMappings[iconName] || iconName;
+  // Return mapped icon or original if no mapping exists. Cast because the
+  // mapping table stores plain strings, but each mapped pair is still a
+  // member of the IconName union in practice.
+  return (arrowMappings[iconName] as T) || iconName;
 };
 
 /**
