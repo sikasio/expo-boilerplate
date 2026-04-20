@@ -44,6 +44,9 @@ interface ListItemProps extends TouchableOpacityProps {
   subtitle?: string;
   description?: string;
   leftIcon?: IconName;
+  // Optional override for the left icon's tint color. Falls back to the
+  // ListItem's default foreground color.
+  leftIconColor?: string;
   rightIcon?: IconName;
   iconSize?: number;
   iconBackground?: string;
@@ -168,6 +171,7 @@ export function ListItem({
   subtitle,
   description,
   leftIcon,
+  leftIconColor,
   rightIcon,
   iconSize = 20,
   iconBackground,
@@ -330,7 +334,7 @@ export function ListItem({
           <Icon
             name={getRTLIconName(leftIcon, isRTL)}
             size={iconSize}
-            color={selected ? theme.colors.primary : theme.colors.text}
+            color={leftIconColor ?? (selected ? theme.colors.primary : theme.colors.text)}
           />
         </View>
       );

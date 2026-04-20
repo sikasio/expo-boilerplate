@@ -62,6 +62,9 @@ export interface HorizontalCardScrollProps extends Omit<ScrollViewProps, 'horizo
   loading?: boolean;
   error?: string;
   emptyMessage?: string;
+  // Ionicons name shown in the default empty-state layout. Forwarded to the
+  // typed Icon at render time; any string literal is accepted.
+  emptyIcon?: string;
   refreshing?: boolean;
   onRefresh?: () => void;
   onLoadMore?: () => void;
@@ -97,6 +100,8 @@ export function HorizontalCardScroll({
   loading = false,
   error,
   emptyMessage = 'No items to display',
+  emptyIcon: _emptyIcon, // accepted for API symmetry; default empty renderer ignores it
+
   refreshing = false,
   onRefresh,
   onLoadMore,
