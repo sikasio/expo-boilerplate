@@ -107,9 +107,9 @@ export function MiniView({
                         false; // Default to no RTL unless explicitly enabled
 
   // Process passed style to extract RTL-relevant properties
-  const styleArray = Array.isArray(style) ? style : [style];
-  const flattenedStyle = styleArray.reduce((acc, styleItem) => {
-    if (styleItem) {
+  const styleArray = (Array.isArray(style) ? style : [style]) as any[];
+  const flattenedStyle = styleArray.reduce((acc: any, styleItem: any) => {
+    if (styleItem && typeof styleItem === 'object' && !Array.isArray(styleItem)) {
       return { ...acc, ...styleItem };
     }
     return acc;
@@ -127,32 +127,35 @@ export function MiniView({
     rtlAwareStyle.flexDirection = flexDirection;
   }
 
-  // Handle margins using RTL utilities - enableRTL overrides style margins
+  // Handle margins — swap left/right when RTL is active.
+  // (Prior impl called getRTLMargin() with the wrong shape; utility returns
+  // marginStart/marginEnd helpers, not {left, right}.)
+  const swapLR = (left: number, right: number): { left: number; right: number } =>
+    shouldApplyRTL ? { left: right, right: left } : { left, right };
+
   if (enableRTL && shouldApplyRTL) {
-    // Override margins from style when enableRTL is active
-    const styleMarginLeft = marginLeft !== undefined ? marginLeft : flattenedStyle.marginLeft || 0;
-    const styleMarginRight = marginRight !== undefined ? marginRight : flattenedStyle.marginRight || 0;
-    const margins = getRTLMargin(styleMarginLeft, styleMarginRight, shouldApplyRTL);
-    rtlAwareStyle.marginLeft = margins.left;
-    rtlAwareStyle.marginRight = margins.right;
+    const styleMarginLeft = marginLeft !== undefined ? marginLeft : (flattenedStyle.marginLeft as number) || 0;
+    const styleMarginRight = marginRight !== undefined ? marginRight : (flattenedStyle.marginRight as number) || 0;
+    const m = swapLR(styleMarginLeft, styleMarginRight);
+    rtlAwareStyle.marginLeft = m.left;
+    rtlAwareStyle.marginRight = m.right;
   } else if (marginLeft !== undefined || marginRight !== undefined) {
-    const margins = getRTLMargin(marginLeft || 0, marginRight || 0, shouldApplyRTL);
-    rtlAwareStyle.marginLeft = margins.left;
-    rtlAwareStyle.marginRight = margins.right;
+    const m = swapLR(marginLeft || 0, marginRight || 0);
+    rtlAwareStyle.marginLeft = m.left;
+    rtlAwareStyle.marginRight = m.right;
   }
 
-  // Handle padding using RTL utilities - enableRTL overrides style padding
+  // Handle padding same as margins.
   if (enableRTL && shouldApplyRTL) {
-    // Override padding from style when enableRTL is active
-    const stylePaddingLeft = paddingLeft !== undefined ? paddingLeft : flattenedStyle.paddingLeft || 0;
-    const stylePaddingRight = paddingRight !== undefined ? paddingRight : flattenedStyle.paddingRight || 0;
-    const paddings = getRTLMargin(stylePaddingLeft, stylePaddingRight, shouldApplyRTL);
-    rtlAwareStyle.paddingLeft = paddings.left;
-    rtlAwareStyle.paddingRight = paddings.right;
+    const stylePaddingLeft = paddingLeft !== undefined ? paddingLeft : (flattenedStyle.paddingLeft as number) || 0;
+    const stylePaddingRight = paddingRight !== undefined ? paddingRight : (flattenedStyle.paddingRight as number) || 0;
+    const p = swapLR(stylePaddingLeft, stylePaddingRight);
+    rtlAwareStyle.paddingLeft = p.left;
+    rtlAwareStyle.paddingRight = p.right;
   } else if (paddingLeft !== undefined || paddingRight !== undefined) {
-    const paddings = getRTLMargin(paddingLeft || 0, paddingRight || 0, shouldApplyRTL);
-    rtlAwareStyle.paddingLeft = paddings.left;
-    rtlAwareStyle.paddingRight = paddings.right;
+    const p = swapLR(paddingLeft || 0, paddingRight || 0);
+    rtlAwareStyle.paddingLeft = p.left;
+    rtlAwareStyle.paddingRight = p.right;
   }
 
   // Handle logical properties (start/end)
@@ -216,17 +219,17 @@ export function MiniView({
     // All other properties (colors, sizes, backgrounds, etc.) should be preserved
     if (style) {
       const styleArray = Array.isArray(style) ? style : [style];
-      processedStyle = styleArray.map(styleItem => {
-        if (styleItem && typeof styleItem === 'object') {
-          const { 
-            flexDirection: _, 
-            marginLeft: __, 
-            marginRight: ___, 
-            paddingLeft: ____, 
-            paddingRight: _____, 
-            left: ______, 
-            right: _______, 
-            ...preservedStyle 
+      processedStyle = styleArray.map((styleItem: any) => {
+        if (styleItem && typeof styleItem === 'object' && !Array.isArray(styleItem)) {
+          const {
+            flexDirection: _,
+            marginLeft: __,
+            marginRight: ___,
+            paddingLeft: ____,
+            paddingRight: _____,
+            left: ______,
+            right: _______,
+            ...preservedStyle
           } = styleItem;
           return preservedStyle;
         }
@@ -234,7 +237,8 @@ export function MiniView({
       });
     }
   } else if (shouldApplyRTL) {
-    processedStyle = createRTLStyle(style as ViewStyle, shouldApplyRTL);
+    // createRTLStyle is (baseStyle, rtlStyle?, rtl?) — pass the rtl flag as arg 3.
+    processedStyle = createRTLStyle(style as ViewStyle, undefined, shouldApplyRTL);
   }
 
   return (
