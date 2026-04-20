@@ -14,7 +14,7 @@ import { Icon, IconName } from './Icon';
 import { Button } from './Button';
 import { getFlexDirection, getRTLMargin, createRTLStyle } from '../../utils';
 
-export type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled';
+export type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled' | 'ghost';
 export type CardSize = 'small' | 'medium' | 'large';
 export type CardColorScheme = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost' | 'white';
 
@@ -26,7 +26,7 @@ interface CardAction {
   rightIcon?: IconName;
 }
 
-interface CardProps extends ViewProps {
+export interface CardProps extends ViewProps {
   children?: React.ReactNode;
   onPress?: () => void;
   variant?: CardVariant;
@@ -218,6 +218,15 @@ export function Card({
         backgroundColor: schemeColors.backgroundColor,
         borderWidth: 1,
         borderColor: schemeColors.borderColor,
+      },
+      // Ghost: no surface, border, or shadow — just hosts its children.
+      ghost: {
+        ...baseStyle,
+        backgroundColor: 'transparent',
+        borderWidth: 0,
+        shadowOpacity: 0,
+        shadowRadius: 0,
+        elevation: 0,
       },
     };
 

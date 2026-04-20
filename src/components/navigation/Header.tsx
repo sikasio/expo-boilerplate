@@ -15,6 +15,8 @@ interface HeaderProps extends ViewProps {
   titleSize?: keyof typeof import('../../constants').FONT_SIZES;
   showBackButton?: boolean;
   backButtonProps?: Partial<BackButtonProps>;
+  // Shortcut for overriding the back-button handler without spreading backButtonProps.
+  onBackPress?: () => void;
   leftComponent?: React.ReactNode;
   rightComponent?: React.ReactNode;
   centerComponent?: React.ReactNode;
@@ -31,6 +33,7 @@ export function Header({
   titleSize = 'lg',
   showBackButton = true,
   backButtonProps,
+  onBackPress,
   leftComponent,
   rightComponent,
   centerComponent,
@@ -108,6 +111,7 @@ export function Header({
             variant="icon-only"
             size="medium"
             {...backButtonProps}
+            {...(onBackPress && { onPress: onBackPress })}
           />
         </View>
       );

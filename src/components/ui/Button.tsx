@@ -17,14 +17,19 @@ import { getFlexDirection, getRTLMargin, createRTLStyle, getRTLIconName } from '
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'outline-white' | 'ghost' | 'success' | 'warning' | 'error' | 'outline-error' | 'outline-warning';
 export type ButtonSize = 'xs' | 'small' | 'medium' | 'large' | 'xl';
 
-interface ButtonProps extends TouchableOpacityProps {
+export interface ButtonProps extends TouchableOpacityProps {
   title?: string;
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
+  // Optional text shown in place of title while loading. Accepted for API
+  // parity with other UI kits; ignored if loading is false.
+  loadingText?: string;
   disabled?: boolean;
   leftIcon?: IconName;
   rightIcon?: IconName;
+  startIcon?: IconName;
+  endIcon?: IconName;
   textStyle?: TextStyle;
   iconColor?: string;
   iconStyle?: TextStyle;
@@ -35,9 +40,12 @@ export function Button({
   variant = 'primary',
   size = 'medium',
   loading = false,
+  loadingText: _loadingText,
   disabled = false,
-  leftIcon,
-  rightIcon,
+  leftIcon: leftIconProp,
+  rightIcon: rightIconProp,
+  startIcon: startIconAlias,
+  endIcon: endIconAlias,
   textStyle,
   iconColor,
   iconStyle,
@@ -45,6 +53,9 @@ export function Button({
   onPress,
   ...props
 }: ButtonProps) {
+  // Accept both `leftIcon`/`rightIcon` and the alias pair `startIcon`/`endIcon`.
+  const leftIcon = leftIconProp ?? startIconAlias;
+  const rightIcon = rightIconProp ?? endIconAlias;
   const { theme } = useTheme();
   
   const { isRTL } = useRTL();
@@ -224,10 +235,10 @@ export function Button({
       ) : (
         <>
           {startIcon && (
-            <View style={iconStyle}>
+            <View style={iconStyle as any}>
               <Icon 
                 name={getRTLIconName(startIcon, isRTL)} 
-                color={iconColor || textStyle?.color || getTextColor()} 
+                color={(iconColor || textStyle?.color || getTextColor()) as string}
                 size={getFontSize()} 
               />
             </View>
@@ -251,10 +262,10 @@ export function Button({
           )}
           
           {endIcon && (
-            <View style={iconStyle}>
+            <View style={iconStyle as any}>
               <Icon 
                 name={getRTLIconName(endIcon, isRTL)} 
-                color={iconColor || textStyle?.color || getTextColor()} 
+                color={(iconColor || textStyle?.color || getTextColor()) as string}
                 size={getFontSize()} 
               />
             </View>

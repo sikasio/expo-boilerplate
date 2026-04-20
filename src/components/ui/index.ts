@@ -1,4 +1,5 @@
 export { Text } from './Text';
+export type { TextVariant } from './Text';
 export { Button } from './Button';
 export { ButtonGroup } from './ButtonGroup';
 export { Card } from './Card';

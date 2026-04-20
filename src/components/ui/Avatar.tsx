@@ -15,13 +15,15 @@ export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export type AvatarVariant = 'circle' | 'rounded' | 'square';
 export type AvatarStatus = 'online' | 'offline' | 'busy' | 'away';
 
-interface AvatarProps extends TouchableOpacityProps {
+export interface AvatarProps extends TouchableOpacityProps {
   // Image properties
   source?: { uri: string } | number;
   alt?: string;
-  
+
   // Fallback content
   name?: string;
+  // Also accept 'title' as an alias for the initials-fallback content.
+  title?: string;
   initials?: string;
   fallbackIcon?: IconName;
   

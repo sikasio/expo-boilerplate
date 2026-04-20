@@ -5,7 +5,7 @@ import { useRTL } from '../../contexts/RTLContext';
 import { useFont } from '../../contexts/FontContext';
 import { getTextAlign, createRTLStyle } from '../../utils';
 
-type TextVariant = 'title' | 'subtitle' | 'body' | 'caption' | 'label';
+export type TextVariant = 'title' | 'subtitle' | 'heading' | 'body' | 'caption' | 'label';
 
 interface TextProps extends RNTextProps {
   variant?: TextVariant;
@@ -43,16 +43,19 @@ export function Text({
   const { requestedFontWeight, isItalic } = React.useMemo(() => {
     if (!style) return { requestedFontWeight: null, isItalic: false };
 
-    // Handle both single style object and style arrays
-    const styleArray = Array.isArray(style) ? style : [style];
+    // Handle both single style object and style arrays. Cast each entry to
+    // `any` because the element type includes RecursiveArray, which doesn't
+    // structurally have `fontStyle` / `fontWeight` even though the flattened
+    // value does.
+    const styleArray = (Array.isArray(style) ? style : [style]) as any[];
 
     // Check for italic
-    const hasItalic = styleArray.some(s => s && typeof s === 'object' && s.fontStyle === 'italic');
+    const hasItalic = styleArray.some(s => s && typeof s === 'object' && !Array.isArray(s) && s.fontStyle === 'italic');
 
     // Check for fontWeight
     let weight = null;
     for (const s of styleArray) {
-      if (s && typeof s === 'object' && s.fontWeight) {
+      if (s && typeof s === 'object' && !Array.isArray(s) && s.fontWeight) {
         const fw = s.fontWeight;
         if (fw === 'bold' || fw === '700') weight = 'bold';
         else if (fw === '600') weight = 'semiBold';
@@ -159,6 +162,20 @@ export function Text({
             includeFontPadding: false,
           }),
         };
+      case 'heading':
+        // Section heading — between title and subtitle in weight/size.
+        const headingWeight = getAvailableFontWeight('semiBold', requestedFontWeight);
+        return {
+          ...baseStyle,
+          ...getFontStyle(headingWeight, isItalic),
+          fontSize: fontSizes.xxl,
+          lineHeight: getLineHeight(fontSizes.lg),
+          color: color || theme.colors.text,
+          ...(Platform.OS === 'ios' && {
+            paddingTop: getIOSPaddingTop(fontSizes.xxl),
+            includeFontPadding: false,
+          }),
+        };
       case 'body':
         const bodyWeight = getAvailableFontWeight('regular', requestedFontWeight);
         return {
@@ -217,9 +234,9 @@ export function Text({
   const processedUserStyles = React.useMemo(() => {
     if (!style) return undefined;
 
-    const styleArray = Array.isArray(style) ? style : [style];
-    return styleArray.map(s => {
-      if (s && typeof s === 'object') {
+    const styleArray = (Array.isArray(style) ? style : [style]) as any[];
+    return styleArray.map((s: any) => {
+      if (s && typeof s === 'object' && !Array.isArray(s)) {
         // Remove fontStyle and fontWeight since they're handled by FontContext
         const { fontStyle, fontWeight, ...restStyle } = s;
         return restStyle;
