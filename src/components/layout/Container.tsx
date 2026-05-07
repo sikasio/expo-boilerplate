@@ -2,8 +2,13 @@ import React from 'react';
 import {
   View,
   ViewProps,
+  SafeAreaView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+// NOTE: deliberately keeping react-native's deprecated SafeAreaView here.
+// react-native-safe-area-context's SafeAreaView injects extra top inset that
+// stacks with the existing paddingTop:0 + Header layout, producing a visible
+// blank gap above headers. The deprecation warning is acceptable; switching
+// to safe-area-context would require auditing every screen for top spacing.
 import { usePathname } from 'expo-router';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useRTL } from '../../contexts/RTLContext';
