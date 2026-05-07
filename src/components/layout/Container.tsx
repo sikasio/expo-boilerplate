@@ -2,9 +2,8 @@ import React from 'react';
 import {
   View,
   ViewProps,
-  SafeAreaView
 } from 'react-native';
-// import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePathname } from 'expo-router';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useRTL } from '../../contexts/RTLContext';
