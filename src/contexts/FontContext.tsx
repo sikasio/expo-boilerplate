@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Text as RNText } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   FONT_FAMILIES,
@@ -69,6 +69,25 @@ export function FontProvider({ children }: FontProviderProps) {
   // Computed values
   const fontSizes = calculateFontSizes(fontSize);
   const availableFonts = Object.values(FONT_FAMILIES);
+
+  // Apply the active font family as the global default for every <Text> in
+  // the app — including third-party Texts we don't control (react-navigation
+  // tab labels, expo-router header titles, library-rendered text). The
+  // boilerplate <Text> still wins for variant/weight/italic logic since
+  // defaultProps style is the lowest-priority layer of the style cascade.
+  useEffect(() => {
+    const fontFamilyName = fontFamily?.weights?.regular;
+    if (!fontFamilyName) return;
+    // RN's Text type doesn't expose `defaultProps` in TS, so cast through any.
+    const TextWithDefaults = RNText as unknown as { defaultProps?: { style?: any } };
+    const baseStyle = TextWithDefaults.defaultProps?.style;
+    // Preserve any pre-existing default style; just append/replace fontFamily.
+    const baseArray = baseStyle == null ? [] : Array.isArray(baseStyle) ? baseStyle : [baseStyle];
+    TextWithDefaults.defaultProps = {
+      ...(TextWithDefaults.defaultProps || {}),
+      style: [...baseArray, { fontFamily: fontFamilyName }],
+    };
+  }, [fontFamily]);
 
   // Load saved settings on mount
   useEffect(() => {

@@ -5,6 +5,7 @@ import { use3ButtonNavigationDetector } from '../../hooks/use3ButtonNavigationDe
 
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSplash } from '../../contexts/SplashContext';
+import { useFont } from '../../contexts/FontContext';
 import { TabBarIcon } from '../ui/TabBarIcon';
 import { IconName } from '../ui/Icon';
 import { Text } from '../ui/Text';
@@ -28,6 +29,12 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
   const { theme } = useTheme();
   const { isSplashActive } = useSplash();
   const { androidBottomOffset } = use3ButtonNavigationDetector();
+  // Subscribe to FontContext so the tab labels re-render with the active
+  // typeface whenever the user picks a new font in settings. Without this,
+  // react-navigation caches the screenOptions and the labels stay on the
+  // previous font until the navigator unmounts.
+  const { fontFamily } = useFont();
+  const tabBarFontFamily = fontFamily?.weights?.regular;
 
   const getTabBarStyle = () => {
     const dimensions = getTabBarDimensions(design);
@@ -269,12 +276,17 @@ export function BottomTabNavigator({ tabs, design = 'default' }: BottomTabNaviga
         headerTintColor: theme.colors.text,
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        ...(design === 'floating' && {
-          tabBarLabelStyle: {
+        // Apply the active font family to all tab-bar designs (react-navigation
+        // renders labels itself, so they need an explicit style override).
+        tabBarLabelStyle: {
+          ...(design === 'floating' && {
             fontSize: 10,
             fontWeight: '600',
             paddingBottom: 0,
-          },
+          }),
+          ...(tabBarFontFamily ? { fontFamily: tabBarFontFamily } : {}),
+        },
+        ...(design === 'floating' && {
           tabBarIconStyle: {
             marginTop: 0,
           },
