@@ -6,6 +6,7 @@ import { StorageService } from '../services/storage';
 import { STORAGE_KEYS } from '../constants';
 import { logger } from '../utils/logger';
 import { getCurrentAppDefaults } from '../config/appDefaults';
+import { FontContext } from './FontContext';
 
 interface ThemeContextType {
   theme: Theme;
@@ -151,6 +152,19 @@ export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  // Overlay the live fontSizes from FontContext (when present) so consumers
+  // reading `theme.fontSizes` automatically pick up the user's chosen base
+  // size. Falling through to the static theme if FontProvider isn't mounted.
+  const fontCtx = useContext(FontContext);
+  if (fontCtx?.fontSizes) {
+    return {
+      ...context,
+      theme: {
+        ...context.theme,
+        fontSizes: fontCtx.fontSizes,
+      },
+    };
   }
   return context;
 }

@@ -42,7 +42,9 @@ interface FontContextType {
   resetToDefaults: () => Promise<void>;
 }
 
-const FontContext = createContext<FontContextType | undefined>(undefined);
+// Exported so other contexts (notably ThemeContext) can subscribe to live
+// font settings without going through the throwing `useFont` hook.
+export const FontContext = createContext<FontContextType | undefined>(undefined);
 
 interface FontProviderProps {
   children: ReactNode;
