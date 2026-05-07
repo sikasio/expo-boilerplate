@@ -138,6 +138,19 @@ interface SettingsScreenContent {
   memberSince?: string;
 }
 
+/**
+ * Single social-media link rendered as a circular icon button in the
+ * SettingsScreen footer. The icon string is whatever the boilerplate's `Icon`
+ * component understands (Ionicons by default, e.g. `'logo-facebook'`).
+ */
+interface FooterSocialLink {
+  icon: string;
+  url: string;
+  label?: string;
+  /** Override the default icon tint (theme primary). */
+  color?: string;
+}
+
 interface FooterConfig {
   show?: boolean;
   logo?: any; // Image source
@@ -145,6 +158,8 @@ interface FooterConfig {
   description?: string;
   websiteUrl?: string;
   copyrightYear?: number;
+  /** Optional row of social-media icon buttons rendered above the copyright. */
+  socialLinks?: FooterSocialLink[];
 }
 
 export interface SettingsScreenProps {
@@ -1072,10 +1087,22 @@ export function SettingsScreen({
               />
             )}
             {footer.companyName && (
+              <Text style={{
+                fontSize: 15,
+                fontWeight: '700',
+                marginBottom: 4,
+                textAlign: 'center',
+                color: theme.colors.text,
+              }}>
+                {footer.companyName}
+              </Text>
+            )}
+            {(footer.websiteUrl || footer.companyName) && (
               <Text variant="caption" style={{
                 marginBottom: theme.sizes.xs,
-                textAlign: 'right',
+                textAlign: 'center',
                 writingDirection: 'rtl',
+                opacity: 0.8,
               }}>
                 مطور بواسطة {footer.websiteUrl || footer.companyName}
               </Text>
@@ -1084,9 +1111,44 @@ export function SettingsScreen({
               <Text variant="caption" style={{
                 opacity: 0.7,
                 marginBottom: theme.sizes.xs,
+                textAlign: 'center',
               }}>
                 {footer.description}
               </Text>
+            )}
+            {footer.socialLinks && footer.socialLinks.length > 0 && (
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: theme.sizes.sm,
+                marginTop: theme.sizes.sm,
+                marginBottom: theme.sizes.sm,
+              }}>
+                {footer.socialLinks.map((link, idx) => (
+                  <TouchableOpacity
+                    key={`${link.icon}-${idx}`}
+                    accessibilityLabel={link.label || link.icon}
+                    onPress={() => { Linking.openURL(link.url).catch(() => {}); }}
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 19,
+                      backgroundColor: theme.colors.surface,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: theme.colors.border,
+                    }}
+                  >
+                    <Icon
+                      name={link.icon as IconName}
+                      size={18}
+                      color={link.color || theme.colors.primary}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
             )}
             <Text variant="caption" style={{
               opacity: 0.6,
