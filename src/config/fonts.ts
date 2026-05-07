@@ -82,6 +82,31 @@ export const FONT_FAMILIES: Record<string, FontFamily> = {
     },
     rtlSupport: true,
   },
+  inter: {
+    id: 'inter',
+    name: 'Inter',
+    // Apple-inspired (SF Pro–like) open-source family. Same letterforms on
+    // iOS and Android since the .ttf files ship with the boilerplate, so
+    // picking this gives consistent typography across platforms.
+    displayName: 'Apple Style (Inter)',
+    description: 'Apple-style open-source typeface, consistent on iOS + Android',
+    category: 'latin',
+    weights: {
+      extraLight: 'Inter-ExtraLight',
+      light: 'Inter-Light',
+      regular: 'Inter-Regular',
+      medium: 'Inter-Medium',
+      semiBold: 'Inter-SemiBold',
+      bold: 'Inter-Bold',
+      extraBold: 'Inter-ExtraBold',
+      black: 'Inter-Black',
+    },
+    italics: {
+      light: 'Inter-LightItalic',
+      regular: 'Inter-Italic',
+    },
+    rtlSupport: false,
+  },
 };
 
 // Font weight mapping for different font families
