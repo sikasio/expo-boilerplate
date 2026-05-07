@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useRTL } from '../../contexts/RTLContext';
+import { useFont } from '../../contexts/FontContext';
 import { Card, CardProps } from './Card';
 import { Text } from './Text';
 import { Button } from './Button';
@@ -123,6 +124,10 @@ export function HorizontalCardScroll({
 }: HorizontalCardScrollProps) {
   const { theme } = useTheme();
   const { isRTL } = useRTL();
+  // Live font sizes — track the user's chosen base size from FontContext so
+  // every Text in this scroller updates when settings change. theme.fontSizes
+  // is a static snapshot and won't react.
+  const { fontSizes: liveFontSizes } = useFont();
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scrollX, setScrollX] = useState(0);
@@ -342,7 +347,7 @@ export function HorizontalCardScroll({
           }}>
             <Text style={{
               color: '#FFFFFF',
-              fontSize: theme.fontSizes.xs,
+              fontSize: liveFontSizes.xs,
               fontWeight: '600',
             }}>
               {item.badge}
@@ -353,7 +358,7 @@ export function HorizontalCardScroll({
         {/* Product Title */}
         {item.title && (
           <Text style={{
-            fontSize: theme.fontSizes.md,
+            fontSize: liveFontSizes.md,
             fontWeight: '600',
             marginBottom: theme.sizes.xs,
             marginTop: imageNoPadding && item.image ? theme.sizes.sm : 0,
@@ -367,7 +372,7 @@ export function HorizontalCardScroll({
         {/* Description */}
         {item.description && !item.description.startsWith('$') && (
           <Text style={{
-            fontSize: theme.fontSizes.sm,
+            fontSize: liveFontSizes.sm,
             color: theme.colors.textSecondary,
             marginBottom: theme.sizes.xs,
             marginHorizontal: imageNoPadding ? theme.sizes.md : 0,
@@ -385,7 +390,7 @@ export function HorizontalCardScroll({
             marginHorizontal: imageNoPadding ? theme.sizes.md : 0
           }}>
             <Text style={{
-              fontSize: theme.fontSizes.md,
+              fontSize: liveFontSizes.md,
               fontWeight: '700',
               color: theme.colors.primary,
             }}>
@@ -393,7 +398,7 @@ export function HorizontalCardScroll({
             </Text>
             {item.description && item.description.startsWith('$') && (
               <Text style={{
-                fontSize: theme.fontSizes.sm,
+                fontSize: liveFontSizes.sm,
                 textDecorationLine: 'line-through',
                 color: theme.colors.textSecondary,
                 ...margin.marginStart(theme.sizes.xs),
@@ -422,7 +427,7 @@ export function HorizontalCardScroll({
               />
             ))}
             <Text style={{
-              fontSize: theme.fontSizes.xs,
+              fontSize: liveFontSizes.xs,
               color: theme.colors.textSecondary,
               ...margin.marginStart(theme.sizes.xs),
             }}>
@@ -453,7 +458,7 @@ export function HorizontalCardScroll({
                 }}
               >
                 <Text style={{
-                  fontSize: theme.fontSizes.xs,
+                  fontSize: liveFontSizes.xs,
                   color: theme.colors.textSecondary,
                 }}>
                   {tag}
@@ -584,7 +589,7 @@ export function HorizontalCardScroll({
           <View style={{ flex: 1 }}>
             {title && (
               <Text variant="subtitle" style={{
-                fontSize: theme.fontSizes.lg,
+                fontSize: liveFontSizes.lg,
                 marginBottom: subtitle ? theme.sizes.xs : 0,
               }}>
                 {title}
@@ -698,7 +703,7 @@ export function HorizontalCardScroll({
           }}>
             <ActivityIndicator size="small" color={theme.colors.primary} />
             <Text style={{
-              fontSize: theme.fontSizes.xs,
+              fontSize: liveFontSizes.xs,
               color: theme.colors.textSecondary,
               marginTop: theme.sizes.xs,
             }}>
