@@ -1,6 +1,6 @@
 {
   "name": "@sikasio/expo-boilerplate",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Sikasio Expo/React Native boilerplate — UI, contexts, services, hooks, utils.",
   "license": "Apache-2.0",
   "author": "Sikasio",

@@ -176,6 +176,22 @@ export const DEFAULT_APP_FONT_CONFIGS: Record<string, AppFontConfig> = {
   },
 };
 
+/**
+ * Register a per-app default font config. Call this during bootstrap (before
+ * FontProvider mounts) so first-launch users land on the right typeface
+ * without having to open settings. Mirrors the `registerAppDefaults` shape
+ * for theme/RTL.
+ *
+ * Usage:
+ *   registerAppFontDefaults('yarwy', { fontFamily: 'zain', baseSize: 16, lineHeightMultiplier: 1.6 });
+ */
+export function registerAppFontDefaults(
+  appName: string,
+  config: Omit<AppFontConfig, 'appId'>,
+): void {
+  DEFAULT_APP_FONT_CONFIGS[appName] = { appId: appName, ...config };
+}
+
 // Utility to get font style object
 export const getFontStyle = (
   fontFamily: FontFamily,

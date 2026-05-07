@@ -5,3 +5,4 @@ export * from './navigationConfig';
 export * from './appDefaults';
 export * from './theme';
 export * from './globalFonts';
+export * from './fonts';
